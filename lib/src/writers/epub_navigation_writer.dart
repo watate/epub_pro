@@ -1,5 +1,4 @@
 import 'package:epubx/src/schema/navigation/epub_navigation.dart';
-import 'package:epubx/src/schema/navigation/epub_navigation_doc_author.dart';
 import 'package:epubx/src/schema/navigation/epub_navigation_doc_title.dart';
 import 'package:epubx/src/schema/navigation/epub_navigation_head.dart';
 import 'package:epubx/src/schema/navigation/epub_navigation_map.dart';
@@ -27,7 +26,8 @@ class EpubNavigationWriter {
     return builder.buildDocument().toXmlString(pretty: false);
   }
 
-  static void writeNavigationDocTitle(XmlBuilder builder, EpubNavigationDocTitle title) {
+  static void writeNavigationDocTitle(
+      XmlBuilder builder, EpubNavigationDocTitle title) {
     builder.element('docTitle', nest: () {
       title.Titles!.forEach((element) {
         builder.text(element);
@@ -36,24 +36,20 @@ class EpubNavigationWriter {
   }
 
   static void writeNavigationHead(XmlBuilder builder, EpubNavigationHead head) {
-    builder.element('head',
-        nest: () {
-          head.Metadata!.forEach((item) => builder.element('meta',
-              attributes: {
-                'content': item.Content!,
-                'name': item.Name!
-              }));
-        });
+    builder.element('head', nest: () {
+      head.Metadata!.forEach((item) => builder.element('meta',
+          attributes: {'content': item.Content!, 'name': item.Name!}));
+    });
   }
 
   static void writeNavigationMap(XmlBuilder builder, EpubNavigationMap map) {
-    builder.element('navMap',
-        nest: () {
-          map.Points!.forEach((item) => writeNavigationPoint(builder, item));
-        });
+    builder.element('navMap', nest: () {
+      map.Points!.forEach((item) => writeNavigationPoint(builder, item));
+    });
   }
 
-  static void writeNavigationPoint(XmlBuilder builder, EpubNavigationPoint point) {
+  static void writeNavigationPoint(
+      XmlBuilder builder, EpubNavigationPoint point) {
     builder.element('navPoint', attributes: {
       'id': point.Id!,
       'playOrder': point.PlayOrder!,
@@ -65,8 +61,7 @@ class EpubNavigationWriter {
           });
         });
       });
-      builder.element('content', attributes: { 'src': point.Content!.Source! });
+      builder.element('content', attributes: {'src': point.Content!.Source!});
     });
   }
-
 }
