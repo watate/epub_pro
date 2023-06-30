@@ -246,7 +246,7 @@ class NavigationReader {
           break;
         case 'href':
           if (_tocFileEntryPath!.length < 2 ||
-              attributeValue.contains(_tocFileEntryPath!)) {
+              attributeValue.startsWith(_tocFileEntryPath!)) {
             result.Source = attributeValue;
           } else {
             result.Source = _tocFileEntryPath! + attributeValue;
