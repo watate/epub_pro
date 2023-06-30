@@ -10,6 +10,7 @@ enum EpubContentType {
   IMAGE_JPEG,
   IMAGE_PNG,
   IMAGE_SVG,
+  IMAGE_BMP,
   FONT_TRUETYPE,
   FONT_OPENTYPE,
   OTHER
