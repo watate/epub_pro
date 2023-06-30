@@ -5,6 +5,7 @@ import 'dart:convert' as convert;
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:epubx/src/schema/opf/epub_version.dart';
 import 'package:xml/xml.dart' as xml;
+import 'package:path/path.dart' as path;
 
 import '../schema/navigation/epub_metadata.dart';
 import '../schema/navigation/epub_navigation.dart';
@@ -249,7 +250,7 @@ class NavigationReader {
               attributeValue.startsWith(_tocFileEntryPath!)) {
             result.Source = attributeValue;
           } else {
-            result.Source = _tocFileEntryPath! + attributeValue;
+            result.Source = path.normalize(_tocFileEntryPath! + attributeValue);
           }
 
           break;
