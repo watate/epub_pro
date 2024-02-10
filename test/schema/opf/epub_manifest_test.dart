@@ -5,9 +5,9 @@ import 'package:epubx/src/schema/opf/epub_manifest_item.dart';
 import 'package:test/test.dart';
 
 main() async {
-  var reference = new EpubManifest();
+  var reference = EpubManifest();
   reference.Items = [
-    new EpubManifestItem()
+    EpubManifestItem()
       ..Fallback = "Some Fallback"
       ..FallbackStyle = "A Very Stylish Fallback"
       ..Href = "Some HREF"
@@ -17,13 +17,12 @@ main() async {
       ..RequiredNamespace = ".NET Namespace"
   ];
 
-  EpubManifest testManifest;
+  late EpubManifest testManifest;
+
   setUp(() async {
-    testManifest = new EpubManifest()..Items = List.from(reference.Items);
+    testManifest = EpubManifest()..Items = List.from(reference.Items ?? []);
   });
-  tearDown(() async {
-    testManifest = null;
-  });
+
   group("EpubManifest", () {
     group(".equals", () {
       test("is true for equivalent objects", () async {
@@ -31,7 +30,7 @@ main() async {
       });
 
       test("is false when Items changes", () async {
-        testManifest.Items.add(new EpubManifestItem()
+        testManifest.Items?.add(EpubManifestItem()
           ..Fallback = "Some Different Fallback"
           ..FallbackStyle = "A less than Stylish Fallback"
           ..Href = "Some Different HREF"
@@ -50,7 +49,7 @@ main() async {
       });
 
       test("is false when Items changes", () async {
-        testManifest.Items.add(new EpubManifestItem()
+        testManifest.Items?.add(EpubManifestItem()
           ..Fallback = "Some Different Fallback"
           ..FallbackStyle = "A less than Stylish Fallback"
           ..Href = "Some Different HREF"

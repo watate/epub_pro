@@ -1,27 +1,27 @@
 library epubreadertest;
 
-import 'package:epubx/epub.dart';
+import 'package:epubx/epubx.dart';
 import 'package:test/test.dart';
 
 main() async {
-  var reference = new EpubTextContentFile();
+  var reference = EpubTextContentFile();
   reference
     ..Content = "Hello"
     ..ContentMimeType = "application/test"
     ..ContentType = EpubContentType.OTHER
     ..FileName = "orthrosFile";
-  EpubTextContentFile testFile;
+
+  late EpubTextContentFile testFile;
+
   setUp(() async {
-    testFile = new EpubTextContentFile();
+    testFile = EpubTextContentFile();
     testFile
       ..Content = "Hello"
       ..ContentMimeType = "application/test"
       ..ContentType = EpubContentType.OTHER
       ..FileName = "orthrosFile";
   });
-  tearDown(() async {
-    testFile = null;
-  });
+
   group("EpubTextContentFile", () {
     group(".equals", () {
       test("is true for equivalent objects", () async {

@@ -10,24 +10,22 @@ import '../../random_data_generator.dart';
 
 main() async {
   final int length = 10;
-  final RandomString randomString = new RandomString(new Random(123788));
+  final RandomString randomString = RandomString(Random(123788));
 
-  var reference = new EpubSpine()
+  var reference = EpubSpine()
     ..Items = [
-      new EpubSpineItemRef()
+      EpubSpineItemRef()
         ..IdRef = randomString.randomAlpha(length)
         ..IdRef = randomString.randomAlpha(length)
     ]
     ..TableOfContents = randomString.randomAlpha(length);
 
-  EpubSpine testSpine;
+  late EpubSpine testSpine;
+
   setUp(() async {
-    testSpine = new EpubSpine()
-      ..Items = List.from(reference.Items)
+    testSpine = EpubSpine()
+      ..Items = List.from(reference.Items ?? [])
       ..TableOfContents = reference.TableOfContents;
-  });
-  tearDown(() async {
-    testSpine = null;
   });
 
   group("EpubSpine", () {
@@ -37,7 +35,7 @@ main() async {
       });
       test("is false when Items changes", () async {
         testSpine.Items = [
-          new EpubSpineItemRef()
+          EpubSpineItemRef()
             ..IdRef = randomString.randomAlpha(length)
             ..IsLinear = false
         ];
@@ -55,7 +53,7 @@ main() async {
       });
       test("is false when IsLinear changes", () async {
         testSpine.Items = [
-          new EpubSpineItemRef()
+          EpubSpineItemRef()
             ..IdRef = randomString.randomAlpha(length)
             ..IsLinear = false
         ];

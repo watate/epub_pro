@@ -1,35 +1,31 @@
 library epubreadertest;
 
 import 'package:archive/archive.dart';
-import 'package:epubx/epub.dart';
+import 'package:epubx/epubx.dart';
 import 'package:epubx/src/ref_entities/epub_byte_content_file_ref.dart';
 import 'package:test/test.dart';
 
 main() async {
-  Archive arch = new Archive();
-  EpubBookRef ref = new EpubBookRef(arch);
+  Archive arch = Archive();
+  EpubBookRef ref = EpubBookRef(arch);
 
-  var reference = new EpubByteContentFileRef(ref);
+  var reference = EpubByteContentFileRef(ref);
   reference
     ..ContentMimeType = "application/test"
     ..ContentType = EpubContentType.OTHER
     ..FileName = "orthrosFile";
 
-  EpubByteContentFileRef testFileRef;
+  late EpubByteContentFileRef testFileRef;
 
   setUp(() async {
-    Archive arch2 = new Archive();
-    EpubBookRef ref2 = new EpubBookRef(arch2);
+    Archive arch2 = Archive();
+    EpubBookRef ref2 = EpubBookRef(arch2);
 
-    testFileRef = new EpubByteContentFileRef(ref2);
+    testFileRef = EpubByteContentFileRef(ref2);
     testFileRef
       ..ContentMimeType = "application/test"
       ..ContentType = EpubContentType.OTHER
       ..FileName = "orthrosFile";
-  });
-
-  tearDown(() async {
-    testFileRef = null;
   });
 
   group("EpubByteContentFileRef", () {

@@ -8,22 +8,20 @@ import 'package:test/test.dart';
 import '../../random_data_generator.dart';
 
 main() async {
-  final RandomDataGenerator generator =
-      new RandomDataGenerator(new Random(123778), 10);
+  final RandomDataGenerator generator = RandomDataGenerator(Random(123778), 10);
 
   var reference = generator.randomEpubGuideReference();
 
-  EpubGuideReference testGuideReference;
+  late EpubGuideReference testGuideReference;
+
   setUp(() async {
-    testGuideReference = new EpubGuideReference();
+    testGuideReference = EpubGuideReference();
     testGuideReference
       ..Href = reference.Href
       ..Title = reference.Title
       ..Type = reference.Type;
   });
-  tearDown(() async {
-    testGuideReference = null;
-  });
+
   group("EpubGuideReference", () {
     group(".equals", () {
       test("is true for equivalent objects", () async {

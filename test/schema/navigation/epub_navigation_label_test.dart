@@ -8,18 +8,15 @@ import 'package:test/test.dart';
 import '../../random_data_generator.dart';
 
 main() async {
-  final RandomDataGenerator generator =
-      new RandomDataGenerator(new Random(123778), 10);
+  final RandomDataGenerator generator = RandomDataGenerator(Random(123778), 10);
 
   final EpubNavigationLabel reference = generator.randomEpubNavigationLabel();
 
-  EpubNavigationLabel testNavigationLabel;
+  late EpubNavigationLabel testNavigationLabel;
   setUp(() async {
-    testNavigationLabel = new EpubNavigationLabel()..Text = reference.Text;
+    testNavigationLabel = EpubNavigationLabel()..Text = reference.Text;
   });
-  tearDown(() async {
-    testNavigationLabel = null;
-  });
+
   group("EpubNavigationLabel", () {
     group(".equals", () {
       test("is true for equivalent objects", () async {

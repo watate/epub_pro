@@ -4,7 +4,7 @@ import 'package:epubx/src/schema/opf/epub_metadata_meta.dart';
 import 'package:test/test.dart';
 
 main() async {
-  var reference = new EpubMetadataMeta()
+  var reference = EpubMetadataMeta()
     ..Content = "some content"
     ..Name = "Orthros"
     ..Property = "Prop"
@@ -12,18 +12,16 @@ main() async {
     ..Id = "Unique"
     ..Scheme = "A plot";
 
-  EpubMetadataMeta testMetadataMeta;
+  late EpubMetadataMeta testMetadataMeta;
+
   setUp(() async {
-    testMetadataMeta = new EpubMetadataMeta()
+    testMetadataMeta = EpubMetadataMeta()
       ..Content = reference.Content
       ..Name = reference.Name
       ..Property = reference.Property
       ..Refines = reference.Refines
       ..Id = reference.Id
       ..Scheme = reference.Scheme;
-  });
-  tearDown(() async {
-    testMetadataMeta = null;
   });
 
   group("EpubMetadataMeta", () {

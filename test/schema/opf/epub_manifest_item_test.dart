@@ -4,7 +4,7 @@ import 'package:epubx/src/schema/opf/epub_manifest_item.dart';
 import 'package:test/test.dart';
 
 main() async {
-  var reference = new EpubManifestItem()
+  var reference = EpubManifestItem()
     ..Fallback = "Some Fallback"
     ..FallbackStyle = "A Very Stylish Fallback"
     ..Href = "Some HREF"
@@ -13,9 +13,10 @@ main() async {
     ..RequiredModules = "nodejs require()"
     ..RequiredNamespace = ".NET Namespace";
 
-  EpubManifestItem testManifestItem;
+  late EpubManifestItem testManifestItem;
+
   setUp(() async {
-    testManifestItem = new EpubManifestItem()
+    testManifestItem = EpubManifestItem()
       ..Fallback = reference.Fallback
       ..FallbackStyle = reference.FallbackStyle
       ..Href = reference.Href
@@ -23,9 +24,6 @@ main() async {
       ..MediaType = reference.MediaType
       ..RequiredModules = reference.RequiredModules
       ..RequiredNamespace = reference.RequiredNamespace;
-  });
-  tearDown(() async {
-    testManifestItem = null;
   });
 
   group("EpubManifestItem", () {

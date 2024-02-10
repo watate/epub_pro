@@ -4,18 +4,16 @@ import 'package:epubx/src/schema/opf/epub_metadata_date.dart';
 import 'package:test/test.dart';
 
 main() async {
-  var reference = new EpubMetadataDate()
+  var reference = EpubMetadataDate()
     ..Date = "a date"
     ..Event = "Some important event";
 
-  EpubMetadataDate testMetadataDate;
+  late EpubMetadataDate testMetadataDate;
+
   setUp(() async {
-    testMetadataDate = new EpubMetadataDate()
+    testMetadataDate = EpubMetadataDate()
       ..Date = reference.Date
       ..Event = reference.Event;
-  });
-  tearDown(() async {
-    testMetadataDate = null;
   });
 
   group("EpubMetadataIdentifier", () {

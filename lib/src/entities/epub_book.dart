@@ -7,7 +7,7 @@ import 'epub_content.dart';
 import 'epub_schema.dart';
 
 class EpubBook {
-  String? Title;
+  String? title;
   String? Author;
   List<String?>? AuthorList;
   EpubSchema? Schema;
@@ -18,7 +18,7 @@ class EpubBook {
   @override
   int get hashCode {
     var objects = [
-      Title.hashCode,
+      title.hashCode,
       Author.hashCode,
       Schema.hashCode,
       Content.hashCode,
@@ -35,7 +35,7 @@ class EpubBook {
       return false;
     }
 
-    return Title == other.Title &&
+    return title == other.title &&
         Author == other.Author &&
         collections.listsEqual(AuthorList, other.AuthorList) &&
         Schema == other.Schema &&

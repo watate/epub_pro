@@ -1,10 +1,10 @@
 library epubreadertest;
 
-import 'package:epubx/epub.dart';
+import 'package:epubx/epubx.dart';
 import 'package:test/test.dart';
 
 main() async {
-  var reference = new EpubChapter();
+  var reference = EpubChapter();
   reference
     ..Anchor = "anchor"
     ..ContentFileName = "orthros"
@@ -12,9 +12,9 @@ main() async {
     ..SubChapters = []
     ..Title = "A New Look at Chapters";
 
-  EpubChapter testChapter;
+  late EpubChapter testChapter;
   setUp(() async {
-    testChapter = new EpubChapter();
+    testChapter = EpubChapter();
     testChapter
       ..Anchor = "anchor"
       ..ContentFileName = "orthros"
@@ -22,9 +22,7 @@ main() async {
       ..SubChapters = []
       ..Title = "A New Look at Chapters";
   });
-  tearDown(() async {
-    testChapter = null;
-  });
+
   group("EpubChapter", () {
     group(".equals", () {
       test("is true for equivalent objects", () async {
@@ -47,7 +45,7 @@ main() async {
       });
 
       test("is false when SubChapters changes", () async {
-        var chapter = new EpubChapter();
+        var chapter = EpubChapter();
         chapter
           ..Title = "A Brave new Epub"
           ..ContentFileName = "orthros.txt";
@@ -86,7 +84,7 @@ main() async {
       });
 
       test("is false when SubChapters changes", () async {
-        var chapter = new EpubChapter();
+        var chapter = EpubChapter();
         chapter
           ..Title = "A Brave new Epub"
           ..ContentFileName = "orthros.txt";

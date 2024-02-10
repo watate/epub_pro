@@ -1,33 +1,31 @@
 library epubreadertest;
 
 import 'package:archive/archive.dart';
-import 'package:epubx/epub.dart';
-import 'package:epubx/src/entities/epub_schema.dart';
+import 'package:epubx/epubx.dart';
 import 'package:epubx/src/ref_entities/epub_content_ref.dart';
 import 'package:epubx/src/ref_entities/epub_text_content_file_ref.dart';
 import 'package:test/test.dart';
 
 main() async {
-  Archive arch = new Archive();
-  var reference = new EpubBookRef(arch);
+  Archive arch = Archive();
+  var reference = EpubBookRef(arch);
   reference
     ..Author = "orthros"
     ..AuthorList = ["orthros"]
-    ..Schema = new EpubSchema()
+    ..Schema = EpubSchema()
     ..Title = "A Dissertation on Epubs";
 
-  EpubBookRef testBookRef;
+  late EpubBookRef testBookRef;
+
   setUp(() async {
-    testBookRef = new EpubBookRef(arch);
+    testBookRef = EpubBookRef(arch);
     testBookRef
       ..Author = "orthros"
       ..AuthorList = ["orthros"]
-      ..Schema = new EpubSchema()
+      ..Schema = EpubSchema()
       ..Title = "A Dissertation on Epubs";
   });
-  tearDown(() async {
-    testBookRef = null;
-  });
+
   group("EpubBookRef", () {
     group(".equals", () {
       test("is true for equivalent objects", () async {
@@ -35,14 +33,14 @@ main() async {
       });
 
       test("is false when Content changes", () async {
-        var file = new EpubTextContentFileRef(testBookRef);
+        var file = EpubTextContentFileRef(testBookRef);
         file
           ..ContentMimeType = "application/txt"
           ..ContentType = EpubContentType.OTHER
           ..FileName = "orthros.txt";
 
-        EpubContentRef content = new EpubContentRef();
-        content.AllFiles["hello"] = file;
+        EpubContentRef content = EpubContentRef();
+        content.AllFiles?["hello"] = file;
 
         testBookRef.Content = content;
 
@@ -60,7 +58,7 @@ main() async {
       });
 
       test("is false when Schema changes", () async {
-        var schema = new EpubSchema();
+        var schema = EpubSchema();
         schema.ContentDirectoryPath = "some/random/path";
         testBookRef.Schema = schema;
         expect(testBookRef, isNot(reference));
@@ -78,14 +76,14 @@ main() async {
       });
 
       test("is false when Content changes", () async {
-        var file = new EpubTextContentFileRef(testBookRef);
+        var file = EpubTextContentFileRef(testBookRef);
         file
           ..ContentMimeType = "application/txt"
           ..ContentType = EpubContentType.OTHER
           ..FileName = "orthros.txt";
 
-        EpubContentRef content = new EpubContentRef();
-        content.AllFiles["hello"] = file;
+        EpubContentRef content = EpubContentRef();
+        content.AllFiles?["hello"] = file;
 
         testBookRef.Content = content;
 
@@ -102,7 +100,7 @@ main() async {
         expect(testBookRef.hashCode, isNot(reference.hashCode));
       });
       test("is false when Schema changes", () async {
-        var schema = new EpubSchema();
+        var schema = EpubSchema();
         schema.ContentDirectoryPath = "some/random/path";
         testBookRef.Schema = schema;
         expect(testBookRef.hashCode, isNot(reference.hashCode));

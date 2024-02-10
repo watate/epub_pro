@@ -8,18 +8,16 @@ import 'package:test/test.dart';
 import '../../random_data_generator.dart';
 
 main() async {
-  final generator = new RandomDataGenerator(new Random(7898), 10);
+  final generator = RandomDataGenerator(Random(7898), 10);
   final EpubNavigationHeadMeta reference = generator.randomNavigationHeadMeta();
 
-  EpubNavigationHeadMeta testNavigationDocTitle;
+  late EpubNavigationHeadMeta testNavigationDocTitle;
+
   setUp(() async {
-    testNavigationDocTitle = new EpubNavigationHeadMeta()
+    testNavigationDocTitle = EpubNavigationHeadMeta()
       ..Content = reference.Content
       ..Name = reference.Name
       ..Scheme = reference.Scheme;
-  });
-  tearDown(() async {
-    testNavigationDocTitle = null;
   });
 
   group("EpubNavigationHeadMeta", () {

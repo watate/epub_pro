@@ -1,33 +1,26 @@
 library epubreadertest;
 
-import 'package:epubx/epub.dart';
-import 'package:epubx/src/entities/epub_schema.dart';
-import 'package:epubx/src/schema/navigation/epub_navigation_doc_author.dart';
-import 'package:epubx/src/schema/navigation/epub_navigation_doc_title.dart';
-import 'package:epubx/src/schema/opf/epub_guide.dart';
-import 'package:epubx/src/schema/opf/epub_version.dart';
+import 'package:epubx/epubx.dart';
 import 'package:test/test.dart';
 
 main() async {
-  var reference = new EpubSchema();
+  var reference = EpubSchema();
   reference
-    ..Package = new EpubPackage()
-    ..Navigation = new EpubNavigation()
+    ..Package = EpubPackage()
+    ..Navigation = EpubNavigation()
     ..ContentDirectoryPath = "some/random/path";
-  reference.Package.Version = EpubVersion.Epub2;
+  reference.Package?.Version = EpubVersion.Epub2;
 
-  EpubSchema testSchema;
+  late EpubSchema testSchema;
   setUp(() async {
-    testSchema = new EpubSchema();
+    testSchema = EpubSchema();
     testSchema
-      ..Package = new EpubPackage()
-      ..Navigation = new EpubNavigation()
+      ..Package = EpubPackage()
+      ..Navigation = EpubNavigation()
       ..ContentDirectoryPath = "some/random/path";
-    testSchema.Package.Version = EpubVersion.Epub2;
+    testSchema.Package?.Version = EpubVersion.Epub2;
   });
-  tearDown(() async {
-    testSchema = null;
-  });
+
   group("EpubSchema", () {
     group(".equals", () {
       test("is true for equivalent objects", () async {
@@ -35,8 +28,8 @@ main() async {
       });
 
       test("is false when Package changes", () async {
-        var package = new EpubPackage()
-          ..Guide = new EpubGuide()
+        var package = EpubPackage()
+          ..Guide = EpubGuide()
           ..Version = EpubVersion.Epub3;
 
         testSchema.Package = package;
@@ -44,9 +37,9 @@ main() async {
       });
 
       test("is false when Navigation changes", () async {
-        testSchema.Navigation = new EpubNavigation()
-          ..DocTitle = new EpubNavigationDocTitle()
-          ..DocAuthors = [new EpubNavigationDocAuthor()];
+        testSchema.Navigation = EpubNavigation()
+          ..DocTitle = EpubNavigationDocTitle()
+          ..DocAuthors = [EpubNavigationDocAuthor()];
 
         expect(testSchema, isNot(reference));
       });
@@ -63,8 +56,8 @@ main() async {
       });
 
       test("is false when Package changes", () async {
-        var package = new EpubPackage()
-          ..Guide = new EpubGuide()
+        var package = EpubPackage()
+          ..Guide = EpubGuide()
           ..Version = EpubVersion.Epub3;
 
         testSchema.Package = package;
@@ -72,9 +65,9 @@ main() async {
       });
 
       test("is false when Navigation changes", () async {
-        testSchema.Navigation = new EpubNavigation()
-          ..DocTitle = new EpubNavigationDocTitle()
-          ..DocAuthors = [new EpubNavigationDocAuthor()];
+        testSchema.Navigation = EpubNavigation()
+          ..DocTitle = EpubNavigationDocTitle()
+          ..DocAuthors = [EpubNavigationDocAuthor()];
 
         expect(testSchema.hashCode, isNot(reference.hashCode));
       });

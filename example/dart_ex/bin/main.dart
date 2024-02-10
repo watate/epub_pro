@@ -16,7 +16,7 @@ main(List<String> args) async {
 // COMMON PROPERTIES
 
 // Book's title
-  String? title = epubBook.Title;
+  String? title = epubBook.title;
 
 // Book's authors (comma separated list)
   String? author = epubBook.Author;

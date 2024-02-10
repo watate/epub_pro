@@ -4,20 +4,18 @@ import 'package:epubx/src/schema/opf/epub_metadata_contributor.dart';
 import 'package:test/test.dart';
 
 main() async {
-  var reference = new EpubMetadataContributor()
+  var reference = EpubMetadataContributor()
     ..Contributor = "orthros"
     ..FileAs = "Large"
     ..Role = "Creator";
 
-  EpubMetadataContributor testMetadataContributor;
+  late EpubMetadataContributor testMetadataContributor;
+
   setUp(() async {
-    testMetadataContributor = new EpubMetadataContributor()
+    testMetadataContributor = EpubMetadataContributor()
       ..Contributor = reference.Contributor
       ..FileAs = reference.FileAs
       ..Role = reference.Role;
-  });
-  tearDown(() async {
-    testMetadataContributor = null;
   });
 
   group("EpubMetadataContributor", () {

@@ -14,33 +14,32 @@ import '../../random_data_generator.dart';
 
 main() async {
   final int length = 10;
-  final RandomString randomString = new RandomString(new Random(123788));
+  final RandomString randomString = RandomString(Random(123788));
   final RandomDataGenerator generator =
-      new RandomDataGenerator(new Random(123778), length);
+      RandomDataGenerator(Random(123778), length);
 
   var reference = generator.randomEpubMetadata();
-  EpubMetadata testMetadata;
+
+  late EpubMetadata testMetadata;
+
   setUp(() async {
-    testMetadata = new EpubMetadata()
-      ..Contributors = List.from(reference.Contributors)
-      ..Coverages = List.from(reference.Coverages)
-      ..Creators = List.from(reference.Creators)
-      ..Dates = List.from(reference.Dates)
+    testMetadata = EpubMetadata()
+      ..Contributors = List.from(reference.Contributors ?? [])
+      ..Coverages = List.from(reference.Coverages ?? [])
+      ..Creators = List.from(reference.Creators ?? [])
+      ..Dates = List.from(reference.Dates ?? [])
       ..Description = reference.Description
-      ..Formats = List.from(reference.Formats)
-      ..Identifiers = List.from(reference.Identifiers)
-      ..Languages = List.from(reference.Languages)
-      ..MetaItems = List.from(reference.MetaItems)
-      ..Publishers = List.from(reference.Publishers)
-      ..Relations = List.from(reference.Relations)
-      ..Rights = List.from(reference.Rights)
-      ..Sources = List.from(reference.Sources)
-      ..Subjects = List.from(reference.Subjects)
-      ..Titles = List.from(reference.Titles)
-      ..Types = List.from(reference.Types);
-  });
-  tearDown(() async {
-    testMetadata = null;
+      ..Formats = List.from(reference.Formats ?? [])
+      ..Identifiers = List.from(reference.Identifiers ?? [])
+      ..Languages = List.from(reference.Languages ?? [])
+      ..MetaItems = List.from(reference.MetaItems ?? [])
+      ..Publishers = List.from(reference.Publishers ?? [])
+      ..Relations = List.from(reference.Relations ?? [])
+      ..Rights = List.from(reference.Rights ?? [])
+      ..Sources = List.from(reference.Sources ?? [])
+      ..Subjects = List.from(reference.Subjects ?? [])
+      ..Titles = List.from(reference.Titles ?? [])
+      ..Types = List.from(reference.Types ?? []);
   });
 
   group("EpubMetadata", () {
@@ -49,7 +48,7 @@ main() async {
         expect(testMetadata, equals(reference));
       });
       test("is false when Contributors changes", () async {
-        testMetadata.Contributors = [new EpubMetadataContributor()];
+        testMetadata.Contributors = [EpubMetadataContributor()];
         expect(testMetadata, isNot(reference));
       });
       test("is false when Coverages changes", () async {
@@ -57,11 +56,11 @@ main() async {
         expect(testMetadata, isNot(reference));
       });
       test("is false when Creators changes", () async {
-        testMetadata.Creators = [new EpubMetadataCreator()];
+        testMetadata.Creators = [EpubMetadataCreator()];
         expect(testMetadata, isNot(reference));
       });
       test("is false when Dates changes", () async {
-        testMetadata.Dates = [new EpubMetadataDate()];
+        testMetadata.Dates = [EpubMetadataDate()];
         expect(testMetadata, isNot(reference));
       });
       test("is false when Description changes", () async {
@@ -73,7 +72,7 @@ main() async {
         expect(testMetadata, isNot(reference));
       });
       test("is false when Identifiers changes", () async {
-        testMetadata.Identifiers = [new EpubMetadataIdentifier()];
+        testMetadata.Identifiers = [EpubMetadataIdentifier()];
         expect(testMetadata, isNot(reference));
       });
       test("is false when Languages changes", () async {
@@ -81,7 +80,7 @@ main() async {
         expect(testMetadata, isNot(reference));
       });
       test("is false when MetaItems changes", () async {
-        testMetadata.MetaItems = [new EpubMetadataMeta()];
+        testMetadata.MetaItems = [EpubMetadataMeta()];
         expect(testMetadata, isNot(reference));
       });
       test("is false when Publishers changes", () async {
@@ -119,7 +118,7 @@ main() async {
         expect(testMetadata.hashCode, equals(reference.hashCode));
       });
       test("is false when Contributors changes", () async {
-        testMetadata.Contributors = [new EpubMetadataContributor()];
+        testMetadata.Contributors = [EpubMetadataContributor()];
         expect(testMetadata.hashCode, isNot(reference.hashCode));
       });
       test("is false when Coverages changes", () async {
@@ -127,11 +126,11 @@ main() async {
         expect(testMetadata.hashCode, isNot(reference.hashCode));
       });
       test("is false when Creators changes", () async {
-        testMetadata.Creators = [new EpubMetadataCreator()];
+        testMetadata.Creators = [EpubMetadataCreator()];
         expect(testMetadata.hashCode, isNot(reference.hashCode));
       });
       test("is false when Dates changes", () async {
-        testMetadata.Dates = [new EpubMetadataDate()];
+        testMetadata.Dates = [EpubMetadataDate()];
         expect(testMetadata.hashCode, isNot(reference.hashCode));
       });
       test("is false when Description changes", () async {
@@ -143,7 +142,7 @@ main() async {
         expect(testMetadata.hashCode, isNot(reference.hashCode));
       });
       test("is false when Identifiers changes", () async {
-        testMetadata.Identifiers = [new EpubMetadataIdentifier()];
+        testMetadata.Identifiers = [EpubMetadataIdentifier()];
         expect(testMetadata.hashCode, isNot(reference.hashCode));
       });
       test("is false when Languages changes", () async {
@@ -151,7 +150,7 @@ main() async {
         expect(testMetadata.hashCode, isNot(reference.hashCode));
       });
       test("is false when MetaItems changes", () async {
-        testMetadata.MetaItems = [new EpubMetadataMeta()];
+        testMetadata.MetaItems = [EpubMetadataMeta()];
         expect(testMetadata.hashCode, isNot(reference.hashCode));
       });
       test("is false when Publishers changes", () async {
