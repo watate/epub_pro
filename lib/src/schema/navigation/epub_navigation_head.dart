@@ -4,15 +4,15 @@ import 'package:quiver/core.dart';
 import 'epub_navigation_head_meta.dart';
 
 class EpubNavigationHead {
-  List<EpubNavigationHeadMeta>? Metadata;
+  List<EpubNavigationHeadMeta>? metadata;
 
   EpubNavigationHead() {
-    Metadata = <EpubNavigationHeadMeta>[];
+    metadata = <EpubNavigationHeadMeta>[];
   }
 
   @override
   int get hashCode {
-    var objects = [...Metadata!.map((meta) => meta.hashCode)];
+    var objects = [...metadata!.map((meta) => meta.hashCode)];
     return hashObjects(objects);
   }
 
@@ -23,6 +23,6 @@ class EpubNavigationHead {
       return false;
     }
 
-    return collections.listsEqual(Metadata, otherAs.Metadata);
+    return collections.listsEqual(metadata, otherAs.metadata);
   }
 }

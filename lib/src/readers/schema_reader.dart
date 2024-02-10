@@ -14,14 +14,14 @@ class SchemaReader {
 
     var rootFilePath = (await RootFilePathReader.getRootFilePath(epubArchive))!;
     var contentDirectoryPath = ZipPathUtils.getDirectoryPath(rootFilePath);
-    result.ContentDirectoryPath = contentDirectoryPath;
+    result.contentDirectoryPath = contentDirectoryPath;
 
     var package = await PackageReader.readPackage(epubArchive, rootFilePath);
-    result.Package = package;
+    result.package = package;
 
     var navigation = await NavigationReader.readNavigation(
         epubArchive, contentDirectoryPath, package);
-    result.Navigation = navigation;
+    result.navigation = navigation;
 
     return result;
   }

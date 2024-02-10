@@ -9,22 +9,22 @@ import 'epub_navigation_map.dart';
 import 'epub_navigation_page_list.dart';
 
 class EpubNavigation {
-  EpubNavigationHead? Head;
-  EpubNavigationDocTitle? DocTitle;
-  List<EpubNavigationDocAuthor>? DocAuthors;
-  EpubNavigationMap? NavMap;
-  EpubNavigationPageList? PageList;
-  List<EpubNavigationList>? NavLists;
+  EpubNavigationHead? head;
+  EpubNavigationDocTitle? docTitle;
+  List<EpubNavigationDocAuthor>? docAuthors;
+  EpubNavigationMap? navMap;
+  EpubNavigationPageList? pageList;
+  List<EpubNavigationList>? navLists;
 
   @override
   int get hashCode {
     var objects = [
-      Head.hashCode,
-      DocTitle.hashCode,
-      NavMap.hashCode,
-      PageList.hashCode,
-      ...DocAuthors?.map((author) => author.hashCode) ?? [0],
-      ...NavLists?.map((navList) => navList.hashCode) ?? [0]
+      head.hashCode,
+      docTitle.hashCode,
+      navMap.hashCode,
+      pageList.hashCode,
+      ...docAuthors?.map((author) => author.hashCode) ?? [0],
+      ...navLists?.map((navList) => navList.hashCode) ?? [0]
     ];
     return hashObjects(objects);
   }
@@ -36,16 +36,16 @@ class EpubNavigation {
       return false;
     }
 
-    if (!collections.listsEqual(DocAuthors, otherAs.DocAuthors)) {
+    if (!collections.listsEqual(docAuthors, otherAs.docAuthors)) {
       return false;
     }
-    if (!collections.listsEqual(NavLists, otherAs.NavLists)) {
+    if (!collections.listsEqual(navLists, otherAs.navLists)) {
       return false;
     }
 
-    return Head == otherAs.Head &&
-        DocTitle == otherAs.DocTitle &&
-        NavMap == otherAs.NavMap &&
-        PageList == otherAs.PageList;
+    return head == otherAs.head &&
+        docTitle == otherAs.docTitle &&
+        navMap == otherAs.navMap &&
+        pageList == otherAs.pageList;
   }
 }

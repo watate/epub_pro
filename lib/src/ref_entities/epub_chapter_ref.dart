@@ -8,37 +8,35 @@ import 'epub_text_content_file_ref.dart';
 class EpubChapterRef {
   EpubTextContentFileRef? epubTextContentFileRef;
 
-  String? Title;
-  String? ContentFileName;
-  String? Anchor;
-  List<EpubChapterRef>? SubChapters;
+  String? title;
+  String? contentFileName;
+  String? anchor;
+  List<EpubChapterRef>? subChapters;
 
-  EpubChapterRef(EpubTextContentFileRef? epubTextContentFileRef) {
-    this.epubTextContentFileRef = epubTextContentFileRef;
-  }
+  EpubChapterRef(this.epubTextContentFileRef);
 
   @override
   int get hashCode {
     var objects = [
-      Title.hashCode,
-      ContentFileName.hashCode,
-      Anchor.hashCode,
+      title.hashCode,
+      contentFileName.hashCode,
+      anchor.hashCode,
       epubTextContentFileRef.hashCode,
-      ...SubChapters?.map((subChapter) => subChapter.hashCode) ?? [0],
+      ...subChapters?.map((subChapter) => subChapter.hashCode) ?? [0],
     ];
     return hashObjects(objects);
   }
 
   @override
   bool operator ==(other) {
-    if (!(other is EpubChapterRef)) {
+    if (other is! EpubChapterRef) {
       return false;
     }
-    return Title == other.Title &&
-        ContentFileName == other.ContentFileName &&
-        Anchor == other.Anchor &&
+    return title == other.title &&
+        contentFileName == other.contentFileName &&
+        anchor == other.anchor &&
         epubTextContentFileRef == other.epubTextContentFileRef &&
-        collections.listsEqual(SubChapters, other.SubChapters);
+        collections.listsEqual(subChapters, other.subChapters);
   }
 
   Future<String> readHtmlContent() async {
@@ -47,6 +45,6 @@ class EpubChapterRef {
 
   @override
   String toString() {
-    return 'Title: $Title, Subchapter count: ${SubChapters!.length}';
+    return 'Title: $title, Subchapter count: ${subChapters!.length}';
   }
 }

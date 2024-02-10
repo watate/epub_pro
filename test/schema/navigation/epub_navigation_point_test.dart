@@ -15,12 +15,12 @@ main() async {
 
   setUp(() async {
     testNavigationPoint = EpubNavigationPoint()
-      ..ChildNavigationPoints = List.from(reference.ChildNavigationPoints ?? [])
-      ..Class = reference.Class
-      ..Content = reference.Content
-      ..Id = reference.Id
-      ..NavigationLabels = List.from(reference.NavigationLabels ?? [])
-      ..PlayOrder = reference.PlayOrder;
+      ..childNavigationPoints = List.from(reference.childNavigationPoints ?? [])
+      ..classs = reference.classs
+      ..content = reference.content
+      ..id = reference.id
+      ..navigationLabels = List.from(reference.navigationLabels ?? [])
+      ..playOrder = reference.playOrder;
   });
 
   group("EpubNavigationPoint", () {
@@ -30,29 +30,29 @@ main() async {
       });
 
       test("is false when ChildNavigationPoints changes", () async {
-        testNavigationPoint.ChildNavigationPoints?.add(
-            generator.randomEpubNavigationPoint());
+        testNavigationPoint.childNavigationPoints
+            ?.add(generator.randomEpubNavigationPoint());
         expect(testNavigationPoint, isNot(reference));
       });
       test("is false when Class changes", () async {
-        testNavigationPoint.Class = generator.randomString();
+        testNavigationPoint.classs = generator.randomString();
         expect(testNavigationPoint, isNot(reference));
       });
       test("is false when Content changes", () async {
-        testNavigationPoint.Content = generator.randomEpubNavigationContent();
+        testNavigationPoint.content = generator.randomEpubNavigationContent();
         expect(testNavigationPoint, isNot(reference));
       });
       test("is false when Id changes", () async {
-        testNavigationPoint.Id = generator.randomString();
+        testNavigationPoint.id = generator.randomString();
         expect(testNavigationPoint, isNot(reference));
       });
       test("is false when PlayOrder changes", () async {
-        testNavigationPoint.PlayOrder = generator.randomString();
+        testNavigationPoint.playOrder = generator.randomString();
         expect(testNavigationPoint, isNot(reference));
       });
       test("is false when NavigationLabels changes", () async {
-        testNavigationPoint.NavigationLabels?.add(
-            generator.randomEpubNavigationLabel());
+        testNavigationPoint.navigationLabels
+            ?.add(generator.randomEpubNavigationLabel());
         expect(testNavigationPoint, isNot(reference));
       });
     });
@@ -63,29 +63,29 @@ main() async {
       });
 
       test("is false when ChildNavigationPoints changes", () async {
-        testNavigationPoint.ChildNavigationPoints?.add(
-            generator.randomEpubNavigationPoint());
+        testNavigationPoint.childNavigationPoints
+            ?.add(generator.randomEpubNavigationPoint());
         expect(testNavigationPoint.hashCode, isNot(reference.hashCode));
       });
       test("is false when Class changes", () async {
-        testNavigationPoint.Class = generator.randomString();
+        testNavigationPoint.classs = generator.randomString();
         expect(testNavigationPoint.hashCode, isNot(reference.hashCode));
       });
       test("is false when Content changes", () async {
-        testNavigationPoint.Content = generator.randomEpubNavigationContent();
+        testNavigationPoint.content = generator.randomEpubNavigationContent();
         expect(testNavigationPoint.hashCode, isNot(reference.hashCode));
       });
       test("is false when Id changes", () async {
-        testNavigationPoint.Id = generator.randomString();
+        testNavigationPoint.id = generator.randomString();
         expect(testNavigationPoint.hashCode, isNot(reference.hashCode));
       });
       test("is false when PlayOrder changes", () async {
-        testNavigationPoint.PlayOrder = generator.randomString();
+        testNavigationPoint.playOrder = generator.randomString();
         expect(testNavigationPoint.hashCode, isNot(reference.hashCode));
       });
       test("is false when NavigationLabels changes", () async {
-        testNavigationPoint.NavigationLabels?.add(
-            generator.randomEpubNavigationLabel());
+        testNavigationPoint.navigationLabels
+            ?.add(generator.randomEpubNavigationLabel());
         expect(testNavigationPoint.hashCode, isNot(reference.hashCode));
       });
     });

@@ -5,17 +5,17 @@ import 'package:test/test.dart';
 
 main() async {
   var reference = EpubMetadataContributor()
-    ..Contributor = "orthros"
-    ..FileAs = "Large"
-    ..Role = "Creator";
+    ..contributor = "orthros"
+    ..fileAs = "Large"
+    ..role = "Creator";
 
   late EpubMetadataContributor testMetadataContributor;
 
   setUp(() async {
     testMetadataContributor = EpubMetadataContributor()
-      ..Contributor = reference.Contributor
-      ..FileAs = reference.FileAs
-      ..Role = reference.Role;
+      ..contributor = reference.contributor
+      ..fileAs = reference.fileAs
+      ..role = reference.role;
   });
 
   group("EpubMetadataContributor", () {
@@ -25,15 +25,15 @@ main() async {
       });
 
       test("is false when Contributor changes", () async {
-        testMetadataContributor.Contributor = "NotOrthros";
+        testMetadataContributor.contributor = "NotOrthros";
         expect(testMetadataContributor, isNot(reference));
       });
       test("is false when FileAs changes", () async {
-        testMetadataContributor.FileAs = "Small";
+        testMetadataContributor.fileAs = "Small";
         expect(testMetadataContributor, isNot(reference));
       });
       test("is false when Role changes", () async {
-        testMetadataContributor.Role = "Copier";
+        testMetadataContributor.role = "Copier";
         expect(testMetadataContributor, isNot(reference));
       });
     });
@@ -44,15 +44,15 @@ main() async {
       });
 
       test("is false when Contributor changes", () async {
-        testMetadataContributor.Contributor = "NotOrthros";
+        testMetadataContributor.contributor = "NotOrthros";
         expect(testMetadataContributor.hashCode, isNot(reference.hashCode));
       });
       test("is false when FileAs changes", () async {
-        testMetadataContributor.FileAs = "Small";
+        testMetadataContributor.fileAs = "Small";
         expect(testMetadataContributor.hashCode, isNot(reference.hashCode));
       });
       test("is false when Role changes", () async {
-        testMetadataContributor.Role = "Copier";
+        testMetadataContributor.role = "Copier";
         expect(testMetadataContributor.hashCode, isNot(reference.hashCode));
       });
     });

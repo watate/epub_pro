@@ -4,16 +4,16 @@ import 'package:quiver/core.dart';
 import 'epub_guide_reference.dart';
 
 class EpubGuide {
-  List<EpubGuideReference>? Items;
+  List<EpubGuideReference>? items;
 
   EpubGuide() {
-    Items = <EpubGuideReference>[];
+    items = <EpubGuideReference>[];
   }
 
   @override
   int get hashCode {
     var objects = [];
-    objects.addAll(Items!.map((item) => item.hashCode));
+    objects.addAll(items!.map((item) => item.hashCode));
     return hashObjects(objects);
   }
 
@@ -24,6 +24,6 @@ class EpubGuide {
       return false;
     }
 
-    return collections.listsEqual(Items, otherAs.Items);
+    return collections.listsEqual(items, otherAs.items);
   }
 }

@@ -61,14 +61,14 @@ class EpubReader {
     var epubArchive = ZipDecoder().decodeBytes(loadedBytes);
 
     var bookRef = EpubBookRef(epubArchive);
-    bookRef.Schema = await SchemaReader.readSchema(epubArchive);
-    bookRef.Title = bookRef.Schema!.Package!.Metadata!.Titles!
+    bookRef.schema = await SchemaReader.readSchema(epubArchive);
+    bookRef.title = bookRef.schema!.package!.metadata!.titles!
         .firstWhere((String name) => true, orElse: () => '');
-    bookRef.AuthorList = bookRef.Schema!.Package!.Metadata!.Creators!
-        .map((EpubMetadataCreator creator) => creator.Creator)
+    bookRef.authors = bookRef.schema!.package!.metadata!.creators!
+        .map((EpubMetadataCreator creator) => creator.creator)
         .toList();
-    bookRef.Author = bookRef.AuthorList!.join(', ');
-    bookRef.Content = ContentReader.parseContentMap(bookRef);
+    bookRef.author = bookRef.authors!.join(', ');
+    bookRef.content = ContentReader.parseContentMap(bookRef);
     return bookRef;
   }
 
@@ -83,44 +83,44 @@ class EpubReader {
     }
 
     var epubBookRef = await openBook(loadedBytes);
-    result.Schema = epubBookRef.Schema;
-    result.title = epubBookRef.Title;
-    result.AuthorList = epubBookRef.AuthorList;
-    result.Author = epubBookRef.Author;
-    result.Content = await readContent(epubBookRef.Content!);
-    result.CoverImage = await epubBookRef.readCover();
+    result.schema = epubBookRef.schema;
+    result.title = epubBookRef.title;
+    result.authors = epubBookRef.authors;
+    result.author = epubBookRef.author;
+    result.content = await readContent(epubBookRef.content!);
+    result.coverImage = await epubBookRef.readCover();
     var chapterRefs = await epubBookRef.getChapters();
-    result.Chapters = await readChapters(chapterRefs);
+    result.chapters = await readChapters(chapterRefs);
 
     return result;
   }
 
   static Future<EpubContent> readContent(EpubContentRef contentRef) async {
     var result = EpubContent();
-    result.Html = await readTextContentFiles(contentRef.Html!);
-    result.Css = await readTextContentFiles(contentRef.Css!);
-    result.Images = await readByteContentFiles(contentRef.Images!);
-    result.Fonts = await readByteContentFiles(contentRef.Fonts!);
-    result.AllFiles = <String, EpubContentFile>{};
+    result.html = await readTextContentFiles(contentRef.html!);
+    result.css = await readTextContentFiles(contentRef.css!);
+    result.images = await readByteContentFiles(contentRef.images!);
+    result.fonts = await readByteContentFiles(contentRef.fonts!);
+    result.allFiles = <String, EpubContentFile>{};
 
-    result.Html!.forEach((String? key, EpubTextContentFile value) {
-      result.AllFiles![key!] = value;
+    result.html!.forEach((String? key, EpubTextContentFile value) {
+      result.allFiles![key!] = value;
     });
-    result.Css!.forEach((String? key, EpubTextContentFile value) {
-      result.AllFiles![key!] = value;
-    });
-
-    result.Images!.forEach((String? key, EpubByteContentFile value) {
-      result.AllFiles![key!] = value;
-    });
-    result.Fonts!.forEach((String? key, EpubByteContentFile value) {
-      result.AllFiles![key!] = value;
+    result.css!.forEach((String? key, EpubTextContentFile value) {
+      result.allFiles![key!] = value;
     });
 
-    await Future.forEach(contentRef.AllFiles!.keys, (dynamic key) async {
-      if (!result.AllFiles!.containsKey(key)) {
-        result.AllFiles![key] =
-            await readByteContentFile(contentRef.AllFiles![key]!);
+    result.images!.forEach((String? key, EpubByteContentFile value) {
+      result.allFiles![key!] = value;
+    });
+    result.fonts!.forEach((String? key, EpubByteContentFile value) {
+      result.allFiles![key!] = value;
+    });
+
+    await Future.forEach(contentRef.allFiles!.keys, (dynamic key) async {
+      if (!result.allFiles!.containsKey(key)) {
+        result.allFiles![key] =
+            await readByteContentFile(contentRef.allFiles![key]!);
       }
     });
 
@@ -134,10 +134,10 @@ class EpubReader {
     await Future.forEach(textContentFileRefs.keys, (dynamic key) async {
       EpubContentFileRef value = textContentFileRefs[key]!;
       var textContentFile = EpubTextContentFile();
-      textContentFile.FileName = value.FileName;
-      textContentFile.ContentType = value.ContentType;
-      textContentFile.ContentMimeType = value.ContentMimeType;
-      textContentFile.Content = await value.readContentAsText();
+      textContentFile.fileName = value.fileName;
+      textContentFile.contentType = value.contentType;
+      textContentFile.contentMimeType = value.contentMimeType;
+      textContentFile.content = await value.readContentAsText();
       result[key] = textContentFile;
     });
     return result;
@@ -156,10 +156,10 @@ class EpubReader {
       EpubContentFileRef contentFileRef) async {
     var result = EpubByteContentFile();
 
-    result.FileName = contentFileRef.FileName;
-    result.ContentType = contentFileRef.ContentType;
-    result.ContentMimeType = contentFileRef.ContentMimeType;
-    result.Content = await contentFileRef.readContentAsBytes();
+    result.fileName = contentFileRef.fileName;
+    result.contentType = contentFileRef.contentType;
+    result.contentMimeType = contentFileRef.contentMimeType;
+    result.content = await contentFileRef.readContentAsBytes();
 
     return result;
   }
@@ -170,11 +170,11 @@ class EpubReader {
     await Future.forEach(chapterRefs, (EpubChapterRef chapterRef) async {
       var chapter = EpubChapter();
 
-      chapter.Title = chapterRef.Title;
-      chapter.ContentFileName = chapterRef.ContentFileName;
-      chapter.Anchor = chapterRef.Anchor;
-      chapter.HtmlContent = await chapterRef.readHtmlContent();
-      chapter.SubChapters = await readChapters(chapterRef.SubChapters!);
+      chapter.title = chapterRef.title;
+      chapter.contentFileName = chapterRef.contentFileName;
+      chapter.anchor = chapterRef.anchor;
+      chapter.htmlContent = await chapterRef.readHtmlContent();
+      chapter.subChapters = await readChapters(chapterRef.subChapters!);
 
       result.add(chapter);
     });

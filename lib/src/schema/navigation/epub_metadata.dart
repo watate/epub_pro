@@ -1,22 +1,22 @@
 import 'package:quiver/core.dart';
 
 class EpubNavigationContent {
-  String? Id;
-  String? Source;
+  String? id;
+  String? source;
 
   @override
-  int get hashCode => hash2(Id.hashCode, Source.hashCode);
+  int get hashCode => hash2(id.hashCode, source.hashCode);
 
   @override
   bool operator ==(other) {
-    if (!(other is EpubNavigationContent)) {
+    if (other is! EpubNavigationContent) {
       return false;
     }
-    return Id == other.Id && Source == other.Source;
+    return id == other.id && source == other.source;
   }
 
   @override
   String toString() {
-    return 'Source: $Source';
+    return 'Source: $source';
   }
 }

@@ -2,38 +2,38 @@ import 'package:quiver/collection.dart' as collections;
 import 'package:quiver/core.dart';
 
 class EpubChapter {
-  String? Title;
-  String? ContentFileName;
-  String? Anchor;
-  String? HtmlContent;
-  List<EpubChapter>? SubChapters;
+  String? title;
+  String? contentFileName;
+  String? anchor;
+  String? htmlContent;
+  List<EpubChapter>? subChapters;
 
   @override
   int get hashCode {
     var objects = [
-      Title.hashCode,
-      ContentFileName.hashCode,
-      Anchor.hashCode,
-      HtmlContent.hashCode,
-      ...SubChapters?.map((subChapter) => subChapter.hashCode) ?? [0],
+      title.hashCode,
+      contentFileName.hashCode,
+      anchor.hashCode,
+      htmlContent.hashCode,
+      ...subChapters?.map((subChapter) => subChapter.hashCode) ?? [0],
     ];
     return hashObjects(objects);
   }
 
   @override
   bool operator ==(other) {
-    if (!(other is EpubChapter)) {
+    if (other is! EpubChapter) {
       return false;
     }
-    return Title == other.Title &&
-        ContentFileName == other.ContentFileName &&
-        Anchor == other.Anchor &&
-        HtmlContent == other.HtmlContent &&
-        collections.listsEqual(SubChapters, other.SubChapters);
+    return title == other.title &&
+        contentFileName == other.contentFileName &&
+        anchor == other.anchor &&
+        htmlContent == other.htmlContent &&
+        collections.listsEqual(subChapters, other.subChapters);
   }
 
   @override
   String toString() {
-    return 'Title: $Title, Subchapter count: ${SubChapters!.length}';
+    return 'Title: $title, Subchapter count: ${subChapters!.length}';
   }
 }

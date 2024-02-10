@@ -1,33 +1,33 @@
 import 'package:quiver/core.dart';
 
 class EpubMetadataMeta {
-  String? Name;
-  String? Content;
-  String? Id;
-  String? Refines;
-  String? Property;
-  String? Scheme;
-  Map<String, String>? Attributes;
+  String? name;
+  String? content;
+  String? id;
+  String? refines;
+  String? property;
+  String? scheme;
+  Map<String, String>? ttributes;
 
   @override
   int get hashCode => hashObjects([
-        Name.hashCode,
-        Content.hashCode,
-        Id.hashCode,
-        Refines.hashCode,
-        Property.hashCode,
-        Scheme.hashCode
+        name.hashCode,
+        content.hashCode,
+        id.hashCode,
+        refines.hashCode,
+        property.hashCode,
+        scheme.hashCode
       ]);
 
   @override
   bool operator ==(other) {
     var otherAs = other as EpubMetadataMeta?;
     if (otherAs == null) return false;
-    return Name == otherAs.Name &&
-        Content == otherAs.Content &&
-        Id == otherAs.Id &&
-        Refines == otherAs.Refines &&
-        Property == otherAs.Property &&
-        Scheme == otherAs.Scheme;
+    return name == otherAs.name &&
+        content == otherAs.content &&
+        id == otherAs.id &&
+        refines == otherAs.refines &&
+        property == otherAs.property &&
+        scheme == otherAs.scheme;
   }
 }

@@ -12,10 +12,10 @@ main() async {
   var reference = EpubChapterRef(contentFileRef);
 
   reference
-    ..Anchor = "anchor"
-    ..ContentFileName = "orthros"
-    ..SubChapters = []
-    ..Title = "A New Look at Chapters";
+    ..anchor = "anchor"
+    ..contentFileName = "orthros"
+    ..subChapters = []
+    ..title = "A New Look at Chapters";
 
   late EpubBookRef bookRef2;
   late EpubChapterRef testChapterRef;
@@ -27,10 +27,10 @@ main() async {
 
     testChapterRef = EpubChapterRef(contentFileRef2);
     testChapterRef
-      ..Anchor = "anchor"
-      ..ContentFileName = "orthros"
-      ..SubChapters = []
-      ..Title = "A New Look at Chapters";
+      ..anchor = "anchor"
+      ..contentFileName = "orthros"
+      ..subChapters = []
+      ..title = "A New Look at Chapters";
   });
 
   group("EpubChapterRef", () {
@@ -40,12 +40,12 @@ main() async {
       });
 
       test("is false when Anchor changes", () async {
-        testChapterRef.Anchor = "NotAnAnchor";
+        testChapterRef.anchor = "NotAnAnchor";
         expect(testChapterRef, isNot(reference));
       });
 
       test("is false when ContentFileName changes", () async {
-        testChapterRef.ContentFileName = "NotOrthros";
+        testChapterRef.contentFileName = "NotOrthros";
         expect(testChapterRef, isNot(reference));
       });
 
@@ -53,14 +53,14 @@ main() async {
         var subchapterContentFileRef = EpubTextContentFileRef(bookRef2);
         var chapter = EpubChapterRef(subchapterContentFileRef);
         chapter
-          ..Title = "A Brave new Epub"
-          ..ContentFileName = "orthros.txt";
-        testChapterRef.SubChapters = [chapter];
+          ..title = "A Brave new Epub"
+          ..contentFileName = "orthros.txt";
+        testChapterRef.subChapters = [chapter];
         expect(testChapterRef, isNot(reference));
       });
 
       test("is false when Title changes", () async {
-        testChapterRef.Title = "A Boring Old World";
+        testChapterRef.title = "A Boring Old World";
         expect(testChapterRef, isNot(reference));
       });
     });
@@ -75,12 +75,12 @@ main() async {
       });
 
       test("is false when Anchor changes", () async {
-        testChapterRef.Anchor = "NotAnAnchor";
+        testChapterRef.anchor = "NotAnAnchor";
         expect(testChapterRef.hashCode, isNot(reference.hashCode));
       });
 
       test("is false when ContentFileName changes", () async {
-        testChapterRef.ContentFileName = "NotOrthros";
+        testChapterRef.contentFileName = "NotOrthros";
         expect(testChapterRef.hashCode, isNot(reference.hashCode));
       });
 
@@ -88,14 +88,14 @@ main() async {
         var subchapterContentFileRef = EpubTextContentFileRef(bookRef2);
         var chapter = EpubChapterRef(subchapterContentFileRef);
         chapter
-          ..Title = "A Brave new Epub"
-          ..ContentFileName = "orthros.txt";
-        testChapterRef.SubChapters = [chapter];
+          ..title = "A Brave new Epub"
+          ..contentFileName = "orthros.txt";
+        testChapterRef.subChapters = [chapter];
         expect(testChapterRef, isNot(reference));
       });
 
       test("is false when Title changes", () async {
-        testChapterRef.Title = "A Boring Old World";
+        testChapterRef.title = "A Boring Old World";
         expect(testChapterRef.hashCode, isNot(reference.hashCode));
       });
     });

@@ -1,12 +1,12 @@
 import 'package:quiver/core.dart';
 
 class EpubNavigationHeadMeta {
-  String? Name;
-  String? Content;
-  String? Scheme;
+  String? name;
+  String? content;
+  String? scheme;
 
   @override
-  int get hashCode => hash3(Name.hashCode, Content.hashCode, Scheme.hashCode);
+  int get hashCode => hash3(name.hashCode, content.hashCode, scheme.hashCode);
 
   @override
   bool operator ==(other) {
@@ -15,8 +15,8 @@ class EpubNavigationHeadMeta {
       return false;
     }
 
-    return Name == otherAs.Name &&
-        Content == otherAs.Content &&
-        Scheme == otherAs.Scheme;
+    return name == otherAs.name &&
+        content == otherAs.content &&
+        scheme == otherAs.scheme;
   }
 }

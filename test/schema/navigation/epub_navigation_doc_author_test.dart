@@ -16,7 +16,7 @@ main() async {
 
   setUp(() async {
     testNavigationDocAuthor = EpubNavigationDocAuthor()
-      ..Authors = List.from(reference.Authors ?? []);
+      ..authors = List.from(reference.authors ?? []);
   });
 
   group("EpubNavigationDocAuthor", () {
@@ -26,7 +26,7 @@ main() async {
       });
 
       test("is false when Authors changes", () async {
-        testNavigationDocAuthor.Authors?.add(generator.randomString());
+        testNavigationDocAuthor.authors?.add(generator.randomString());
         expect(testNavigationDocAuthor, isNot(reference));
       });
     });
@@ -37,7 +37,7 @@ main() async {
       });
 
       test("is false when Authors changes", () async {
-        testNavigationDocAuthor.Authors?.add(generator.randomString());
+        testNavigationDocAuthor.authors?.add(generator.randomString());
         expect(testNavigationDocAuthor.hashCode, isNot(reference.hashCode));
       });
     });

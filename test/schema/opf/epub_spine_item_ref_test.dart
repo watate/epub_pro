@@ -12,15 +12,15 @@ main() async {
   final RandomString randomString = RandomString(Random(123788));
 
   var reference = EpubSpineItemRef()
-    ..IsLinear = true
-    ..IdRef = randomString.randomAlpha(length);
+    ..isLinear = true
+    ..idRef = randomString.randomAlpha(length);
 
   late EpubSpineItemRef testSpineItemRef;
 
   setUp(() async {
     testSpineItemRef = EpubSpineItemRef()
-      ..IsLinear = reference.IsLinear
-      ..IdRef = reference.IdRef;
+      ..isLinear = reference.isLinear
+      ..idRef = reference.idRef;
   });
 
   group("EpubSpineItemRef", () {
@@ -29,12 +29,12 @@ main() async {
         expect(testSpineItemRef, equals(reference));
       });
       test("is false when IsLinear changes", () async {
-        testSpineItemRef.IsLinear = !(testSpineItemRef.IsLinear ?? false);
-        ;
+        testSpineItemRef.isLinear = !(testSpineItemRef.isLinear ?? false);
+
         expect(testSpineItemRef, isNot(reference));
       });
       test("is false when IdRef changes", () async {
-        testSpineItemRef.IdRef = randomString.randomAlpha(length);
+        testSpineItemRef.idRef = randomString.randomAlpha(length);
         expect(testSpineItemRef, isNot(reference));
       });
     });
@@ -44,11 +44,11 @@ main() async {
         expect(testSpineItemRef.hashCode, equals(reference.hashCode));
       });
       test("is false when IsLinear changes", () async {
-        testSpineItemRef.IsLinear = !(testSpineItemRef.IsLinear ?? false);
+        testSpineItemRef.isLinear = !(testSpineItemRef.isLinear ?? false);
         expect(testSpineItemRef.hashCode, isNot(reference.hashCode));
       });
       test("is false when IdRef changes", () async {
-        testSpineItemRef.IdRef = randomString.randomAlpha(length);
+        testSpineItemRef.idRef = randomString.randomAlpha(length);
         expect(testSpineItemRef.hashCode, isNot(reference.hashCode));
       });
     });

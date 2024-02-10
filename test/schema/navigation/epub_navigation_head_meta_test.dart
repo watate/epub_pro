@@ -15,9 +15,9 @@ main() async {
 
   setUp(() async {
     testNavigationDocTitle = EpubNavigationHeadMeta()
-      ..Content = reference.Content
-      ..Name = reference.Name
-      ..Scheme = reference.Scheme;
+      ..content = reference.content
+      ..name = reference.name
+      ..scheme = reference.scheme;
   });
 
   group("EpubNavigationHeadMeta", () {
@@ -27,15 +27,15 @@ main() async {
       });
 
       test("is false when Content changes", () async {
-        testNavigationDocTitle.Content = generator.randomString();
+        testNavigationDocTitle.content = generator.randomString();
         expect(testNavigationDocTitle, isNot(reference));
       });
       test("is false when Name changes", () async {
-        testNavigationDocTitle.Name = generator.randomString();
+        testNavigationDocTitle.name = generator.randomString();
         expect(testNavigationDocTitle, isNot(reference));
       });
       test("is false when Scheme changes", () async {
-        testNavigationDocTitle.Scheme = generator.randomString();
+        testNavigationDocTitle.scheme = generator.randomString();
         expect(testNavigationDocTitle, isNot(reference));
       });
     });
@@ -46,15 +46,15 @@ main() async {
       });
 
       test("is false when Content changes", () async {
-        testNavigationDocTitle.Content = generator.randomString();
+        testNavigationDocTitle.content = generator.randomString();
         expect(testNavigationDocTitle.hashCode, isNot(reference.hashCode));
       });
       test("is false when Name changes", () async {
-        testNavigationDocTitle.Name = generator.randomString();
+        testNavigationDocTitle.name = generator.randomString();
         expect(testNavigationDocTitle.hashCode, isNot(reference.hashCode));
       });
       test("is false when Scheme changes", () async {
-        testNavigationDocTitle.Scheme = generator.randomString();
+        testNavigationDocTitle.scheme = generator.randomString();
         expect(testNavigationDocTitle.hashCode, isNot(reference.hashCode));
       });
     });

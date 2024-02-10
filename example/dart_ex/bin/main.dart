@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 import 'dart:io' as io;
 
 import 'package:path/path.dart' as path;
@@ -19,91 +21,91 @@ main(List<String> args) async {
   String? title = epubBook.title;
 
 // Book's authors (comma separated list)
-  String? author = epubBook.Author;
+  String? author = epubBook.author;
 
 // Book's authors (list of authors names)
-  List<String?>? authors = epubBook.AuthorList;
+  List<String?>? authors = epubBook.authors;
 
 // Book's cover image (null if there is no cover)
-  Image? coverImage = epubBook.CoverImage;
+  Image? coverImage = epubBook.coverImage;
 
 // CHAPTERS
 
 // Enumerating chapters
-  epubBook.Chapters!.forEach((EpubChapter chapter) {
+  epubBook.chapters!.forEach((EpubChapter chapter) {
     // Title of chapter
-    String chapterTitle = chapter.Title!;
+    String chapterTitle = chapter.title!;
 
     // HTML content of current chapter
-    String chapterHtmlContent = chapter.HtmlContent!;
+    String chapterHtmlContent = chapter.htmlContent!;
 
     // Nested chapters
-    List<EpubChapter> subChapters = chapter.SubChapters!;
+    List<EpubChapter> subChapters = chapter.subChapters!;
   });
 
 // CONTENT
 
 // Book's content (HTML files, stlylesheets, images, fonts, etc.)
-  EpubContent bookContent = epubBook.Content!;
+  EpubContent bookContent = epubBook.content!;
 
 // IMAGES
 
 // All images in the book (file name is the key)
-  Map<String, EpubByteContentFile> images = bookContent.Images!;
+  Map<String, EpubByteContentFile> images = bookContent.images!;
 
   EpubByteContentFile? firstImage =
       images.isNotEmpty ? images.values.first : null;
 
 // Content type (e.g. EpubContentType.IMAGE_JPEG, EpubContentType.IMAGE_PNG)
-  EpubContentType contentType = firstImage!.ContentType!;
+  EpubContentType contentType = firstImage!.contentType!;
 
 // MIME type (e.g. "image/jpeg", "image/png")
-  String mimeContentType = firstImage.ContentMimeType!;
+  String mimeContentType = firstImage.contentMimeType!;
 
 // HTML & CSS
 
 // All XHTML files in the book (file name is the key)
-  Map<String?, EpubTextContentFile> htmlFiles = bookContent.Html!;
+  Map<String?, EpubTextContentFile> htmlFiles = bookContent.html!;
 
 // All CSS files in the book (file name is the key)
-  Map<String, EpubTextContentFile> cssFiles = bookContent.Css!;
+  Map<String, EpubTextContentFile> cssFiles = bookContent.css!;
 
 // Entire HTML content of the book
   htmlFiles.values.forEach((EpubTextContentFile htmlFile) {
-    String htmlContent = htmlFile.Content!;
+    String htmlContent = htmlFile.content!;
   });
 
 // All CSS content in the book
   cssFiles.values.forEach((EpubTextContentFile cssFile) {
-    String cssContent = cssFile.Content!;
+    String cssContent = cssFile.content!;
   });
 
 // OTHER CONTENT
 
 // All fonts in the book (file name is the key)
-  Map<String, EpubByteContentFile> fonts = bookContent.Fonts!;
+  Map<String, EpubByteContentFile> fonts = bookContent.fonts!;
 
 // All files in the book (including HTML, CSS, images, fonts, and other types of files)
-  Map<String, EpubContentFile> allFiles = bookContent.AllFiles!;
+  Map<String, EpubContentFile> allFiles = bookContent.allFiles!;
 
 // ACCESSING RAW SCHEMA INFORMATION
 
 // EPUB OPF data
-  EpubPackage package = epubBook.Schema!.Package!;
+  EpubPackage package = epubBook.schema!.package!;
 
 // Enumerating book's contributors
-  package.Metadata!.Contributors!.forEach((contributor) {
-    String contributorName = contributor.Contributor!;
-    String contributorRole = contributor.Role!;
+  package.metadata!.contributors!.forEach((contributor) {
+    String contributorName = contributor.contributor!;
+    String contributorRole = contributor.role!;
   });
 
 // EPUB NCX data
-  EpubNavigation navigation = epubBook.Schema!.Navigation!;
+  EpubNavigation navigation = epubBook.schema!.navigation!;
 
 // Enumerating NCX metadata
-  navigation.Head!.Metadata!.forEach((meta) {
-    String metadataItemName = meta.Name!;
-    String metadataItemContent = meta.Content!;
+  navigation.head!.metadata!.forEach((meta) {
+    String metadataItemName = meta.name!;
+    String metadataItemContent = meta.content!;
   });
 
   // Write the Book

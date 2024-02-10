@@ -2,15 +2,15 @@ import 'package:quiver/collection.dart' as collections;
 import 'package:quiver/core.dart';
 
 class EpubNavigationDocTitle {
-  List<String>? Titles;
+  List<String>? titles;
 
   EpubNavigationDocTitle() {
-    Titles = <String>[];
+    titles = <String>[];
   }
 
   @override
   int get hashCode {
-    var objects = [...Titles!.map((title) => title.hashCode)];
+    var objects = [...titles!.map((title) => title.hashCode)];
     return hashObjects(objects);
   }
 
@@ -19,6 +19,6 @@ class EpubNavigationDocTitle {
     var otherAs = other as EpubNavigationDocTitle?;
     if (otherAs == null) return false;
 
-    return collections.listsEqual(Titles, otherAs.Titles);
+    return collections.listsEqual(titles, otherAs.titles);
   }
 }

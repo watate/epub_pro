@@ -3,20 +3,20 @@ import 'package:quiver/core.dart';
 import 'epub_content_file.dart';
 
 class EpubTextContentFile extends EpubContentFile {
-  String? Content;
+  String? content;
 
   @override
-  int get hashCode => hash4(Content, ContentMimeType, ContentType, FileName);
+  int get hashCode => hash4(content, contentMimeType, contentType, fileName);
 
   @override
   bool operator ==(other) {
-    if (!(other is EpubTextContentFile)) {
+    if (other is! EpubTextContentFile) {
       return false;
     }
 
-    return Content == other.Content &&
-        ContentMimeType == other.ContentMimeType &&
-        ContentType == other.ContentType &&
-        FileName == other.FileName;
+    return content == other.content &&
+        contentMimeType == other.contentMimeType &&
+        contentType == other.contentType &&
+        fileName == other.fileName;
   }
 }

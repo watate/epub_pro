@@ -17,9 +17,9 @@ main() async {
   setUp(() async {
     testGuideReference = EpubGuideReference();
     testGuideReference
-      ..Href = reference.Href
-      ..Title = reference.Title
-      ..Type = reference.Type;
+      ..href = reference.href
+      ..title = reference.title
+      ..type = reference.type;
   });
 
   group("EpubGuideReference", () {
@@ -29,18 +29,18 @@ main() async {
       });
 
       test("is false when Href changes", () async {
-        testGuideReference.Href = "A different href";
+        testGuideReference.href = "A different href";
 
         expect(testGuideReference, isNot(reference));
       });
 
       test("is false when Title changes", () async {
-        testGuideReference.Title = "A different Title";
+        testGuideReference.title = "A different Title";
         expect(testGuideReference, isNot(reference));
       });
 
       test("is false when Type changes", () async {
-        testGuideReference.Type = "Some different type";
+        testGuideReference.type = "Some different type";
         expect(testGuideReference, isNot(reference));
       });
     });
@@ -51,18 +51,18 @@ main() async {
       });
 
       test("is false when Href changes", () async {
-        testGuideReference.Href = "A different href";
+        testGuideReference.href = "A different href";
 
         expect(testGuideReference.hashCode, isNot(reference.hashCode));
       });
 
       test("is false when Title changes", () async {
-        testGuideReference.Title = "A different Title";
+        testGuideReference.title = "A different Title";
         expect(testGuideReference.hashCode, isNot(reference.hashCode));
       });
 
       test("is false when Type changes", () async {
-        testGuideReference.Type = "Some different type";
+        testGuideReference.type = "Some different type";
         expect(testGuideReference.hashCode, isNot(reference.hashCode));
       });
     });

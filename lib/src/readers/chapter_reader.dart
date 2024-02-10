@@ -5,49 +5,51 @@ import '../schema/navigation/epub_navigation_point.dart';
 
 class ChapterReader {
   static List<EpubChapterRef> getChapters(EpubBookRef bookRef) {
-    if (bookRef.Schema!.Navigation == null) {
+    if (bookRef.schema!.navigation == null) {
       return <EpubChapterRef>[];
     }
     return getChaptersImpl(
-        bookRef, bookRef.Schema!.Navigation!.NavMap!.Points!);
+        bookRef, bookRef.schema!.navigation!.navMap!.points!);
   }
 
   static List<EpubChapterRef> getChaptersImpl(
       EpubBookRef bookRef, List<EpubNavigationPoint> navigationPoints) {
     var result = <EpubChapterRef>[];
     // navigationPoints.forEach((EpubNavigationPoint navigationPoint) {
-    for (var navigationPoint in navigationPoints){
+    for (var navigationPoint in navigationPoints) {
       String? contentFileName;
       String? anchor;
-      if (navigationPoint.Content?.Source ==null) continue;
+      if (navigationPoint.content?.source == null) continue;
       var contentSourceAnchorCharIndex =
-          navigationPoint.Content!.Source!.indexOf('#');
+          navigationPoint.content!.source!.indexOf('#');
       if (contentSourceAnchorCharIndex == -1) {
-        contentFileName = navigationPoint.Content!.Source;
+        contentFileName = navigationPoint.content!.source;
         anchor = null;
       } else {
-        contentFileName = navigationPoint.Content!.Source!
+        contentFileName = navigationPoint.content!.source!
             .substring(0, contentSourceAnchorCharIndex);
-        anchor = navigationPoint.Content!.Source!
+        anchor = navigationPoint.content!.source!
             .substring(contentSourceAnchorCharIndex + 1);
       }
       contentFileName = Uri.decodeFull(contentFileName!);
       EpubTextContentFileRef? htmlContentFileRef;
-      if (!bookRef.Content!.Html!.containsKey(contentFileName)) {
+      if (!bookRef.content!.html!.containsKey(contentFileName)) {
         throw Exception(
-            'Incorrect EPUB manifest: item with href = \"$contentFileName\" is missing.');
+          'Incorrect EPUB manifest: item with href = "$contentFileName" is missing.',
+        );
       }
 
-      htmlContentFileRef = bookRef.Content!.Html![contentFileName];
+      htmlContentFileRef = bookRef.content!.html![contentFileName];
       var chapterRef = EpubChapterRef(htmlContentFileRef);
-      chapterRef.ContentFileName = contentFileName;
-      chapterRef.Anchor = anchor;
-      chapterRef.Title = navigationPoint.NavigationLabels!.first.Text;
-      chapterRef.SubChapters =
-          getChaptersImpl(bookRef, navigationPoint.ChildNavigationPoints!);
+      chapterRef.contentFileName = contentFileName;
+      chapterRef.anchor = anchor;
+      chapterRef.title = navigationPoint.navigationLabels!.first.text;
+      chapterRef.subChapters =
+          getChaptersImpl(bookRef, navigationPoint.childNavigationPoints!);
 
       result.add(chapterRef);
-    };
+    }
+
     return result;
   }
 }

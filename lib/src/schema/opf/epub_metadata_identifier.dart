@@ -1,19 +1,19 @@
 import 'package:quiver/core.dart';
 
 class EpubMetadataIdentifier {
-  String? Id;
-  String? Scheme;
-  String? Identifier;
+  String? id;
+  String? scheme;
+  String? identifier;
 
   @override
-  int get hashCode => hash3(Id.hashCode, Scheme.hashCode, Identifier.hashCode);
+  int get hashCode => hash3(id.hashCode, scheme.hashCode, identifier.hashCode);
 
   @override
   bool operator ==(other) {
     var otherAs = other as EpubMetadataIdentifier?;
     if (otherAs == null) return false;
-    return Id == otherAs.Id &&
-        Scheme == otherAs.Scheme &&
-        Identifier == otherAs.Identifier;
+    return id == otherAs.id &&
+        scheme == otherAs.scheme &&
+        identifier == otherAs.identifier;
   }
 }

@@ -5,22 +5,22 @@ import 'epub_metadata.dart';
 import 'epub_navigation_label.dart';
 
 class EpubNavigationPoint {
-  String? Id;
-  String? Class;
-  String? PlayOrder;
-  List<EpubNavigationLabel>? NavigationLabels;
-  EpubNavigationContent? Content;
-  List<EpubNavigationPoint>? ChildNavigationPoints;
+  String? id;
+  String? classs;
+  String? playOrder;
+  List<EpubNavigationLabel>? navigationLabels;
+  EpubNavigationContent? content;
+  List<EpubNavigationPoint>? childNavigationPoints;
 
   @override
   int get hashCode {
     var objects = [
-      Id.hashCode,
-      Class.hashCode,
-      PlayOrder.hashCode,
-      Content.hashCode,
-      ...NavigationLabels!.map((label) => label.hashCode),
-      ...ChildNavigationPoints!.map((point) => point.hashCode)
+      id.hashCode,
+      classs.hashCode,
+      playOrder.hashCode,
+      content.hashCode,
+      ...navigationLabels!.map((label) => label.hashCode),
+      ...childNavigationPoints!.map((point) => point.hashCode)
     ];
     return hashObjects(objects);
   }
@@ -32,21 +32,21 @@ class EpubNavigationPoint {
       return false;
     }
 
-    if (!collections.listsEqual(NavigationLabels, otherAs.NavigationLabels)) {
+    if (!collections.listsEqual(navigationLabels, otherAs.navigationLabels)) {
       return false;
     }
 
     if (!collections.listsEqual(
-        ChildNavigationPoints, otherAs.ChildNavigationPoints)) return false;
+        childNavigationPoints, otherAs.childNavigationPoints)) return false;
 
-    return Id == otherAs.Id &&
-        Class == otherAs.Class &&
-        PlayOrder == otherAs.PlayOrder &&
-        Content == otherAs.Content;
+    return id == otherAs.id &&
+        classs == otherAs.classs &&
+        playOrder == otherAs.playOrder &&
+        content == otherAs.content;
   }
 
   @override
   String toString() {
-    return 'Id: $Id, Content.Source: ${Content!.Source}';
+    return 'Id: $id, Content.Source: ${content!.source}';
   }
 }

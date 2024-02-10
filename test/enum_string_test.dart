@@ -6,21 +6,21 @@ import 'package:epubx/epubx.dart';
 
 main() {
   test("Enum One", () {
-    expect(new EnumFromString<Simple>(Simple.values).get("ONE"),
-        equals(Simple.ONE));
+    expect(
+        EnumFromString<Simple>(Simple.values).get("ONE"), equals(Simple.one));
   });
   test("Enum Two", () {
-    expect(new EnumFromString<Simple>(Simple.values).get("TWO"),
-        equals(Simple.TWO));
+    expect(
+        EnumFromString<Simple>(Simple.values).get("TWO"), equals(Simple.two));
   });
   test("Enum One", () {
-    expect(new EnumFromString<Simple>(Simple.values).get("THREE"),
-        equals(Simple.THREE));
+    expect(EnumFromString<Simple>(Simple.values).get("THREE"),
+        equals(Simple.three));
   });
   test("Enum One Lower Case", () {
-    expect(new EnumFromString<Simple>(Simple.values).get("one"),
-        equals(Simple.ONE));
+    expect(
+        EnumFromString<Simple>(Simple.values).get("one"), equals(Simple.one));
   });
 }
 
-enum Simple { ONE, TWO, THREE }
+enum Simple { one, two, three }

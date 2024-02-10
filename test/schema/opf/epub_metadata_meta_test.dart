@@ -5,23 +5,23 @@ import 'package:test/test.dart';
 
 main() async {
   var reference = EpubMetadataMeta()
-    ..Content = "some content"
-    ..Name = "Orthros"
-    ..Property = "Prop"
-    ..Refines = "Oil"
-    ..Id = "Unique"
-    ..Scheme = "A plot";
+    ..content = "some content"
+    ..name = "Orthros"
+    ..property = "Prop"
+    ..refines = "Oil"
+    ..id = "Unique"
+    ..scheme = "A plot";
 
   late EpubMetadataMeta testMetadataMeta;
 
   setUp(() async {
     testMetadataMeta = EpubMetadataMeta()
-      ..Content = reference.Content
-      ..Name = reference.Name
-      ..Property = reference.Property
-      ..Refines = reference.Refines
-      ..Id = reference.Id
-      ..Scheme = reference.Scheme;
+      ..content = reference.content
+      ..name = reference.name
+      ..property = reference.property
+      ..refines = reference.refines
+      ..id = reference.id
+      ..scheme = reference.scheme;
   });
 
   group("EpubMetadataMeta", () {
@@ -31,27 +31,27 @@ main() async {
       });
 
       test("is false when Refines changes", () async {
-        testMetadataMeta.Refines = "Natural gas";
+        testMetadataMeta.refines = "Natural gas";
         expect(testMetadataMeta, isNot(reference));
       });
       test("is false when Property changes", () async {
-        testMetadataMeta.Property = "A different Property";
+        testMetadataMeta.property = "A different Property";
         expect(testMetadataMeta, isNot(reference));
       });
       test("is false when Name changes", () async {
-        testMetadataMeta.Id = "notOrthros";
+        testMetadataMeta.id = "notOrthros";
         expect(testMetadataMeta, isNot(reference));
       });
       test("is false when Content changes", () async {
-        testMetadataMeta.Content = "A different Content";
+        testMetadataMeta.content = "A different Content";
         expect(testMetadataMeta, isNot(reference));
       });
       test("is false when Id changes", () async {
-        testMetadataMeta.Id = "A different ID";
+        testMetadataMeta.id = "A different ID";
         expect(testMetadataMeta, isNot(reference));
       });
       test("is false when Scheme changes", () async {
-        testMetadataMeta.Scheme = "A strange scheme";
+        testMetadataMeta.scheme = "A strange scheme";
         expect(testMetadataMeta, isNot(reference));
       });
     });
@@ -61,27 +61,27 @@ main() async {
         expect(testMetadataMeta.hashCode, equals(reference.hashCode));
       });
       test("is false when Refines changes", () async {
-        testMetadataMeta.Refines = "Natural Gas";
+        testMetadataMeta.refines = "Natural Gas";
         expect(testMetadataMeta.hashCode, isNot(reference.hashCode));
       });
       test("is false when Property changes", () async {
-        testMetadataMeta.Property = "A different property";
+        testMetadataMeta.property = "A different property";
         expect(testMetadataMeta.hashCode, isNot(reference.hashCode));
       });
       test("is false when Name changes", () async {
-        testMetadataMeta.Name = "NotOrthros";
+        testMetadataMeta.name = "NotOrthros";
         expect(testMetadataMeta.hashCode, isNot(reference.hashCode));
       });
       test("is false when Content changes", () async {
-        testMetadataMeta.Content = "Different Content";
+        testMetadataMeta.content = "Different Content";
         expect(testMetadataMeta.hashCode, isNot(reference.hashCode));
       });
       test("is false when Id changes", () async {
-        testMetadataMeta.Id = "A different Id";
+        testMetadataMeta.id = "A different Id";
         expect(testMetadataMeta.hashCode, isNot(reference.hashCode));
       });
       test("is false when Scheme changes", () async {
-        testMetadataMeta.Scheme = "A strange scheme";
+        testMetadataMeta.scheme = "A strange scheme";
         expect(testMetadataMeta.hashCode, isNot(reference.hashCode));
       });
     });

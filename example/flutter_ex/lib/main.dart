@@ -157,7 +157,7 @@ Widget buildEpubWidget(epub.EpubBookRef book) {
         style: TextStyle(fontSize: 20.0),
       ),
       Text(
-        book.Title!,
+        book.title!,
         style: const TextStyle(fontSize: 15.0),
       ),
       const Padding(
@@ -168,7 +168,7 @@ Widget buildEpubWidget(epub.EpubBookRef book) {
         style: TextStyle(fontSize: 20.0),
       ),
       Text(
-        book.Author!,
+        book.author!,
         style: const TextStyle(fontSize: 15.0),
       ),
       const Padding(

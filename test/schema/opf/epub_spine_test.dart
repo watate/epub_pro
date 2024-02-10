@@ -13,19 +13,19 @@ main() async {
   final RandomString randomString = RandomString(Random(123788));
 
   var reference = EpubSpine()
-    ..Items = [
+    ..items = [
       EpubSpineItemRef()
-        ..IdRef = randomString.randomAlpha(length)
-        ..IdRef = randomString.randomAlpha(length)
+        ..idRef = randomString.randomAlpha(length)
+        ..idRef = randomString.randomAlpha(length)
     ]
-    ..TableOfContents = randomString.randomAlpha(length);
+    ..tableOfContents = randomString.randomAlpha(length);
 
   late EpubSpine testSpine;
 
   setUp(() async {
     testSpine = EpubSpine()
-      ..Items = List.from(reference.Items ?? [])
-      ..TableOfContents = reference.TableOfContents;
+      ..items = List.from(reference.items ?? [])
+      ..tableOfContents = reference.tableOfContents;
   });
 
   group("EpubSpine", () {
@@ -34,15 +34,15 @@ main() async {
         expect(testSpine, equals(reference));
       });
       test("is false when Items changes", () async {
-        testSpine.Items = [
+        testSpine.items = [
           EpubSpineItemRef()
-            ..IdRef = randomString.randomAlpha(length)
-            ..IsLinear = false
+            ..idRef = randomString.randomAlpha(length)
+            ..isLinear = false
         ];
         expect(testSpine, isNot(reference));
       });
       test("is false when TableOfContents changes", () async {
-        testSpine.TableOfContents = randomString.randomAlpha(length);
+        testSpine.tableOfContents = randomString.randomAlpha(length);
         expect(testSpine, isNot(reference));
       });
     });
@@ -52,15 +52,15 @@ main() async {
         expect(testSpine.hashCode, equals(reference.hashCode));
       });
       test("is false when IsLinear changes", () async {
-        testSpine.Items = [
+        testSpine.items = [
           EpubSpineItemRef()
-            ..IdRef = randomString.randomAlpha(length)
-            ..IsLinear = false
+            ..idRef = randomString.randomAlpha(length)
+            ..isLinear = false
         ];
         expect(testSpine.hashCode, isNot(reference.hashCode));
       });
       test("is false when TableOfContents changes", () async {
-        testSpine.TableOfContents = randomString.randomAlpha(length);
+        testSpine.tableOfContents = randomString.randomAlpha(length);
         expect(testSpine.hashCode, isNot(reference.hashCode));
       });
     });

@@ -8,8 +8,8 @@ void main() async {
   var epubRes = await http.get(Uri.parse('alicesAdventuresUnderGround.epub'));
   if (epubRes.statusCode == 200) {
     var book = await epub.EpubReader.openBook(epubRes.bodyBytes);
-    querySelector('#title')?.text = book.Title;
-    querySelector('#author')?.text = book.Author;
+    querySelector('#title')?.text = book.title;
+    querySelector('#author')?.text = book.author;
     var chapters = await book.getChapters();
     querySelector('#nchapters')?.text = chapters.length.toString();
     querySelectorAll('h2').style.visibility = 'visible';

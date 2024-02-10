@@ -8,42 +8,42 @@ import 'epub_metadata_identifier.dart';
 import 'epub_metadata_meta.dart';
 
 class EpubMetadata {
-  List<String>? Titles;
-  List<EpubMetadataCreator>? Creators;
-  List<String>? Subjects;
-  String? Description;
-  List<String>? Publishers;
-  List<EpubMetadataContributor>? Contributors;
-  List<EpubMetadataDate>? Dates;
-  List<String>? Types;
-  List<String>? Formats;
-  List<EpubMetadataIdentifier>? Identifiers;
-  List<String>? Sources;
-  List<String>? Languages;
-  List<String>? Relations;
-  List<String>? Coverages;
-  List<String>? Rights;
-  List<EpubMetadataMeta>? MetaItems;
+  List<String>? titles;
+  List<EpubMetadataCreator>? creators;
+  List<String>? subjects;
+  String? description;
+  List<String>? publishers;
+  List<EpubMetadataContributor>? contributors;
+  List<EpubMetadataDate>? dates;
+  List<String>? types;
+  List<String>? formats;
+  List<EpubMetadataIdentifier>? identifiers;
+  List<String>? sources;
+  List<String>? languages;
+  List<String>? relations;
+  List<String>? coverages;
+  List<String>? rights;
+  List<EpubMetadataMeta>? metaItems;
 
   @override
   int get hashCode {
     var objects = [
-      ...Titles!.map((title) => title.hashCode),
-      ...Creators!.map((creator) => creator.hashCode),
-      ...Subjects!.map((subject) => subject.hashCode),
-      ...Publishers!.map((publisher) => publisher.hashCode),
-      ...Contributors!.map((contributor) => contributor.hashCode),
-      ...Dates!.map((date) => date.hashCode),
-      ...Types!.map((type) => type.hashCode),
-      ...Formats!.map((format) => format.hashCode),
-      ...Identifiers!.map((identifier) => identifier.hashCode),
-      ...Sources!.map((source) => source.hashCode),
-      ...Languages!.map((language) => language.hashCode),
-      ...Relations!.map((relation) => relation.hashCode),
-      ...Coverages!.map((coverage) => coverage.hashCode),
-      ...Rights!.map((right) => right.hashCode),
-      ...MetaItems!.map((metaItem) => metaItem.hashCode),
-      Description.hashCode
+      ...titles!.map((title) => title.hashCode),
+      ...creators!.map((creator) => creator.hashCode),
+      ...subjects!.map((subject) => subject.hashCode),
+      ...publishers!.map((publisher) => publisher.hashCode),
+      ...contributors!.map((contributor) => contributor.hashCode),
+      ...dates!.map((date) => date.hashCode),
+      ...types!.map((type) => type.hashCode),
+      ...formats!.map((format) => format.hashCode),
+      ...identifiers!.map((identifier) => identifier.hashCode),
+      ...sources!.map((source) => source.hashCode),
+      ...languages!.map((language) => language.hashCode),
+      ...relations!.map((relation) => relation.hashCode),
+      ...coverages!.map((coverage) => coverage.hashCode),
+      ...rights!.map((right) => right.hashCode),
+      ...metaItems!.map((metaItem) => metaItem.hashCode),
+      description.hashCode
     ];
 
     return hashObjects(objects);
@@ -53,23 +53,23 @@ class EpubMetadata {
   bool operator ==(other) {
     var otherAs = other as EpubMetadata?;
     if (otherAs == null) return false;
-    if (Description != otherAs.Description) return false;
+    if (description != otherAs.description) return false;
 
-    if (!collections.listsEqual(Titles, otherAs.Titles) ||
-        !collections.listsEqual(Creators, otherAs.Creators) ||
-        !collections.listsEqual(Subjects, otherAs.Subjects) ||
-        !collections.listsEqual(Publishers, otherAs.Publishers) ||
-        !collections.listsEqual(Contributors, otherAs.Contributors) ||
-        !collections.listsEqual(Dates, otherAs.Dates) ||
-        !collections.listsEqual(Types, otherAs.Types) ||
-        !collections.listsEqual(Formats, otherAs.Formats) ||
-        !collections.listsEqual(Identifiers, otherAs.Identifiers) ||
-        !collections.listsEqual(Sources, otherAs.Sources) ||
-        !collections.listsEqual(Languages, otherAs.Languages) ||
-        !collections.listsEqual(Relations, otherAs.Relations) ||
-        !collections.listsEqual(Coverages, otherAs.Coverages) ||
-        !collections.listsEqual(Rights, otherAs.Rights) ||
-        !collections.listsEqual(MetaItems, otherAs.MetaItems)) {
+    if (!collections.listsEqual(titles, otherAs.titles) ||
+        !collections.listsEqual(creators, otherAs.creators) ||
+        !collections.listsEqual(subjects, otherAs.subjects) ||
+        !collections.listsEqual(publishers, otherAs.publishers) ||
+        !collections.listsEqual(contributors, otherAs.contributors) ||
+        !collections.listsEqual(dates, otherAs.dates) ||
+        !collections.listsEqual(types, otherAs.types) ||
+        !collections.listsEqual(formats, otherAs.formats) ||
+        !collections.listsEqual(identifiers, otherAs.identifiers) ||
+        !collections.listsEqual(sources, otherAs.sources) ||
+        !collections.listsEqual(languages, otherAs.languages) ||
+        !collections.listsEqual(relations, otherAs.relations) ||
+        !collections.listsEqual(coverages, otherAs.coverages) ||
+        !collections.listsEqual(rights, otherAs.rights) ||
+        !collections.listsEqual(metaItems, otherAs.metaItems)) {
       return false;
     }
 

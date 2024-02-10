@@ -5,18 +5,18 @@ import 'epub_navigation_label.dart';
 import 'epub_navigation_target.dart';
 
 class EpubNavigationList {
-  String? Id;
-  String? Class;
-  List<EpubNavigationLabel>? NavigationLabels;
-  List<EpubNavigationTarget>? NavigationTargets;
+  String? id;
+  String? classs;
+  List<EpubNavigationLabel>? navigationLabels;
+  List<EpubNavigationTarget>? navigationTargets;
 
   @override
   int get hashCode {
     var objects = [
-      Id.hashCode,
-      Class.hashCode,
-      ...NavigationLabels?.map((label) => label.hashCode) ?? [0],
-      ...NavigationTargets?.map((target) => target.hashCode) ?? [0]
+      id.hashCode,
+      classs.hashCode,
+      ...navigationLabels?.map((label) => label.hashCode) ?? [0],
+      ...navigationTargets?.map((target) => target.hashCode) ?? [0]
     ];
     return hashObjects(objects);
   }
@@ -26,14 +26,14 @@ class EpubNavigationList {
     var otherAs = other as EpubNavigationList?;
     if (otherAs == null) return false;
 
-    if (!(Id == otherAs.Id && Class == otherAs.Class)) {
+    if (!(id == otherAs.id && classs == otherAs.classs)) {
       return false;
     }
 
-    if (!collections.listsEqual(NavigationLabels, otherAs.NavigationLabels)) {
+    if (!collections.listsEqual(navigationLabels, otherAs.navigationLabels)) {
       return false;
     }
-    if (!collections.listsEqual(NavigationTargets, otherAs.NavigationTargets)) {
+    if (!collections.listsEqual(navigationTargets, otherAs.navigationTargets)) {
       return false;
     }
     return true;

@@ -4,27 +4,27 @@ import 'package:quiver/core.dart';
 import 'epub_content_file.dart';
 
 class EpubByteContentFile extends EpubContentFile {
-  List<int>? Content;
+  List<int>? content;
 
   @override
   int get hashCode {
     var objects = [
-      ContentMimeType.hashCode,
-      ContentType.hashCode,
-      FileName.hashCode,
-      ...Content?.map((content) => content.hashCode) ?? [0],
+      contentMimeType.hashCode,
+      contentType.hashCode,
+      fileName.hashCode,
+      ...content?.map((content) => content.hashCode) ?? [0],
     ];
     return hashObjects(objects);
   }
 
   @override
   bool operator ==(other) {
-    if (!(other is EpubByteContentFile)) {
+    if (other is! EpubByteContentFile) {
       return false;
     }
-    return collections.listsEqual(Content, other.Content) &&
-        ContentMimeType == other.ContentMimeType &&
-        ContentType == other.ContentType &&
-        FileName == other.FileName;
+    return collections.listsEqual(content, other.content) &&
+        contentMimeType == other.contentMimeType &&
+        contentType == other.contentType &&
+        fileName == other.fileName;
   }
 }

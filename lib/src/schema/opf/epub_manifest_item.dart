@@ -1,27 +1,27 @@
 import 'package:quiver/core.dart';
 
 class EpubManifestItem {
-  String? Id;
-  String? Href;
-  String? MediaType;
-  String? MediaOverlay;
-  String? RequiredNamespace;
-  String? RequiredModules;
-  String? Fallback;
-  String? FallbackStyle;
-  String? Properties;
+  String? id;
+  String? href;
+  String? mediaType;
+  String? mediaOverlay;
+  String? requiredNamespace;
+  String? requiredModules;
+  String? fallback;
+  String? fallbackStyle;
+  String? properties;
 
   @override
   int get hashCode => hashObjects([
-        Id.hashCode,
-        Href.hashCode,
-        MediaType.hashCode,
-        MediaOverlay.hashCode,
-        RequiredNamespace.hashCode,
-        RequiredModules.hashCode,
-        Fallback.hashCode,
-        FallbackStyle.hashCode,
-        Properties.hashCode
+        id.hashCode,
+        href.hashCode,
+        mediaType.hashCode,
+        mediaOverlay.hashCode,
+        requiredNamespace.hashCode,
+        requiredModules.hashCode,
+        fallback.hashCode,
+        fallbackStyle.hashCode,
+        properties.hashCode
       ]);
 
   @override
@@ -31,19 +31,19 @@ class EpubManifestItem {
       return false;
     }
 
-    return Id == otherAs.Id &&
-        Href == otherAs.Href &&
-        MediaType == otherAs.MediaType &&
-        MediaOverlay == otherAs.MediaOverlay &&
-        RequiredNamespace == otherAs.RequiredNamespace &&
-        RequiredModules == otherAs.RequiredModules &&
-        Fallback == otherAs.Fallback &&
-        FallbackStyle == otherAs.FallbackStyle &&
-        Properties == otherAs.Properties;
+    return id == otherAs.id &&
+        href == otherAs.href &&
+        mediaType == otherAs.mediaType &&
+        mediaOverlay == otherAs.mediaOverlay &&
+        requiredNamespace == otherAs.requiredNamespace &&
+        requiredModules == otherAs.requiredModules &&
+        fallback == otherAs.fallback &&
+        fallbackStyle == otherAs.fallbackStyle &&
+        properties == otherAs.properties;
   }
 
   @override
   String toString() {
-    return 'Id: $Id, Href = $Href, MediaType = $MediaType, Properties = $Properties, MediaOverlay = $MediaOverlay';
+    return 'Id: $id, Href = $href, MediaType = $mediaType, Properties = $properties, MediaOverlay = $mediaOverlay';
   }
 }
