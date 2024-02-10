@@ -1,18 +1,22 @@
-import 'package:quiver/core.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 
 class EpubNavigationContent {
-  String? id;
-  String? source;
+  final String? id;
+  final String? source;
+
+  const EpubNavigationContent({
+    this.id,
+    this.source,
+  });
 
   @override
-  int get hashCode => hash2(id.hashCode, source.hashCode);
+  int get hashCode => id.hashCode ^ source.hashCode;
 
   @override
-  bool operator ==(other) {
-    if (other is! EpubNavigationContent) {
-      return false;
-    }
-    return id == other.id && source == other.source;
+  bool operator ==(covariant EpubNavigationContent other) {
+    if (identical(this, other)) return true;
+
+    return other.id == id && other.source == source;
   }
 
   @override

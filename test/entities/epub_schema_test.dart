@@ -37,9 +37,10 @@ main() async {
       });
 
       test("is false when Navigation changes", () async {
-        testSchema.navigation = EpubNavigation()
-          ..docTitle = EpubNavigationDocTitle()
-          ..docAuthors = [EpubNavigationDocAuthor()];
+        testSchema.navigation = EpubNavigation(
+          docTitle: EpubNavigationDocTitle(),
+          docAuthors: [EpubNavigationDocAuthor()],
+        );
 
         expect(testSchema, isNot(reference));
       });
@@ -65,9 +66,10 @@ main() async {
       });
 
       test("is false when Navigation changes", () async {
-        testSchema.navigation = EpubNavigation()
-          ..docTitle = EpubNavigationDocTitle()
-          ..docAuthors = [EpubNavigationDocAuthor()];
+        testSchema.navigation = EpubNavigation(
+          docTitle: EpubNavigationDocTitle(),
+          docAuthors: [EpubNavigationDocAuthor()],
+        );
 
         expect(testSchema.hashCode, isNot(reference.hashCode));
       });

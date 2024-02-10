@@ -9,12 +9,21 @@ import 'epub_navigation_map.dart';
 import 'epub_navigation_page_list.dart';
 
 class EpubNavigation {
-  EpubNavigationHead? head;
-  EpubNavigationDocTitle? docTitle;
-  List<EpubNavigationDocAuthor>? docAuthors;
-  EpubNavigationMap? navMap;
-  EpubNavigationPageList? pageList;
-  List<EpubNavigationList>? navLists;
+  final EpubNavigationHead? head;
+  final EpubNavigationDocTitle? docTitle;
+  final List<EpubNavigationDocAuthor> docAuthors;
+  final EpubNavigationMap? navMap;
+  final EpubNavigationPageList? pageList;
+  final List<EpubNavigationList> navLists;
+
+  const EpubNavigation({
+    this.head,
+    this.docTitle,
+    this.docAuthors = const <EpubNavigationDocAuthor>[],
+    this.navMap,
+    this.pageList,
+    this.navLists = const <EpubNavigationList>[],
+  });
 
   @override
   int get hashCode {
@@ -23,8 +32,8 @@ class EpubNavigation {
       docTitle.hashCode,
       navMap.hashCode,
       pageList.hashCode,
-      ...docAuthors?.map((author) => author.hashCode) ?? [0],
-      ...navLists?.map((navList) => navList.hashCode) ?? [0]
+      ...docAuthors.map((author) => author.hashCode),
+      ...navLists.map((navList) => navList.hashCode),
     ];
     return hashObjects(objects);
   }

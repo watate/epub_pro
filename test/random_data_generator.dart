@@ -95,9 +95,10 @@ class RandomDataGenerator {
   }
 
   EpubNavigationContent randomEpubNavigationContent() {
-    return EpubNavigationContent()
-      ..id = randomString()
-      ..source = randomString();
+    return EpubNavigationContent(
+      id: randomString(),
+      source: randomString(),
+    );
   }
 
   EpubNavigationTarget randomEpubNavigationTarget() {
@@ -119,18 +120,19 @@ class RandomDataGenerator {
   }
 
   EpubNavigationHeadMeta randomNavigationHeadMeta() {
-    return EpubNavigationHeadMeta()
-      ..content = randomString()
-      ..name = randomString()
-      ..scheme = randomString();
+    return EpubNavigationHeadMeta(
+      content: randomString(),
+      name: randomString(),
+      scheme: randomString(),
+    );
   }
 
   EpubNavigationDocTitle randomNavigationDocTitle() {
-    return EpubNavigationDocTitle()..titles = [randomString()];
+    return EpubNavigationDocTitle(titles: [randomString()]);
   }
 
   EpubNavigationDocAuthor randomNavigationDocAuthor() {
-    return EpubNavigationDocAuthor()..authors = [randomString()];
+    return EpubNavigationDocAuthor(authors: [randomString()]);
   }
 
   EpubPackage randomEpubPackage() {

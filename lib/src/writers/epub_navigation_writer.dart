@@ -37,7 +37,7 @@ class EpubNavigationWriter {
     builder.element(
       'docTitle',
       nest: () {
-        for (var element in title.titles!) {
+        for (final element in title.titles) {
           builder.text(element);
         }
       },

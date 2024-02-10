@@ -15,8 +15,9 @@ main() async {
   late EpubNavigationDocAuthor testNavigationDocAuthor;
 
   setUp(() async {
-    testNavigationDocAuthor = EpubNavigationDocAuthor()
-      ..authors = List.from(reference.authors ?? []);
+    testNavigationDocAuthor = EpubNavigationDocAuthor(
+      authors: List.from(reference.authors),
+    );
   });
 
   group("EpubNavigationDocAuthor", () {
@@ -26,7 +27,7 @@ main() async {
       });
 
       test("is false when Authors changes", () async {
-        testNavigationDocAuthor.authors?.add(generator.randomString());
+        testNavigationDocAuthor.authors.add(generator.randomString());
         expect(testNavigationDocAuthor, isNot(reference));
       });
     });
@@ -37,7 +38,7 @@ main() async {
       });
 
       test("is false when Authors changes", () async {
-        testNavigationDocAuthor.authors?.add(generator.randomString());
+        testNavigationDocAuthor.authors.add(generator.randomString());
         expect(testNavigationDocAuthor.hashCode, isNot(reference.hashCode));
       });
     });
