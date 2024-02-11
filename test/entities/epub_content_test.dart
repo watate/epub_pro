@@ -13,18 +13,19 @@ main() async {
   setUp(() async {
     testContent = EpubContent();
 
-    textContentFile = EpubTextContentFile();
-    textContentFile
-      ..content = "Some string"
-      ..contentMimeType = "application/text"
-      ..contentType = EpubContentType.other
-      ..fileName = "orthros.txt";
+    textContentFile = EpubTextContentFile(
+      content: "Some string",
+      contentMimeType: "application/text",
+      contentType: EpubContentType.other,
+      fileName: "orthros.txt",
+    );
 
-    byteContentFile = EpubByteContentFile()
-      ..content = [0, 1, 2, 3]
-      ..contentMimeType = "application/orthros"
-      ..contentType = EpubContentType.other
-      ..fileName = "orthros.bin";
+    byteContentFile = EpubByteContentFile(
+      content: [0, 1, 2, 3],
+      contentMimeType: "application/orthros",
+      contentType: EpubContentType.other,
+      fileName: "orthros.bin",
+    );
   });
 
   group("EpubContent", () {

@@ -34,12 +34,12 @@ main() async {
       });
 
       test("is false when Content changes", () async {
-        var file = EpubTextContentFile();
-        file
-          ..content = "Hello"
-          ..contentMimeType = "application/txt"
-          ..contentType = EpubContentType.other
-          ..fileName = "orthros.txt";
+        var file = EpubTextContentFile(
+          content: "Hello",
+          contentMimeType: "application/txt",
+          contentType: EpubContentType.other,
+          fileName: "orthros.txt",
+        );
 
         EpubContent content = EpubContent();
         content.allFiles?["hello"] = file;
@@ -91,12 +91,12 @@ main() async {
       });
 
       test("is false when Content changes", () async {
-        var file = EpubTextContentFile();
-        file
-          ..content = "Hello"
-          ..contentMimeType = "application/txt"
-          ..contentType = EpubContentType.other
-          ..fileName = "orthros.txt";
+        var file = EpubTextContentFile(
+          content: "Hello",
+          contentMimeType: "application/txt",
+          contentType: EpubContentType.other,
+          fileName: "orthros.txt",
+        );
 
         EpubContent content = EpubContent();
         content.allFiles?["hello"] = file;

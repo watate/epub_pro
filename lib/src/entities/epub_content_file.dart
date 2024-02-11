@@ -1,23 +1,26 @@
-import 'package:quiver/core.dart';
-
 import 'epub_content_type.dart';
 
 abstract class EpubContentFile {
-  String? fileName;
-  EpubContentType? contentType;
-  String? contentMimeType;
+  final String? fileName;
+  final EpubContentType? contentType;
+  final String? contentMimeType;
+
+  const EpubContentFile({
+    this.fileName,
+    this.contentType,
+    this.contentMimeType,
+  });
 
   @override
   int get hashCode =>
-      hash3(fileName.hashCode, contentType.hashCode, contentMimeType.hashCode);
+      fileName.hashCode ^ contentType.hashCode ^ contentMimeType.hashCode;
 
   @override
-  bool operator ==(other) {
-    if (other is! EpubContentFile) {
-      return false;
-    }
-    return fileName == other.fileName &&
-        contentType == other.contentType &&
-        contentMimeType == other.contentMimeType;
+  bool operator ==(covariant EpubContentFile other) {
+    if (identical(this, other)) return true;
+
+    return other.fileName == fileName &&
+        other.contentType == contentType &&
+        other.contentMimeType == contentMimeType;
   }
 }

@@ -133,11 +133,13 @@ class EpubReader {
 
     await Future.forEach(textContentFileRefs.keys, (dynamic key) async {
       EpubContentFileRef value = textContentFileRefs[key]!;
-      var textContentFile = EpubTextContentFile();
-      textContentFile.fileName = value.fileName;
-      textContentFile.contentType = value.contentType;
-      textContentFile.contentMimeType = value.contentMimeType;
-      textContentFile.content = await value.readContentAsText();
+      final content = await value.readContentAsText();
+      final textContentFile = EpubTextContentFile(
+        fileName: value.fileName,
+        contentType: value.contentType,
+        contentMimeType: value.contentMimeType,
+        content: content,
+      );
       result[key] = textContentFile;
     });
     return result;
@@ -153,13 +155,15 @@ class EpubReader {
   }
 
   static Future<EpubByteContentFile> readByteContentFile(
-      EpubContentFileRef contentFileRef) async {
-    var result = EpubByteContentFile();
-
-    result.fileName = contentFileRef.fileName;
-    result.contentType = contentFileRef.contentType;
-    result.contentMimeType = contentFileRef.contentMimeType;
-    result.content = await contentFileRef.readContentAsBytes();
+    EpubContentFileRef contentFileRef,
+  ) async {
+    final content = await contentFileRef.readContentAsBytes();
+    final result = EpubByteContentFile(
+      fileName: contentFileRef.fileName,
+      contentType: contentFileRef.contentType,
+      contentMimeType: contentFileRef.contentMimeType,
+      content: content,
+    );
 
     return result;
   }
