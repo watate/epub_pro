@@ -84,14 +84,15 @@ class RandomDataGenerator {
   }
 
   EpubNavigationPoint randomEpubNavigationPoint([int depth = 0]) {
-    return EpubNavigationPoint()
-      ..playOrder = randomString()
-      ..navigationLabels = [randomEpubNavigationLabel()]
-      ..id = randomString()
-      ..content = randomEpubNavigationContent()
-      ..classs = randomString()
-      ..childNavigationPoints =
-          depth > 0 ? [randomEpubNavigationPoint(depth - 1)] : [];
+    return EpubNavigationPoint(
+      id: randomString(),
+      classs: randomString(),
+      playOrder: randomString(),
+      navigationLabels: [randomEpubNavigationLabel()],
+      content: randomEpubNavigationContent(),
+      childNavigationPoints:
+          depth > 0 ? [randomEpubNavigationPoint(depth - 1)] : [],
+    );
   }
 
   EpubNavigationContent randomEpubNavigationContent() {
@@ -102,21 +103,22 @@ class RandomDataGenerator {
   }
 
   EpubNavigationTarget randomEpubNavigationTarget() {
-    return EpubNavigationTarget()
-      ..classs = randomString()
-      ..content = randomEpubNavigationContent()
-      ..id = randomString()
-      ..navigationLabels = [randomEpubNavigationLabel()]
-      ..playOrder = randomString()
-      ..value = randomString();
+    return EpubNavigationTarget(
+      id: randomString(),
+      classs: randomString(),
+      value: randomString(),
+      playOrder: randomString(),
+      navigationLabels: [randomEpubNavigationLabel()],
+      content: randomEpubNavigationContent(),
+    );
   }
 
   EpubNavigationLabel randomEpubNavigationLabel() {
-    return EpubNavigationLabel()..text = randomString();
+    return EpubNavigationLabel(text: randomString());
   }
 
   EpubNavigationHead randomEpubNavigationHead() {
-    return EpubNavigationHead()..metadata = [randomNavigationHeadMeta()];
+    return EpubNavigationHead(metadata: [randomNavigationHeadMeta()]);
   }
 
   EpubNavigationHeadMeta randomNavigationHeadMeta() {

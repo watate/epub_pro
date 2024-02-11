@@ -9,18 +9,6 @@ class EpubNavigationHeadMeta {
     this.scheme,
   });
 
-  EpubNavigationHeadMeta copyWith({
-    String? name,
-    String? content,
-    String? scheme,
-  }) {
-    return EpubNavigationHeadMeta(
-      name: name ?? this.name,
-      content: content ?? this.content,
-      scheme: scheme ?? this.scheme,
-    );
-  }
-
   @override
   int get hashCode => name.hashCode ^ content.hashCode ^ scheme.hashCode;
 

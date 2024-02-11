@@ -1,49 +1,50 @@
-import 'package:quiver/collection.dart' as collections;
-import 'package:quiver/core.dart';
+import 'package:collection/collection.dart';
 
 import 'epub_metadata.dart';
 import 'epub_navigation_label.dart';
 import 'epub_navigation_page_target_type.dart';
 
 class EpubNavigationPageTarget {
-  String? id;
-  String? value;
-  EpubNavigationPageTargetType? type;
-  String? classs;
-  String? playOrder;
-  List<EpubNavigationLabel>? navigationLabels;
-  EpubNavigationContent? content;
+  final String? id;
+  final String? value;
+  final EpubNavigationPageTargetType? type;
+  final String? classs;
+  final String? playOrder;
+  final List<EpubNavigationLabel> navigationLabels;
+  final EpubNavigationContent? content;
+
+  const EpubNavigationPageTarget({
+    this.id,
+    this.value,
+    this.type,
+    this.classs,
+    this.playOrder,
+    this.navigationLabels = const <EpubNavigationLabel>[],
+    this.content,
+  });
 
   @override
   int get hashCode {
-    var objects = [
-      id.hashCode,
-      value.hashCode,
-      type.hashCode,
-      classs.hashCode,
-      playOrder.hashCode,
-      content.hashCode,
-      ...navigationLabels?.map((label) => label.hashCode) ?? [0]
-    ];
-    return hashObjects(objects);
+    return id.hashCode ^
+        value.hashCode ^
+        type.hashCode ^
+        classs.hashCode ^
+        playOrder.hashCode ^
+        const DeepCollectionEquality().hash(navigationLabels) ^
+        content.hashCode;
   }
 
   @override
-  bool operator ==(other) {
-    var otherAs = other as EpubNavigationPageTarget?;
-    if (otherAs == null) {
-      return false;
-    }
+  bool operator ==(covariant EpubNavigationPageTarget other) {
+    if (identical(this, other)) return true;
+    final listEquals = const DeepCollectionEquality().equals;
 
-    if (!(id == otherAs.id &&
-        value == otherAs.value &&
-        type == otherAs.type &&
-        classs == otherAs.classs &&
-        playOrder == otherAs.playOrder &&
-        content == otherAs.content)) {
-      return false;
-    }
-
-    return collections.listsEqual(navigationLabels, otherAs.navigationLabels);
+    return other.id == id &&
+        other.value == value &&
+        other.type == type &&
+        other.classs == classs &&
+        other.playOrder == playOrder &&
+        listEquals(other.navigationLabels, navigationLabels) &&
+        other.content == content;
   }
 }

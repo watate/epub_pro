@@ -103,7 +103,7 @@ main(List<String> args) async {
   EpubNavigation navigation = epubBook.schema!.navigation!;
 
 // Enumerating NCX metadata
-  navigation.head!.metadata!.forEach((meta) {
+  navigation.head!.metadata.forEach((meta) {
     String metadataItemName = meta.name!;
     String metadataItemContent = meta.content!;
   });

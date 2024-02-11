@@ -63,3 +63,17 @@ main() async {
     });
   });
 }
+
+extension on EpubNavigationHeadMeta {
+  EpubNavigationHeadMeta copyWith({
+    String? content,
+    String? name,
+    String? scheme,
+  }) {
+    return EpubNavigationHeadMeta(
+      content: content ?? this.content,
+      name: name ?? this.name,
+      scheme: scheme ?? this.scheme,
+    );
+  }
+}

@@ -46,7 +46,7 @@ class EpubNavigationWriter {
 
   static void writeNavigationHead(XmlBuilder builder, EpubNavigationHead head) {
     builder.element('head', nest: () {
-      for (var item in head.metadata!) {
+      for (final item in head.metadata) {
         builder.element(
           'meta',
           attributes: {'content': item.content!, 'name': item.name!},
@@ -59,7 +59,7 @@ class EpubNavigationWriter {
     builder.element(
       'navMap',
       nest: () {
-        for (var item in map.points!) {
+        for (var item in map.points) {
           writeNavigationPoint(builder, item);
         }
       },
@@ -77,7 +77,7 @@ class EpubNavigationWriter {
         'playOrder': point.playOrder!,
       },
       nest: () {
-        for (var element in point.navigationLabels!) {
+        for (final element in point.navigationLabels) {
           builder.element(
             'navLabel',
             nest: () {

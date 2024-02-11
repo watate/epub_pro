@@ -1,18 +1,21 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 class EpubNavigationLabel {
-  String? text;
+  final String? text;
+
+  const EpubNavigationLabel({
+    this.text,
+  });
 
   @override
   int get hashCode => text.hashCode;
 
   @override
-  bool operator ==(other) {
-    var otherAs = other as EpubNavigationLabel?;
-    if (otherAs == null) return false;
-    return text == otherAs.text;
+  bool operator ==(covariant EpubNavigationLabel other) {
+    if (identical(this, other)) return true;
+
+    return other.text == text;
   }
 
   @override
-  String toString() {
-    return text!;
-  }
+  String toString() => '$text';
 }

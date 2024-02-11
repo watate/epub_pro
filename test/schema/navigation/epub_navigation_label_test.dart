@@ -14,7 +14,7 @@ main() async {
 
   late EpubNavigationLabel testNavigationLabel;
   setUp(() async {
-    testNavigationLabel = EpubNavigationLabel()..text = reference.text;
+    testNavigationLabel = reference.copyWith();
   });
 
   group("EpubNavigationLabel", () {
@@ -24,7 +24,8 @@ main() async {
       });
 
       test("is false when Text changes", () async {
-        testNavigationLabel.text = generator.randomString();
+        testNavigationLabel =
+            reference.copyWith(text: generator.randomString());
         expect(testNavigationLabel, isNot(reference));
       });
     });
@@ -35,9 +36,21 @@ main() async {
       });
 
       test("is false when Metadata changes", () async {
-        testNavigationLabel.text = generator.randomString();
+        testNavigationLabel = reference.copyWith(
+          text: generator.randomString(),
+        );
         expect(testNavigationLabel.hashCode, isNot(reference.hashCode));
       });
     });
   });
+}
+
+extension on EpubNavigationLabel {
+  EpubNavigationLabel copyWith({
+    String? text,
+  }) {
+    return EpubNavigationLabel(
+      text: text ?? this.text,
+    );
+  }
 }

@@ -8,10 +8,7 @@ class EpubNavigationDocAuthor {
   });
 
   @override
-  int get hashCode => authors.fold(
-        0,
-        (hashCode, author) => hashCode ^ author.hashCode,
-      );
+  int get hashCode => const DeepCollectionEquality().hash(authors);
 
   @override
   bool operator ==(covariant EpubNavigationDocAuthor other) {

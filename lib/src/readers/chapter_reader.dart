@@ -8,8 +8,7 @@ class ChapterReader {
     if (bookRef.schema!.navigation == null) {
       return <EpubChapterRef>[];
     }
-    return getChaptersImpl(
-        bookRef, bookRef.schema!.navigation!.navMap!.points!);
+    return getChaptersImpl(bookRef, bookRef.schema!.navigation!.navMap!.points);
   }
 
   static List<EpubChapterRef> getChaptersImpl(
@@ -43,9 +42,9 @@ class ChapterReader {
       var chapterRef = EpubChapterRef(htmlContentFileRef);
       chapterRef.contentFileName = contentFileName;
       chapterRef.anchor = anchor;
-      chapterRef.title = navigationPoint.navigationLabels!.first.text;
+      chapterRef.title = navigationPoint.navigationLabels.first.text;
       chapterRef.subChapters =
-          getChaptersImpl(bookRef, navigationPoint.childNavigationPoints!);
+          getChaptersImpl(bookRef, navigationPoint.childNavigationPoints);
 
       result.add(chapterRef);
     }

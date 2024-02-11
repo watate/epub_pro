@@ -1,5 +1,5 @@
-import 'package:quiver/collection.dart' as collections;
-import 'package:quiver/core.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:collection/collection.dart';
 
 import 'epub_navigation_doc_author.dart';
 import 'epub_navigation_doc_title.dart';
@@ -27,34 +27,24 @@ class EpubNavigation {
 
   @override
   int get hashCode {
-    var objects = [
-      head.hashCode,
-      docTitle.hashCode,
-      navMap.hashCode,
-      pageList.hashCode,
-      ...docAuthors.map((author) => author.hashCode),
-      ...navLists.map((navList) => navList.hashCode),
-    ];
-    return hashObjects(objects);
+    return head.hashCode ^
+        docTitle.hashCode ^
+        const DeepCollectionEquality().hash(docAuthors) ^
+        navMap.hashCode ^
+        pageList.hashCode ^
+        const DeepCollectionEquality().hash(navLists);
   }
 
   @override
-  bool operator ==(other) {
-    var otherAs = other as EpubNavigation?;
-    if (otherAs == null) {
-      return false;
-    }
+  bool operator ==(covariant EpubNavigation other) {
+    if (identical(this, other)) return true;
+    final listEquals = const DeepCollectionEquality().equals;
 
-    if (!collections.listsEqual(docAuthors, otherAs.docAuthors)) {
-      return false;
-    }
-    if (!collections.listsEqual(navLists, otherAs.navLists)) {
-      return false;
-    }
-
-    return head == otherAs.head &&
-        docTitle == otherAs.docTitle &&
-        navMap == otherAs.navMap &&
-        pageList == otherAs.pageList;
+    return other.head == head &&
+        other.docTitle == docTitle &&
+        listEquals(other.docAuthors, docAuthors) &&
+        other.navMap == navMap &&
+        other.pageList == pageList &&
+        listEquals(other.navLists, navLists);
   }
 }

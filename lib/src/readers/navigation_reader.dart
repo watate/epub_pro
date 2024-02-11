@@ -331,8 +331,7 @@ class NavigationReader {
   }
 
   static EpubNavigationHead readNavigationHead(xml.XmlElement headNode) {
-    var result = EpubNavigationHead();
-    result.metadata = <EpubNavigationHeadMeta>[];
+    final metadata = <EpubNavigationHeadMeta>[];
 
     headNode.children.whereType<xml.XmlElement>().forEach(
       (xml.XmlElement metaNode) {
@@ -369,149 +368,157 @@ class NavigationReader {
             scheme: scheme,
           );
 
-          result.metadata!.add(meta);
+          metadata.add(meta);
         }
       },
     );
-    return result;
+    return EpubNavigationHead(metadata: metadata);
   }
 
   static EpubNavigationLabel readNavigationLabel(
-      xml.XmlElement navigationLabelNode) {
-    var result = EpubNavigationLabel();
-
+    xml.XmlElement navigationLabelNode,
+  ) {
     var navigationLabelTextNode = navigationLabelNode
         .findElements('text', namespace: navigationLabelNode.name.namespaceUri)
         .firstWhereOrNull((xml.XmlElement? elem) => elem != null);
     if (navigationLabelTextNode == null) {
       throw Exception(
-          'Incorrect EPUB navigation label: label text element is missing.');
+        'Incorrect EPUB navigation label: label text element is missing.',
+      );
     }
 
-    result.text = navigationLabelTextNode.value;
+    final text = navigationLabelTextNode.value;
 
-    return result;
+    return EpubNavigationLabel(text: text);
   }
 
   static EpubNavigationLabel readNavigationLabelV3(
-      xml.XmlElement navigationLabelNode) {
-    var result = EpubNavigationLabel();
-    result.text = navigationLabelNode.value?.trim();
-    return result;
+    xml.XmlElement navigationLabelNode,
+  ) {
+    final text = navigationLabelNode.value?.trim();
+    return EpubNavigationLabel(text: text);
   }
 
   static EpubNavigationList readNavigationList(
-      xml.XmlElement navigationListNode) {
-    var result = EpubNavigationList();
-    for (var navigationListNodeAttribute in navigationListNode.attributes) {
-      var attributeValue = navigationListNodeAttribute.value;
-      switch (navigationListNodeAttribute.name.local.toLowerCase()) {
+    xml.XmlElement navigationListNode,
+  ) {
+    String? id, classs;
+
+    for (final attribute in navigationListNode.attributes) {
+      final attributeValue = attribute.value;
+
+      switch (attribute.name.local.toLowerCase()) {
         case 'id':
-          result.id = attributeValue;
-          break;
+          id = attributeValue;
         case 'class':
-          result.classs = attributeValue;
-          break;
+          classs = attributeValue;
       }
     }
-    navigationListNode.children
-        .whereType<xml.XmlElement>()
-        .forEach((xml.XmlElement navigationListChildNode) {
-      switch (navigationListChildNode.name.local.toLowerCase()) {
+
+    final navigationLabels = <EpubNavigationLabel>[];
+    final navigationTargets = <EpubNavigationTarget>[];
+    for (final node
+        in navigationListNode.children.whereType<xml.XmlElement>()) {
+      switch (node.name.local.toLowerCase()) {
         case 'navlabel':
-          var navigationLabel = readNavigationLabel(navigationListChildNode);
-          result.navigationLabels!.add(navigationLabel);
-          break;
+          final navigationLabel = readNavigationLabel(node);
+          navigationLabels.add(navigationLabel);
         case 'navtarget':
-          var navigationTarget = readNavigationTarget(navigationListChildNode);
-          result.navigationTargets!.add(navigationTarget);
-          break;
+          final navigationTarget = readNavigationTarget(node);
+          navigationTargets.add(navigationTarget);
       }
-    });
+    }
+
     // if (result.NavigationLabels!.isEmpty) {
     //   throw Exception(
     //       'Incorrect EPUB navigation page target: at least one navLabel element is required.');
     // }
-    return result;
+    return EpubNavigationList(
+      id: id,
+      classs: classs,
+      navigationLabels: navigationLabels,
+      navigationTargets: navigationTargets,
+    );
   }
 
   static EpubNavigationMap readNavigationMap(xml.XmlElement navigationMapNode) {
-    var result = EpubNavigationMap();
-    result.points = <EpubNavigationPoint>[];
+    final points = <EpubNavigationPoint>[];
+
     navigationMapNode.children
         .whereType<xml.XmlElement>()
         .forEach((xml.XmlElement navigationPointNode) {
       if (navigationPointNode.name.local.toLowerCase() == 'navpoint') {
         var navigationPoint = readNavigationPoint(navigationPointNode);
-        result.points!.add(navigationPoint);
+        points.add(navigationPoint);
       }
     });
-    return result;
+    return EpubNavigationMap(points: points);
   }
 
   static EpubNavigationMap readNavigationMapV3(
       xml.XmlElement navigationMapNode) {
-    var result = EpubNavigationMap();
-    result.points = <EpubNavigationPoint>[];
+    final points = <EpubNavigationPoint>[];
+
     navigationMapNode.children
         .whereType<xml.XmlElement>()
         .forEach((xml.XmlElement navigationPointNode) {
       if (navigationPointNode.name.local.toLowerCase() == 'li') {
         var navigationPoint = readNavigationPointV3(navigationPointNode);
-        result.points!.add(navigationPoint);
+        points.add(navigationPoint);
       }
     });
-    return result;
+    return EpubNavigationMap(points: points);
   }
 
   static EpubNavigationPageList readNavigationPageList(
-      xml.XmlElement navigationPageListNode) {
-    var result = EpubNavigationPageList();
-    result.targets = <EpubNavigationPageTarget>[];
-    navigationPageListNode.children
-        .whereType<xml.XmlElement>()
-        .forEach((xml.XmlElement pageTargetNode) {
-      if (pageTargetNode.name.local == 'pageTarget') {
-        var pageTarget = readNavigationPageTarget(pageTargetNode);
-        result.targets!.add(pageTarget);
-      }
-    });
+    xml.XmlElement navigationPageListNode,
+  ) {
+    final targets = <EpubNavigationPageTarget>[];
 
-    return result;
+    for (final node
+        in navigationPageListNode.children.whereType<xml.XmlElement>()) {
+      if (node.name.local.toLowerCase() == 'pagetarget') {
+        final pageTarget = readNavigationPageTarget(node);
+        targets.add(pageTarget);
+      }
+    }
+
+    return EpubNavigationPageList(targets: targets);
   }
 
   static EpubNavigationPageTarget readNavigationPageTarget(
       xml.XmlElement navigationPageTargetNode) {
-    var result = EpubNavigationPageTarget();
-    result.navigationLabels = <EpubNavigationLabel>[];
-    for (var navigationPageTargetNodeAttribute
-        in navigationPageTargetNode.attributes) {
-      var attributeValue = navigationPageTargetNodeAttribute.value;
-      switch (navigationPageTargetNodeAttribute.name.local.toLowerCase()) {
+    String? id, value, classs, playOrder;
+
+    EpubNavigationPageTargetType? type;
+
+    for (var attribute in navigationPageTargetNode.attributes) {
+      var attributeValue = attribute.value;
+      switch (attribute.name.local.toLowerCase()) {
         case 'id':
-          result.id = attributeValue;
-          break;
+          id = attributeValue;
         case 'value':
-          result.value = attributeValue;
-          break;
+          value = attributeValue;
         case 'type':
           var converter = EnumFromString<EpubNavigationPageTargetType>(
-              EpubNavigationPageTargetType.values);
+            EpubNavigationPageTargetType.values,
+          );
           var type = converter.get(attributeValue);
-          result.type = type;
-          break;
+          type = type;
         case 'class':
-          result.classs = attributeValue;
-          break;
+          classs = attributeValue;
         case 'playorder':
-          result.playOrder = attributeValue;
-          break;
+          playOrder = attributeValue;
       }
     }
-    if (result.type == EpubNavigationPageTargetType.undefined) {
+    if (type == EpubNavigationPageTargetType.undefined) {
       throw Exception(
-          'Incorrect EPUB navigation page target: page target type is missing.');
+        'Incorrect EPUB navigation page target: page target type is missing.',
+      );
     }
+    final navigationLabels = <EpubNavigationLabel>[];
+
+    EpubNavigationContent? content;
 
     navigationPageTargetNode.children
         .whereType<xml.XmlElement>()
@@ -520,157 +527,190 @@ class NavigationReader {
         case 'navlabel':
           var navigationLabel =
               readNavigationLabel(navigationPageTargetChildNode);
-          result.navigationLabels!.add(navigationLabel);
-          break;
+          navigationLabels.add(navigationLabel);
         case 'content':
           var content = readNavigationContent(navigationPageTargetChildNode);
-          result.content = content;
-          break;
+          content = content;
       }
     });
-    if (result.navigationLabels!.isEmpty) {
+    if (navigationLabels.isEmpty) {
       throw Exception(
-          'Incorrect EPUB navigation page target: at least one navLabel element is required.');
+        'Incorrect EPUB navigation page target: at least one navLabel element is required.',
+      );
     }
 
-    return result;
+    return EpubNavigationPageTarget(
+      id: id,
+      value: value,
+      type: type,
+      classs: classs,
+      playOrder: playOrder,
+      navigationLabels: navigationLabels,
+      content: content,
+    );
   }
 
   static EpubNavigationPoint readNavigationPoint(
       xml.XmlElement navigationPointNode) {
-    var result = EpubNavigationPoint();
-    for (var navigationPointNodeAttribute in navigationPointNode.attributes) {
-      var attributeValue = navigationPointNodeAttribute.value;
-      switch (navigationPointNodeAttribute.name.local.toLowerCase()) {
+    String? id, classs, playOrder;
+    for (final attribute in navigationPointNode.attributes) {
+      var attributeValue = attribute.value;
+      switch (attribute.name.local.toLowerCase()) {
         case 'id':
-          result.id = attributeValue;
-          break;
+          id = attributeValue;
         case 'class':
-          result.classs = attributeValue;
-          break;
+          classs = attributeValue;
         case 'playorder':
-          result.playOrder = attributeValue;
-          break;
+          playOrder = attributeValue;
       }
     }
-    if (result.id == null || result.id!.isEmpty) {
+    if (id == null || id.isEmpty) {
       throw Exception('Incorrect EPUB navigation point: point ID is missing.');
     }
+    EpubNavigationContent? content;
 
-    result.navigationLabels = <EpubNavigationLabel>[];
-    result.childNavigationPoints = <EpubNavigationPoint>[];
+    final navigationLabels = <EpubNavigationLabel>[];
+    final childNavigationPoints = <EpubNavigationPoint>[];
     navigationPointNode.children.whereType<xml.XmlElement>().forEach(
       (xml.XmlElement navigationPointChildNode) {
         switch (navigationPointChildNode.name.local.toLowerCase()) {
           case 'navlabel':
             var navigationLabel = readNavigationLabel(navigationPointChildNode);
-            result.navigationLabels!.add(navigationLabel);
-            break;
+            navigationLabels.add(navigationLabel);
           case 'content':
-            var content = readNavigationContent(navigationPointChildNode);
-            result.content = content;
-            break;
+            final navContent = readNavigationContent(navigationPointChildNode);
+            content = navContent;
           case 'navpoint':
             var childNavigationPoint =
                 readNavigationPoint(navigationPointChildNode);
-            result.childNavigationPoints!.add(childNavigationPoint);
-            break;
+            childNavigationPoints.add(childNavigationPoint);
         }
       },
     );
 
-    if (result.navigationLabels!.isEmpty) {
+    if (navigationLabels.isEmpty) {
       throw Exception(
-          'EPUB parsing error: navigation point ${result.id} should contain at least one navigation label.');
+        'EPUB parsing error: navigation point $id should contain at least one navigation label.',
+      );
     }
-    if (result.content == null) {
+    if (content == null) {
       throw Exception(
-          'EPUB parsing error: navigation point ${result.id} should contain content.');
+        'EPUB parsing error: navigation point $id should contain content.',
+      );
     }
 
-    return result;
+    return EpubNavigationPoint(
+      id: id,
+      classs: classs,
+      playOrder: playOrder,
+      navigationLabels: navigationLabels,
+      content: content,
+      childNavigationPoints: childNavigationPoints,
+    );
   }
 
   static EpubNavigationPoint readNavigationPointV3(
-      xml.XmlElement navigationPointNode) {
-    var result = EpubNavigationPoint();
+    xml.XmlElement navigationPointNode,
+  ) {
+    String? id, classs, playOrder;
 
-    result.navigationLabels = <EpubNavigationLabel>[];
-    result.childNavigationPoints = <EpubNavigationPoint>[];
+    EpubNavigationContent? content;
+
+    final navigationLabels = <EpubNavigationLabel>[];
+    final childNavigationPoints = <EpubNavigationPoint>[];
     navigationPointNode.children.whereType<xml.XmlElement>().forEach(
       (xml.XmlElement navigationPointChildNode) {
         switch (navigationPointChildNode.name.local.toLowerCase()) {
           case 'a':
           case 'span':
-            var navigationLabel =
-                readNavigationLabelV3(navigationPointChildNode);
-            result.navigationLabels!.add(navigationLabel);
-            var content = readNavigationContentV3(navigationPointChildNode);
-            result.content = content;
-            break;
+            final label = readNavigationLabelV3(navigationPointChildNode);
+            navigationLabels.add(label);
+            final navContent =
+                readNavigationContentV3(navigationPointChildNode);
+            content = navContent;
           case 'ol':
-            for (var point
-                in readNavigationMapV3(navigationPointChildNode).points!) {
-              result.childNavigationPoints!.add(point);
+            for (final point
+                in readNavigationMapV3(navigationPointChildNode).points) {
+              childNavigationPoints.add(point);
             }
-            break;
         }
       },
     );
 
-    if (result.navigationLabels!.isEmpty) {
+    if (navigationLabels.isEmpty) {
       throw Exception(
-          'EPUB parsing error: navigation point ${result.id} should contain at least one navigation label.');
+        'EPUB parsing error: navigation point $id should contain at least one navigation label.',
+      );
     }
-    if (result.content == null) {
+    if (content == null) {
       throw Exception(
-          'EPUB parsing error: navigation point ${result.id} should contain content.');
+        'EPUB parsing error: navigation point $id should contain content.',
+      );
     }
 
-    return result;
+    return EpubNavigationPoint(
+      id: id,
+      classs: classs,
+      playOrder: playOrder,
+      navigationLabels: navigationLabels,
+      content: content,
+      childNavigationPoints: childNavigationPoints,
+    );
   }
 
   static EpubNavigationTarget readNavigationTarget(
       xml.XmlElement navigationTargetNode) {
-    var result = EpubNavigationTarget();
-    for (var navigationPageTargetNodeAttribute
-        in navigationTargetNode.attributes) {
-      var attributeValue = navigationPageTargetNodeAttribute.value;
-      switch (navigationPageTargetNodeAttribute.name.local.toLowerCase()) {
+    String? id, classs, value, playOrder;
+
+    for (var attribute in navigationTargetNode.attributes) {
+      final attributeValue = attribute.value;
+
+      switch (attribute.name.local.toLowerCase()) {
         case 'id':
-          result.id = attributeValue;
+          id = attributeValue;
         case 'value':
-          result.value = attributeValue;
+          value = attributeValue;
         case 'class':
-          result.classs = attributeValue;
+          classs = attributeValue;
         case 'playorder':
-          result.playOrder = attributeValue;
+          playOrder = attributeValue;
       }
     }
-    if (result.id == null || result.id!.isEmpty) {
+    if (id == null || id.isEmpty) {
       throw Exception(
-          'Incorrect EPUB navigation target: navigation target ID is missing.');
+        'Incorrect EPUB navigation target: navigation target ID is missing.',
+      );
     }
+
+    final navigationLabels = <EpubNavigationLabel>[];
+
+    EpubNavigationContent? content;
 
     navigationTargetNode.children.whereType<xml.XmlElement>().forEach(
       (xml.XmlElement navigationTargetChildNode) {
         switch (navigationTargetChildNode.name.local.toLowerCase()) {
           case 'navlabel':
-            var navigationLabel =
-                readNavigationLabel(navigationTargetChildNode);
-            result.navigationLabels!.add(navigationLabel);
+            final label = readNavigationLabel(navigationTargetChildNode);
+            navigationLabels.add(label);
           case 'content':
-            var content = readNavigationContent(navigationTargetChildNode);
-            result.content = content;
+            final navContent = readNavigationContent(navigationTargetChildNode);
+            content = navContent;
         }
       },
     );
-    if (result.navigationLabels!.isEmpty) {
+    if (navigationLabels.isEmpty) {
       throw Exception(
         'Incorrect EPUB navigation target: at least one navLabel element is required.',
       );
     }
 
-    return result;
+    return EpubNavigationTarget(
+      id: id,
+      classs: classs,
+      value: value,
+      playOrder: playOrder,
+      navigationLabels: navigationLabels,
+      content: content,
+    );
   }
 }
