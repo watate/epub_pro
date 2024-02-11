@@ -62,9 +62,9 @@ class EpubReader {
 
     var bookRef = EpubBookRef(epubArchive);
     bookRef.schema = await SchemaReader.readSchema(epubArchive);
-    bookRef.title = bookRef.schema!.package!.metadata!.titles!
+    bookRef.title = bookRef.schema!.package!.metadata!.titles
         .firstWhere((String name) => true, orElse: () => '');
-    bookRef.authors = bookRef.schema!.package!.metadata!.creators!
+    bookRef.authors = bookRef.schema!.package!.metadata!.creators
         .map((EpubMetadataCreator creator) => creator.creator)
         .toList();
     bookRef.author = bookRef.authors!.join(', ');

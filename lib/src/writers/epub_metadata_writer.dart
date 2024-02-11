@@ -13,9 +13,9 @@ class EpubMetadataWriter {
       namespaces: {_opfNamespace: 'opf', _dcNamespace: 'dc'},
       nest: () {
         meta!
-          ..titles?.forEach((item) =>
+          ..titles.forEach((item) =>
               builder.element('title', nest: item, namespace: _dcNamespace))
-          ..creators?.forEach(
+          ..creators.forEach(
             (item) => builder.element(
               'creator',
               namespace: _dcNamespace,
@@ -32,11 +32,11 @@ class EpubMetadataWriter {
               },
             ),
           )
-          ..subjects?.forEach((item) =>
+          ..subjects.forEach((item) =>
               builder.element('subject', namespace: _dcNamespace, nest: item))
-          ..publishers?.forEach((item) =>
+          ..publishers.forEach((item) =>
               builder.element('publisher', namespace: _dcNamespace, nest: item))
-          ..contributors?.forEach(
+          ..contributors.forEach(
             (item) => builder.element(
               'contributor',
               namespace: _dcNamespace,
@@ -53,7 +53,7 @@ class EpubMetadataWriter {
               },
             ),
           )
-          ..dates?.forEach(
+          ..dates.forEach(
             (date) => builder.element(
               'date',
               namespace: _dcNamespace,
@@ -66,11 +66,11 @@ class EpubMetadataWriter {
               },
             ),
           )
-          ..types?.forEach((type) =>
+          ..types.forEach((type) =>
               builder.element('type', namespace: _dcNamespace, nest: type))
-          ..formats?.forEach((format) =>
+          ..formats.forEach((format) =>
               builder.element('format', namespace: _dcNamespace, nest: format))
-          ..identifiers?.forEach(
+          ..identifiers.forEach(
             (id) => builder.element(
               'identifier',
               namespace: _dcNamespace,
@@ -84,17 +84,17 @@ class EpubMetadataWriter {
               },
             ),
           )
-          ..sources?.forEach((item) =>
+          ..sources.forEach((item) =>
               builder.element('source', namespace: _dcNamespace, nest: item))
-          ..languages?.forEach((item) =>
+          ..languages.forEach((item) =>
               builder.element('language', namespace: _dcNamespace, nest: item))
-          ..relations?.forEach((item) =>
+          ..relations.forEach((item) =>
               builder.element('relation', namespace: _dcNamespace, nest: item))
-          ..coverages?.forEach((item) =>
+          ..coverages.forEach((item) =>
               builder.element('coverage', namespace: _dcNamespace, nest: item))
-          ..rights?.forEach((item) =>
+          ..rights.forEach((item) =>
               builder.element('rights', namespace: _dcNamespace, nest: item))
-          ..metaItems?.forEach(
+          ..metaItems.forEach(
             (metaitem) => builder.element(
               'meta',
               nest: () {

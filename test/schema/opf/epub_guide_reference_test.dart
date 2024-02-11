@@ -15,11 +15,7 @@ main() async {
   late EpubGuideReference testGuideReference;
 
   setUp(() async {
-    testGuideReference = EpubGuideReference();
-    testGuideReference
-      ..href = reference.href
-      ..title = reference.title
-      ..type = reference.type;
+    testGuideReference = reference.copyWith();
   });
 
   group("EpubGuideReference", () {
@@ -29,18 +25,21 @@ main() async {
       });
 
       test("is false when Href changes", () async {
-        testGuideReference.href = "A different href";
+        testGuideReference =
+            testGuideReference.copyWith(href: generator.randomString());
 
         expect(testGuideReference, isNot(reference));
       });
 
       test("is false when Title changes", () async {
-        testGuideReference.title = "A different Title";
+        testGuideReference =
+            testGuideReference.copyWith(title: generator.randomString());
         expect(testGuideReference, isNot(reference));
       });
 
       test("is false when Type changes", () async {
-        testGuideReference.type = "Some different type";
+        testGuideReference =
+            testGuideReference.copyWith(type: generator.randomString());
         expect(testGuideReference, isNot(reference));
       });
     });
@@ -51,20 +50,37 @@ main() async {
       });
 
       test("is false when Href changes", () async {
-        testGuideReference.href = "A different href";
+        testGuideReference =
+            testGuideReference.copyWith(href: generator.randomString());
 
         expect(testGuideReference.hashCode, isNot(reference.hashCode));
       });
 
       test("is false when Title changes", () async {
-        testGuideReference.title = "A different Title";
+        testGuideReference =
+            testGuideReference.copyWith(title: generator.randomString());
         expect(testGuideReference.hashCode, isNot(reference.hashCode));
       });
 
       test("is false when Type changes", () async {
-        testGuideReference.type = "Some different type";
+        testGuideReference =
+            testGuideReference.copyWith(type: generator.randomString());
         expect(testGuideReference.hashCode, isNot(reference.hashCode));
       });
     });
   });
+}
+
+extension on EpubGuideReference {
+  EpubGuideReference copyWith({
+    String? type,
+    String? title,
+    String? href,
+  }) {
+    return EpubGuideReference(
+      type: type ?? this.type,
+      title: title ?? this.title,
+      href: href ?? this.href,
+    );
+  }
 }

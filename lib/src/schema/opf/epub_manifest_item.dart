@@ -1,45 +1,52 @@
-import 'package:quiver/core.dart';
-
 class EpubManifestItem {
-  String? id;
-  String? href;
-  String? mediaType;
-  String? mediaOverlay;
-  String? requiredNamespace;
-  String? requiredModules;
-  String? fallback;
-  String? fallbackStyle;
-  String? properties;
+  final String? id;
+  final String? href;
+  final String? mediaType;
+  final String? mediaOverlay;
+  final String? requiredNamespace;
+  final String? requiredModules;
+  final String? fallback;
+  final String? fallbackStyle;
+  final String? properties;
+
+  const EpubManifestItem({
+    this.id,
+    this.href,
+    this.mediaType,
+    this.mediaOverlay,
+    this.requiredNamespace,
+    this.requiredModules,
+    this.fallback,
+    this.fallbackStyle,
+    this.properties,
+  });
 
   @override
-  int get hashCode => hashObjects([
-        id.hashCode,
-        href.hashCode,
-        mediaType.hashCode,
-        mediaOverlay.hashCode,
-        requiredNamespace.hashCode,
-        requiredModules.hashCode,
-        fallback.hashCode,
-        fallbackStyle.hashCode,
-        properties.hashCode
-      ]);
+  int get hashCode {
+    return id.hashCode ^
+        href.hashCode ^
+        mediaType.hashCode ^
+        mediaOverlay.hashCode ^
+        requiredNamespace.hashCode ^
+        requiredModules.hashCode ^
+        fallback.hashCode ^
+        fallbackStyle.hashCode ^
+        properties.hashCode;
+  }
 
   @override
-  bool operator ==(other) {
-    var otherAs = other as EpubManifestItem?;
-    if (otherAs == null) {
-      return false;
-    }
+  bool operator ==(covariant EpubManifestItem other) {
+    if (identical(this, other)) return true;
 
-    return id == otherAs.id &&
-        href == otherAs.href &&
-        mediaType == otherAs.mediaType &&
-        mediaOverlay == otherAs.mediaOverlay &&
-        requiredNamespace == otherAs.requiredNamespace &&
-        requiredModules == otherAs.requiredModules &&
-        fallback == otherAs.fallback &&
-        fallbackStyle == otherAs.fallbackStyle &&
-        properties == otherAs.properties;
+    return other.id == id &&
+        other.href == href &&
+        other.mediaType == mediaType &&
+        other.mediaOverlay == mediaOverlay &&
+        other.requiredNamespace == requiredNamespace &&
+        other.requiredModules == requiredModules &&
+        other.fallback == fallback &&
+        other.fallbackStyle == fallbackStyle &&
+        other.properties == properties;
   }
 
   @override

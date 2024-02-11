@@ -12,7 +12,7 @@ import '../schema/opf/epub_metadata_meta.dart';
 class BookCoverReader {
   static Future<images.Image?> readBookCover(EpubBookRef bookRef) async {
     var metaItems = bookRef.schema!.package!.metadata!.metaItems;
-    if (metaItems == null || metaItems.isEmpty) return null;
+    if (metaItems.isEmpty) return null;
 
     var coverMetaItem = metaItems.firstWhereOrNull(
         (EpubMetadataMeta metaItem) =>
@@ -23,7 +23,7 @@ class BookCoverReader {
           'Incorrect EPUB metadata: cover item content is missing.');
     }
 
-    var coverManifestItem = bookRef.schema!.package!.manifest!.items!
+    var coverManifestItem = bookRef.schema!.package!.manifest!.items
         .firstWhereOrNull((EpubManifestItem manifestItem) =>
             manifestItem.id!.toLowerCase() ==
             coverMetaItem.content!.toLowerCase());

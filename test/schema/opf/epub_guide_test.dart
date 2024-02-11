@@ -15,7 +15,7 @@ main() async {
   late EpubGuide testGuide;
 
   setUp(() async {
-    testGuide = EpubGuide()..items = List.from(reference.items ?? []);
+    testGuide = EpubGuide(items: List.from(reference.items));
   });
 
   group("EpubGuide", () {
@@ -24,7 +24,7 @@ main() async {
         expect(testGuide, equals(reference));
       });
       test("is false when Items changes", () async {
-        testGuide.items?.add(generator.randomEpubGuideReference());
+        testGuide.items.add(generator.randomEpubGuideReference());
         expect(testGuide, isNot(reference));
       });
     });
@@ -34,7 +34,7 @@ main() async {
         expect(testGuide.hashCode, equals(reference.hashCode));
       });
       test("is false when Items changes", () async {
-        testGuide.items?.add(generator.randomEpubGuideReference());
+        testGuide.items.add(generator.randomEpubGuideReference());
         expect(testGuide.hashCode, isNot(reference.hashCode));
       });
     });

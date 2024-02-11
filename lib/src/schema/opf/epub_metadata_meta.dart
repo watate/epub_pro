@@ -1,33 +1,46 @@
-import 'package:quiver/core.dart';
+import 'package:collection/collection.dart';
 
 class EpubMetadataMeta {
-  String? name;
-  String? content;
-  String? id;
-  String? refines;
-  String? property;
-  String? scheme;
-  Map<String, String>? ttributes;
+  final String? name;
+  final String? content;
+  final String? id;
+  final String? refines;
+  final String? property;
+  final String? scheme;
+  final Map<String, String> attributes;
+
+  const EpubMetadataMeta({
+    this.name,
+    this.content,
+    this.id,
+    this.refines,
+    this.property,
+    this.scheme,
+    this.attributes = const <String, String>{},
+  });
 
   @override
-  int get hashCode => hashObjects([
-        name.hashCode,
-        content.hashCode,
-        id.hashCode,
-        refines.hashCode,
-        property.hashCode,
-        scheme.hashCode
-      ]);
+  int get hashCode {
+    return name.hashCode ^
+        content.hashCode ^
+        id.hashCode ^
+        refines.hashCode ^
+        property.hashCode ^
+        scheme.hashCode ^
+        const DeepCollectionEquality().hash(attributes);
+  }
 
   @override
-  bool operator ==(other) {
-    var otherAs = other as EpubMetadataMeta?;
-    if (otherAs == null) return false;
-    return name == otherAs.name &&
-        content == otherAs.content &&
-        id == otherAs.id &&
-        refines == otherAs.refines &&
-        property == otherAs.property &&
-        scheme == otherAs.scheme;
+  bool operator ==(covariant EpubMetadataMeta other) {
+    if (identical(this, other)) return true;
+    final mapEquals = const DeepCollectionEquality().equals;
+
+    return other.name == name &&
+        other.content == content &&
+        other.id == id &&
+        other.refines == refines &&
+        other.property == property &&
+        other.scheme == scheme &&
+        mapEquals(other.attributes, attributes);
   }
 }

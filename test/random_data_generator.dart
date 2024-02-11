@@ -138,113 +138,121 @@ class RandomDataGenerator {
   }
 
   EpubPackage randomEpubPackage() {
-    return EpubPackage()
-      ..guide = randomEpubGuide()
-      ..manifest = randomEpubManifest()
-      ..metadata = randomEpubMetadata()
-      ..spine = randomEpubSpine()
-      ..version = rng.nextBool() ? EpubVersion.epub2 : EpubVersion.epub3;
+    return EpubPackage(
+      guide: randomEpubGuide(),
+      manifest: randomEpubManifest(),
+      metadata: randomEpubMetadata(),
+      spine: randomEpubSpine(),
+      version: rng.nextBool() ? EpubVersion.epub2 : EpubVersion.epub3,
+    );
   }
 
   EpubSpine randomEpubSpine() {
-    var reference = EpubSpine()
-      ..items = [randomEpubSpineItemRef()]
-      ..tableOfContents = _randomString.randomAlpha(_length);
+    final reference = EpubSpine(
+      tableOfContents: _randomString.randomAlpha(_length),
+      items: [randomEpubSpineItemRef()],
+      ltr: true,
+    );
     return reference;
   }
 
   EpubSpineItemRef randomEpubSpineItemRef() {
-    return EpubSpineItemRef()
-      ..idRef = _randomString.randomAlpha(_length)
-      ..idRef = _randomString.randomAlpha(_length);
+    return EpubSpineItemRef(
+      idRef: _randomString.randomAlpha(_length),
+      isLinear: true,
+    );
   }
 
   EpubManifest randomEpubManifest() {
-    var reference = EpubManifest();
-    reference.items = [randomEpubManifestItem()];
-    return reference;
+    return EpubManifest(items: [randomEpubManifestItem()]);
   }
 
   EpubManifestItem randomEpubManifestItem() {
-    return EpubManifestItem()
-      ..fallback = _randomString.randomAlpha(_length)
-      ..fallbackStyle = _randomString.randomAlpha(_length)
-      ..href = _randomString.randomAlpha(_length)
-      ..id = _randomString.randomAlpha(_length)
-      ..mediaType = _randomString.randomAlpha(_length)
-      ..requiredModules = _randomString.randomAlpha(_length)
-      ..requiredNamespace = _randomString.randomAlpha(_length);
+    return EpubManifestItem(
+      fallback: _randomString.randomAlpha(_length),
+      fallbackStyle: _randomString.randomAlpha(_length),
+      href: _randomString.randomAlpha(_length),
+      id: _randomString.randomAlpha(_length),
+      mediaType: _randomString.randomAlpha(_length),
+      requiredModules: _randomString.randomAlpha(_length),
+      requiredNamespace: _randomString.randomAlpha(_length),
+    );
   }
 
   EpubGuide randomEpubGuide() {
-    var reference = EpubGuide();
-    reference.items = [randomEpubGuideReference()];
-    return reference;
+    return EpubGuide(items: [randomEpubGuideReference()]);
   }
 
   EpubGuideReference randomEpubGuideReference() {
-    return EpubGuideReference()
-      ..href = _randomString.randomAlpha(_length)
-      ..title = _randomString.randomAlpha(_length)
-      ..type = _randomString.randomAlpha(_length);
+    return EpubGuideReference(
+      href: _randomString.randomAlpha(_length),
+      title: _randomString.randomAlpha(_length),
+      type: _randomString.randomAlpha(_length),
+    );
   }
 
   EpubMetadata randomEpubMetadata() {
-    var reference = EpubMetadata()
-      ..contributors = [randomEpubMetadataContributor()]
-      ..coverages = [_randomString.randomAlpha(_length)]
-      ..creators = [randomEpubMetadataCreator()]
-      ..dates = [randomEpubMetadataDate()]
-      ..description = _randomString.randomAlpha(_length)
-      ..formats = [_randomString.randomAlpha(_length)]
-      ..identifiers = [randomEpubMetadataIdentifier()]
-      ..languages = [_randomString.randomAlpha(_length)]
-      ..metaItems = [randomEpubMetadataMeta()]
-      ..publishers = [_randomString.randomAlpha(_length)]
-      ..relations = [_randomString.randomAlpha(_length)]
-      ..rights = [_randomString.randomAlpha(_length)]
-      ..sources = [_randomString.randomAlpha(_length)]
-      ..subjects = [_randomString.randomAlpha(_length)]
-      ..titles = [_randomString.randomAlpha(_length)]
-      ..types = [_randomString.randomAlpha(_length)];
+    var reference = EpubMetadata(
+      contributors: [randomEpubMetadataContributor()],
+      coverages: [_randomString.randomAlpha(_length)],
+      creators: [randomEpubMetadataCreator()],
+      dates: [randomEpubMetadataDate()],
+      description: _randomString.randomAlpha(_length),
+      formats: [_randomString.randomAlpha(_length)],
+      identifiers: [randomEpubMetadataIdentifier()],
+      languages: [_randomString.randomAlpha(_length)],
+      metaItems: [randomEpubMetadataMeta()],
+      publishers: [_randomString.randomAlpha(_length)],
+      relations: [_randomString.randomAlpha(_length)],
+      rights: [_randomString.randomAlpha(_length)],
+      sources: [_randomString.randomAlpha(_length)],
+      subjects: [_randomString.randomAlpha(_length)],
+      titles: [_randomString.randomAlpha(_length)],
+      types: [_randomString.randomAlpha(_length)],
+    );
 
     return reference;
   }
 
   EpubMetadataMeta randomEpubMetadataMeta() {
-    return EpubMetadataMeta()
-      ..content = _randomString.randomAlpha(_length)
-      ..id = _randomString.randomAlpha(_length)
-      ..name = _randomString.randomAlpha(_length)
-      ..property = _randomString.randomAlpha(_length)
-      ..refines = _randomString.randomAlpha(_length)
-      ..scheme = _randomString.randomAlpha(_length);
+    return EpubMetadataMeta(
+      content: _randomString.randomAlpha(_length),
+      id: _randomString.randomAlpha(_length),
+      name: _randomString.randomAlpha(_length),
+      property: _randomString.randomAlpha(_length),
+      refines: _randomString.randomAlpha(_length),
+      scheme: _randomString.randomAlpha(_length),
+    );
   }
 
   EpubMetadataIdentifier randomEpubMetadataIdentifier() {
-    return EpubMetadataIdentifier()
-      ..id = _randomString.randomAlpha(_length)
-      ..identifier = _randomString.randomAlpha(_length)
-      ..scheme = _randomString.randomAlpha(_length);
+    return EpubMetadataIdentifier(
+      id: _randomString.randomAlpha(_length),
+      scheme: _randomString.randomAlpha(_length),
+      identifier: _randomString.randomAlpha(_length),
+    );
   }
 
   EpubMetadataDate randomEpubMetadataDate() {
-    return EpubMetadataDate()
-      ..date = _randomString.randomAlpha(_length)
-      ..event = _randomString.randomAlpha(_length);
+    return EpubMetadataDate(
+      event: _randomString.randomAlpha(_length),
+      date: _randomString.randomAlpha(_length),
+    );
   }
 
   EpubMetadataContributor randomEpubMetadataContributor() {
-    return EpubMetadataContributor()
-      ..contributor = _randomString.randomAlpha(_length)
-      ..fileAs = _randomString.randomAlpha(_length)
-      ..role = _randomString.randomAlpha(_length);
+    return EpubMetadataContributor(
+      fileAs: _randomString.randomAlpha(_length),
+      role: _randomString.randomAlpha(_length),
+      contributor: _randomString.randomAlpha(_length),
+    );
   }
 
   EpubMetadataCreator randomEpubMetadataCreator() {
-    return EpubMetadataCreator()
-      ..creator = _randomString.randomAlpha(_length)
-      ..fileAs = _randomString.randomAlpha(_length)
-      ..role = _randomString.randomAlpha(_length);
+    return EpubMetadataCreator(
+      fileAs: _randomString.randomAlpha(_length),
+      role: _randomString.randomAlpha(_length),
+      creator: _randomString.randomAlpha(_length),
+    );
   }
 }

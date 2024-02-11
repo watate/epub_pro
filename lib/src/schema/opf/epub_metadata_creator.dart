@@ -1,19 +1,23 @@
-import 'package:quiver/core.dart';
-
 class EpubMetadataCreator {
-  String? creator;
-  String? fileAs;
-  String? role;
+  final String? creator;
+  final String? fileAs;
+  final String? role;
+
+  const EpubMetadataCreator({
+    this.creator,
+    this.fileAs,
+    this.role,
+  });
 
   @override
-  int get hashCode => hash3(creator.hashCode, fileAs.hashCode, role.hashCode);
+  int get hashCode => creator.hashCode ^ fileAs.hashCode ^ role.hashCode;
 
   @override
-  bool operator ==(other) {
-    var otherAs = other as EpubMetadataCreator?;
-    if (otherAs == null) return false;
-    return creator == otherAs.creator &&
-        fileAs == otherAs.fileAs &&
-        role == otherAs.role;
+  bool operator ==(covariant EpubMetadataCreator other) {
+    if (identical(this, other)) return true;
+
+    return other.creator == creator &&
+        other.fileAs == fileAs &&
+        other.role == role;
   }
 }

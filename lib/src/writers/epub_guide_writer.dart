@@ -6,7 +6,7 @@ class EpubGuideWriter {
     builder.element(
       'guide',
       nest: () {
-        for (final guideItem in guide!.items!) {
+        for (final guideItem in guide!.items) {
           builder.element(
             'reference',
             attributes: {

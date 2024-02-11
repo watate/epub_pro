@@ -4,18 +4,16 @@ import 'package:epubx/src/schema/opf/epub_metadata_creator.dart';
 import 'package:test/test.dart';
 
 main() async {
-  var reference = EpubMetadataCreator()
-    ..creator = "orthros"
-    ..fileAs = "Large"
-    ..role = "Creator";
+  var reference = EpubMetadataCreator(
+    creator: "orthros",
+    fileAs: "Large",
+    role: "Creator",
+  );
 
   late EpubMetadataCreator testMetadataCreator;
 
   setUp(() async {
-    testMetadataCreator = EpubMetadataCreator()
-      ..creator = reference.creator
-      ..fileAs = reference.fileAs
-      ..role = reference.role;
+    testMetadataCreator = reference.copyWith();
   });
 
   group("EpubMetadataCreator", () {
@@ -25,15 +23,21 @@ main() async {
       });
 
       test("is false when Creator changes", () async {
-        testMetadataCreator.creator = "NotOrthros";
+        testMetadataCreator = testMetadataCreator.copyWith(
+          creator: "NotOrthros",
+        );
         expect(testMetadataCreator, isNot(reference));
       });
       test("is false when FileAs changes", () async {
-        testMetadataCreator.fileAs = "Small";
+        testMetadataCreator = testMetadataCreator.copyWith(
+          fileAs: "Small",
+        );
         expect(testMetadataCreator, isNot(reference));
       });
       test("is false when Role changes", () async {
-        testMetadataCreator.role = "Copier";
+        testMetadataCreator = testMetadataCreator.copyWith(
+          role: "Copier",
+        );
         expect(testMetadataCreator, isNot(reference));
       });
     });
@@ -44,17 +48,37 @@ main() async {
       });
 
       test("is false when Creator changes", () async {
-        testMetadataCreator.creator = "NotOrthros";
+        testMetadataCreator = testMetadataCreator.copyWith(
+          creator: "NotOrthros",
+        );
         expect(testMetadataCreator.hashCode, isNot(reference.hashCode));
       });
       test("is false when FileAs changes", () async {
-        testMetadataCreator.fileAs = "Small";
+        testMetadataCreator = testMetadataCreator.copyWith(
+          fileAs: "Small",
+        );
         expect(testMetadataCreator.hashCode, isNot(reference.hashCode));
       });
       test("is false when Role changes", () async {
-        testMetadataCreator.role = "Copier";
+        testMetadataCreator = testMetadataCreator.copyWith(
+          role: "Copier",
+        );
         expect(testMetadataCreator.hashCode, isNot(reference.hashCode));
       });
     });
   });
+}
+
+extension on EpubMetadataCreator {
+  EpubMetadataCreator copyWith({
+    String? creator,
+    String? fileAs,
+    String? role,
+  }) {
+    return EpubMetadataCreator(
+      creator: creator ?? this.creator,
+      fileAs: fileAs ?? this.fileAs,
+      role: role ?? this.role,
+    );
+  }
 }

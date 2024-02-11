@@ -40,7 +40,7 @@ class NavigationReader {
       }
 
       var tocManifestItem =
-          package.manifest!.items!.cast<EpubManifestItem?>().firstWhere(
+          package.manifest!.items.cast<EpubManifestItem?>().firstWhere(
                 (EpubManifestItem? item) =>
                     item!.id!.toLowerCase() == tocId.toLowerCase(),
                 orElse: () => null,
@@ -159,7 +159,7 @@ class NavigationReader {
     } else {
       //Version 3
 
-      var tocManifestItem = package.manifest!.items!
+      var tocManifestItem = package.manifest!.items
           .cast<EpubManifestItem?>()
           .firstWhere((element) => element!.properties == 'nav',
               orElse: () => null);
@@ -199,7 +199,7 @@ class NavigationReader {
             'EPUB parsing error: TOC file does not contain head element.');
       }
 
-      final titles = package.metadata!.titles ?? <String>[];
+      final titles = package.metadata!.titles;
       final docTitle = EpubNavigationDocTitle(titles: titles);
 
       final navNode = containerDocument

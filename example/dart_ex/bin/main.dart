@@ -94,7 +94,7 @@ main(List<String> args) async {
   EpubPackage package = epubBook.schema!.package!;
 
 // Enumerating book's contributors
-  package.metadata!.contributors!.forEach((contributor) {
+  package.metadata!.contributors.forEach((contributor) {
     String contributorName = contributor.contributor!;
     String contributorRole = contributor.role!;
   });

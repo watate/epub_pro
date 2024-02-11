@@ -1,5 +1,4 @@
-import 'package:quiver/collection.dart' as collections;
-import 'package:quiver/core.dart';
+import 'package:collection/collection.dart';
 
 import 'epub_metadata_contributor.dart';
 import 'epub_metadata_creator.dart';
@@ -8,71 +7,84 @@ import 'epub_metadata_identifier.dart';
 import 'epub_metadata_meta.dart';
 
 class EpubMetadata {
-  List<String>? titles;
-  List<EpubMetadataCreator>? creators;
-  List<String>? subjects;
-  String? description;
-  List<String>? publishers;
-  List<EpubMetadataContributor>? contributors;
-  List<EpubMetadataDate>? dates;
-  List<String>? types;
-  List<String>? formats;
-  List<EpubMetadataIdentifier>? identifiers;
-  List<String>? sources;
-  List<String>? languages;
-  List<String>? relations;
-  List<String>? coverages;
-  List<String>? rights;
-  List<EpubMetadataMeta>? metaItems;
+  final List<String> titles;
+  final List<EpubMetadataCreator> creators;
+  final List<String> subjects;
+  final String? description;
+  final List<String> publishers;
+  final List<EpubMetadataContributor> contributors;
+  final List<EpubMetadataDate> dates;
+  final List<String> types;
+  final List<String> formats;
+  final List<EpubMetadataIdentifier> identifiers;
+  final List<String> sources;
+  final List<String> languages;
+  final List<String> relations;
+  final List<String> coverages;
+  final List<String> rights;
+  final List<EpubMetadataMeta> metaItems;
+
+  const EpubMetadata({
+    this.titles = const <String>[],
+    this.creators = const <EpubMetadataCreator>[],
+    this.subjects = const <String>[],
+    this.description,
+    this.publishers = const <String>[],
+    this.contributors = const <EpubMetadataContributor>[],
+    this.dates = const <EpubMetadataDate>[],
+    this.types = const <String>[],
+    this.formats = const <String>[],
+    this.identifiers = const <EpubMetadataIdentifier>[],
+    this.sources = const <String>[],
+    this.languages = const <String>[],
+    this.relations = const <String>[],
+    this.coverages = const <String>[],
+    this.rights = const <String>[],
+    this.metaItems = const <EpubMetadataMeta>[],
+  });
 
   @override
   int get hashCode {
-    var objects = [
-      ...titles!.map((title) => title.hashCode),
-      ...creators!.map((creator) => creator.hashCode),
-      ...subjects!.map((subject) => subject.hashCode),
-      ...publishers!.map((publisher) => publisher.hashCode),
-      ...contributors!.map((contributor) => contributor.hashCode),
-      ...dates!.map((date) => date.hashCode),
-      ...types!.map((type) => type.hashCode),
-      ...formats!.map((format) => format.hashCode),
-      ...identifiers!.map((identifier) => identifier.hashCode),
-      ...sources!.map((source) => source.hashCode),
-      ...languages!.map((language) => language.hashCode),
-      ...relations!.map((relation) => relation.hashCode),
-      ...coverages!.map((coverage) => coverage.hashCode),
-      ...rights!.map((right) => right.hashCode),
-      ...metaItems!.map((metaItem) => metaItem.hashCode),
-      description.hashCode
-    ];
+    final hash = const DeepCollectionEquality().hash;
 
-    return hashObjects(objects);
+    return hash(titles) ^
+        hash(creators) ^
+        hash(subjects) ^
+        description.hashCode ^
+        hash(publishers) ^
+        hash(contributors) ^
+        hash(dates) ^
+        hash(types) ^
+        hash(formats) ^
+        hash(identifiers) ^
+        hash(sources) ^
+        hash(languages) ^
+        hash(relations) ^
+        hash(coverages) ^
+        hash(rights) ^
+        hash(metaItems);
   }
 
   @override
-  bool operator ==(other) {
-    var otherAs = other as EpubMetadata?;
-    if (otherAs == null) return false;
-    if (description != otherAs.description) return false;
+  bool operator ==(covariant EpubMetadata other) {
+    if (identical(this, other)) return true;
+    final listEquals = const DeepCollectionEquality().equals;
 
-    if (!collections.listsEqual(titles, otherAs.titles) ||
-        !collections.listsEqual(creators, otherAs.creators) ||
-        !collections.listsEqual(subjects, otherAs.subjects) ||
-        !collections.listsEqual(publishers, otherAs.publishers) ||
-        !collections.listsEqual(contributors, otherAs.contributors) ||
-        !collections.listsEqual(dates, otherAs.dates) ||
-        !collections.listsEqual(types, otherAs.types) ||
-        !collections.listsEqual(formats, otherAs.formats) ||
-        !collections.listsEqual(identifiers, otherAs.identifiers) ||
-        !collections.listsEqual(sources, otherAs.sources) ||
-        !collections.listsEqual(languages, otherAs.languages) ||
-        !collections.listsEqual(relations, otherAs.relations) ||
-        !collections.listsEqual(coverages, otherAs.coverages) ||
-        !collections.listsEqual(rights, otherAs.rights) ||
-        !collections.listsEqual(metaItems, otherAs.metaItems)) {
-      return false;
-    }
-
-    return true;
+    return listEquals(other.titles, titles) &&
+        listEquals(other.creators, creators) &&
+        listEquals(other.subjects, subjects) &&
+        other.description == description &&
+        listEquals(other.publishers, publishers) &&
+        listEquals(other.contributors, contributors) &&
+        listEquals(other.dates, dates) &&
+        listEquals(other.types, types) &&
+        listEquals(other.formats, formats) &&
+        listEquals(other.identifiers, identifiers) &&
+        listEquals(other.sources, sources) &&
+        listEquals(other.languages, languages) &&
+        listEquals(other.relations, relations) &&
+        listEquals(other.coverages, coverages) &&
+        listEquals(other.rights, rights) &&
+        listEquals(other.metaItems, metaItems);
   }
 }

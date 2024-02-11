@@ -4,21 +4,19 @@ import 'package:epubx/epubx.dart';
 import 'package:test/test.dart';
 
 main() async {
-  var reference = EpubSchema();
+  final reference = EpubSchema();
   reference
-    ..package = EpubPackage()
+    ..package = EpubPackage(version: EpubVersion.epub2)
     ..navigation = EpubNavigation()
     ..contentDirectoryPath = "some/random/path";
-  reference.package?.version = EpubVersion.epub2;
 
   late EpubSchema testSchema;
   setUp(() async {
     testSchema = EpubSchema();
     testSchema
-      ..package = EpubPackage()
+      ..package = EpubPackage(version: EpubVersion.epub2)
       ..navigation = EpubNavigation()
       ..contentDirectoryPath = "some/random/path";
-    testSchema.package?.version = EpubVersion.epub2;
   });
 
   group("EpubSchema", () {
@@ -28,9 +26,10 @@ main() async {
       });
 
       test("is false when Package changes", () async {
-        var package = EpubPackage()
-          ..guide = EpubGuide()
-          ..version = EpubVersion.epub3;
+        var package = EpubPackage(
+          version: EpubVersion.epub3,
+          guide: EpubGuide(),
+        );
 
         testSchema.package = package;
         expect(testSchema, isNot(reference));
@@ -57,9 +56,10 @@ main() async {
       });
 
       test("is false when Package changes", () async {
-        var package = EpubPackage()
-          ..guide = EpubGuide()
-          ..version = EpubVersion.epub3;
+        final package = EpubPackage(
+          version: EpubVersion.epub3,
+          guide: EpubGuide(),
+        );
 
         testSchema.package = package;
         expect(testSchema.hashCode, isNot(reference.hashCode));

@@ -14,7 +14,7 @@ class ContentReader {
     result.fonts = <String, EpubByteContentFileRef>{};
     result.allFiles = <String, EpubContentFileRef>{};
 
-    for (final manifestItem in bookRef.schema!.package!.manifest!.items!) {
+    for (final manifestItem in bookRef.schema!.package!.manifest!.items) {
       var fileName = manifestItem.href;
       var contentMimeType = manifestItem.mediaType!;
       var contentType = getContentTypeByContentMimeType(contentMimeType);
