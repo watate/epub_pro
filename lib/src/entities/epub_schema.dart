@@ -1,25 +1,27 @@
-import 'package:quiver/core.dart';
-
 import '../schema/navigation/epub_navigation.dart';
 import '../schema/opf/epub_package.dart';
 
 class EpubSchema {
-  EpubPackage? package;
-  EpubNavigation? navigation;
-  String? contentDirectoryPath;
+  final EpubPackage? package;
+  final EpubNavigation? navigation;
+  final String? contentDirectoryPath;
+
+  const EpubSchema({
+    this.package,
+    this.navigation,
+    this.contentDirectoryPath,
+  });
 
   @override
-  int get hashCode => hash3(
-      package.hashCode, navigation.hashCode, contentDirectoryPath.hashCode);
+  int get hashCode =>
+      package.hashCode ^ navigation.hashCode ^ contentDirectoryPath.hashCode;
 
   @override
-  bool operator ==(other) {
-    if (other is! EpubSchema) {
-      return false;
-    }
+  bool operator ==(covariant EpubSchema other) {
+    if (identical(this, other)) return true;
 
-    return package == other.package &&
-        navigation == other.navigation &&
-        contentDirectoryPath == other.contentDirectoryPath;
+    return other.package == package &&
+        other.navigation == navigation &&
+        other.contentDirectoryPath == contentDirectoryPath;
   }
 }

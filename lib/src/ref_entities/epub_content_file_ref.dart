@@ -2,44 +2,47 @@ import 'dart:async';
 import 'dart:convert' as convert;
 
 import 'package:archive/archive.dart';
-import 'package:collection/collection.dart' show IterableExtension;
-import 'package:quiver/core.dart';
+import 'package:collection/collection.dart';
 
 import '../entities/epub_content_type.dart';
 import '../utils/zip_path_utils.dart';
 import 'epub_book_ref.dart';
 
 abstract class EpubContentFileRef {
-  late EpubBookRef epubBookRef;
+  final EpubBookRef epubBookRef;
+  final String? fileName;
+  final EpubContentType? contentType;
+  final String? contentMimeType;
 
-  String? fileName;
-
-  EpubContentType? contentType;
-  String? contentMimeType;
-
-  EpubContentFileRef(this.epubBookRef);
+  const EpubContentFileRef({
+    required this.epubBookRef,
+    this.fileName,
+    this.contentType,
+    this.contentMimeType,
+  });
 
   @override
-  int get hashCode =>
-      hash3(fileName.hashCode, contentMimeType.hashCode, contentType.hashCode);
+  int get hashCode {
+    return epubBookRef.hashCode ^
+        fileName.hashCode ^
+        contentType.hashCode ^
+        contentMimeType.hashCode;
+  }
 
   @override
-  bool operator ==(other) {
-    if (other is! EpubContentFileRef) {
-      return false;
-    }
+  bool operator ==(covariant EpubContentFileRef other) {
+    if (identical(this, other)) return true;
 
-    return (other.fileName == fileName &&
-        other.contentMimeType == contentMimeType &&
-        other.contentType == contentType);
+    return other.epubBookRef == epubBookRef &&
+        other.fileName == fileName &&
+        other.contentType == contentType &&
+        other.contentMimeType == contentMimeType;
   }
 
   ArchiveFile getContentFileEntry() {
     var contentFilePath = ZipPathUtils.combine(
         epubBookRef.schema!.contentDirectoryPath, fileName);
-    var contentFileEntry = epubBookRef
-        .epubArchive()!
-        .files
+    var contentFileEntry = epubBookRef.epubArchive.files
         .firstWhereOrNull((ArchiveFile x) => x.name == contentFilePath);
     if (contentFileEntry == null) {
       throw Exception(

@@ -7,24 +7,22 @@ import 'package:test/test.dart';
 
 main() async {
   var arch = Archive();
-  var epubRef = EpubBookRef(arch);
+  var epubRef = EpubBookRef(epubArchive: arch);
 
-  var reference = EpubTextContentFileRef(epubRef);
-  reference
-    ..contentMimeType = "application/test"
-    ..contentType = EpubContentType.other
-    ..fileName = "orthrosFile";
+  var reference = EpubTextContentFileRef(
+    epubBookRef: epubRef,
+    contentMimeType: "application/test",
+    contentType: EpubContentType.other,
+    fileName: "orthrosFile",
+  );
+
   late EpubTextContentFileRef testFile;
 
   setUp(() async {
     var arch2 = Archive();
-    var epubRef2 = EpubBookRef(arch2);
+    var epubRef2 = EpubBookRef(epubArchive: arch2);
 
-    testFile = EpubTextContentFileRef(epubRef2);
-    testFile
-      ..contentMimeType = "application/test"
-      ..contentType = EpubContentType.other
-      ..fileName = "orthrosFile";
+    testFile = reference.copyWith(epubBookRef: epubRef2);
   });
 
   group("EpubTextContentFile", () {
@@ -34,17 +32,17 @@ main() async {
       });
 
       test("is false when ContentMimeType changes", () async {
-        testFile.contentMimeType = "application/different";
+        testFile = testFile.copyWith(contentMimeType: "application/different");
         expect(testFile, isNot(reference));
       });
 
       test("is false when ContentType changes", () async {
-        testFile.contentType = EpubContentType.css;
+        testFile = testFile.copyWith(contentType: EpubContentType.css);
         expect(testFile, isNot(reference));
       });
 
       test("is false when FileName changes", () async {
-        testFile.fileName = "a_different_file_name.txt";
+        testFile = testFile.copyWith(fileName: "a_different_file_name");
         expect(testFile, isNot(reference));
       });
     });
@@ -54,19 +52,35 @@ main() async {
       });
 
       test('changes when ContentMimeType changes', () async {
-        testFile.contentMimeType = "application/orthros";
+        testFile = testFile.copyWith(contentMimeType: "application/different");
         expect(testFile.hashCode, isNot(reference.hashCode));
       });
 
       test('changes when ContentType changes', () async {
-        testFile.contentType = EpubContentType.css;
+        testFile = testFile.copyWith(contentType: EpubContentType.css);
         expect(testFile.hashCode, isNot(reference.hashCode));
       });
 
       test('changes when FileName changes', () async {
-        testFile.fileName = "a_different_file_name";
+        testFile = testFile.copyWith(fileName: "a_different_file_name");
         expect(testFile.hashCode, isNot(reference.hashCode));
       });
     });
   });
+}
+
+extension on EpubTextContentFileRef {
+  EpubTextContentFileRef copyWith({
+    EpubBookRef? epubBookRef,
+    String? contentMimeType,
+    EpubContentType? contentType,
+    String? fileName,
+  }) {
+    return EpubTextContentFileRef(
+      epubBookRef: epubBookRef ?? this.epubBookRef,
+      contentMimeType: contentMimeType ?? this.contentMimeType,
+      contentType: contentType ?? this.contentType,
+      fileName: fileName ?? this.fileName,
+    );
+  }
 }

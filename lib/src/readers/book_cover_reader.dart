@@ -34,13 +34,13 @@ class BookCoverReader {
     }
 
     EpubByteContentFileRef? coverImageContentFileRef;
-    if (!bookRef.content!.images!.containsKey(coverManifestItem.href)) {
+    if (!bookRef.content!.images.containsKey(coverManifestItem.href)) {
       throw Exception(
         'Incorrect EPUB manifest: item with href = "${coverManifestItem.href}" is missing.',
       );
     }
 
-    coverImageContentFileRef = bookRef.content!.images![coverManifestItem.href];
+    coverImageContentFileRef = bookRef.content!.images[coverManifestItem.href];
     var coverImageContent =
         await coverImageContentFileRef!.readContentAsBytes();
     var retval = images.decodeImage(Uint8List.fromList(coverImageContent));

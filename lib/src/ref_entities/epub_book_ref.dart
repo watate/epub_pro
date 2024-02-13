@@ -1,9 +1,8 @@
 import 'dart:async';
 
 import 'package:archive/archive.dart';
+import 'package:collection/collection.dart';
 import 'package:image/image.dart';
-import 'package:quiver/collection.dart' as collections;
-import 'package:quiver/core.dart';
 
 import '../entities/epub_schema.dart';
 import '../readers/book_cover_reader.dart';
@@ -12,44 +11,43 @@ import 'epub_chapter_ref.dart';
 import 'epub_content_ref.dart';
 
 class EpubBookRef {
-  Archive? _epubArchive;
+  final Archive epubArchive;
+  final String? title;
+  final String? author;
+  final List<String?> authors;
+  final EpubSchema? schema;
+  final EpubContentRef? content;
 
-  String? title;
-  String? author;
-  List<String?>? authors;
-  EpubSchema? schema;
-  EpubContentRef? content;
-  EpubBookRef(Archive epubArchive) {
-    _epubArchive = epubArchive;
-  }
+  const EpubBookRef({
+    required this.epubArchive,
+    this.title,
+    this.author,
+    this.authors = const [],
+    this.schema,
+    this.content,
+  });
 
   @override
   int get hashCode {
-    var objects = [
-      title.hashCode,
-      author.hashCode,
-      schema.hashCode,
-      content.hashCode,
-      ...authors?.map((author) => author.hashCode) ?? [0],
-    ];
-    return hashObjects(objects);
+    return epubArchive.hashCode ^
+        title.hashCode ^
+        author.hashCode ^
+        authors.hashCode ^
+        schema.hashCode ^
+        content.hashCode;
   }
 
   @override
-  bool operator ==(other) {
-    if (other is! EpubBookRef) {
-      return false;
-    }
+  bool operator ==(covariant EpubBookRef other) {
+    if (identical(this, other)) return true;
+    final listEquals = const DeepCollectionEquality().equals;
 
-    return title == other.title &&
-        author == other.author &&
-        schema == other.schema &&
-        content == other.content &&
-        collections.listsEqual(authors, other.authors);
-  }
-
-  Archive? epubArchive() {
-    return _epubArchive;
+    return other.epubArchive == epubArchive &&
+        other.title == title &&
+        other.author == author &&
+        listEquals(other.authors, authors) &&
+        other.schema == schema &&
+        other.content == content;
   }
 
   Future<List<EpubChapterRef>> getChapters() async {

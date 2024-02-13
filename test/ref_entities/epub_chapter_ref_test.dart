@@ -7,8 +7,8 @@ import 'package:test/test.dart';
 
 main() async {
   var arch = Archive();
-  var bookRef = EpubBookRef(arch);
-  var contentFileRef = EpubTextContentFileRef(bookRef);
+  var bookRef = EpubBookRef(epubArchive: arch);
+  var contentFileRef = EpubTextContentFileRef(epubBookRef: bookRef);
   var reference = EpubChapterRef(contentFileRef);
 
   reference
@@ -22,8 +22,8 @@ main() async {
 
   setUp(() async {
     var arch2 = Archive();
-    bookRef2 = EpubBookRef(arch2);
-    var contentFileRef2 = EpubTextContentFileRef(bookRef2);
+    bookRef2 = EpubBookRef(epubArchive: arch2);
+    var contentFileRef2 = EpubTextContentFileRef(epubBookRef: bookRef2);
 
     testChapterRef = EpubChapterRef(contentFileRef2);
     testChapterRef
@@ -50,7 +50,8 @@ main() async {
       });
 
       test("is false when SubChapters changes", () async {
-        var subchapterContentFileRef = EpubTextContentFileRef(bookRef2);
+        var subchapterContentFileRef =
+            EpubTextContentFileRef(epubBookRef: bookRef2);
         var chapter = EpubChapterRef(subchapterContentFileRef);
         chapter
           ..title = "A Brave new Epub"
@@ -85,7 +86,8 @@ main() async {
       });
 
       test("is false when SubChapters changes", () async {
-        var subchapterContentFileRef = EpubTextContentFileRef(bookRef2);
+        var subchapterContentFileRef =
+            EpubTextContentFileRef(epubBookRef: bookRef2);
         var chapter = EpubChapterRef(subchapterContentFileRef);
         chapter
           ..title = "A Brave new Epub"

@@ -32,7 +32,7 @@ main(List<String> args) async {
 // CHAPTERS
 
 // Enumerating chapters
-  epubBook.chapters!.forEach((EpubChapter chapter) {
+  epubBook.chapters.forEach((EpubChapter chapter) {
     // Title of chapter
     String chapterTitle = chapter.title!;
 
@@ -40,7 +40,7 @@ main(List<String> args) async {
     String chapterHtmlContent = chapter.htmlContent!;
 
     // Nested chapters
-    List<EpubChapter> subChapters = chapter.subChapters!;
+    List<EpubChapter> subChapters = chapter.subChapters;
   });
 
 // CONTENT
@@ -51,7 +51,7 @@ main(List<String> args) async {
 // IMAGES
 
 // All images in the book (file name is the key)
-  Map<String, EpubByteContentFile> images = bookContent.images!;
+  Map<String, EpubByteContentFile> images = bookContent.images;
 
   EpubByteContentFile? firstImage =
       images.isNotEmpty ? images.values.first : null;
@@ -65,10 +65,10 @@ main(List<String> args) async {
 // HTML & CSS
 
 // All XHTML files in the book (file name is the key)
-  Map<String?, EpubTextContentFile> htmlFiles = bookContent.html!;
+  Map<String?, EpubTextContentFile> htmlFiles = bookContent.html;
 
 // All CSS files in the book (file name is the key)
-  Map<String, EpubTextContentFile> cssFiles = bookContent.css!;
+  Map<String, EpubTextContentFile> cssFiles = bookContent.css;
 
 // Entire HTML content of the book
   htmlFiles.values.forEach((EpubTextContentFile htmlFile) {
@@ -83,10 +83,10 @@ main(List<String> args) async {
 // OTHER CONTENT
 
 // All fonts in the book (file name is the key)
-  Map<String, EpubByteContentFile> fonts = bookContent.fonts!;
+  Map<String, EpubByteContentFile> fonts = bookContent.fonts;
 
 // All files in the book (including HTML, CSS, images, fonts, and other types of files)
-  Map<String, EpubContentFile> allFiles = bookContent.allFiles!;
+  Map<String, EpubContentFile> allFiles = bookContent.allFiles;
 
 // ACCESSING RAW SCHEMA INFORMATION
 

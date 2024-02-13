@@ -1,21 +1,15 @@
 import '../entities/epub_content_type.dart';
 import '../ref_entities/epub_book_ref.dart';
 import '../ref_entities/epub_byte_content_file_ref.dart';
-import '../ref_entities/epub_content_file_ref.dart';
 import '../ref_entities/epub_content_ref.dart';
 import '../ref_entities/epub_text_content_file_ref.dart';
 
 class ContentReader {
   static EpubContentRef parseContentMap(EpubBookRef bookRef) {
-    var result = EpubContentRef();
-    result.html = <String, EpubTextContentFileRef>{};
-    result.css = <String, EpubTextContentFileRef>{};
-    result.images = <String, EpubByteContentFileRef>{};
-    result.fonts = <String, EpubByteContentFileRef>{};
-    result.allFiles = <String, EpubContentFileRef>{};
+    final result = EpubContentRef();
 
     for (final manifestItem in bookRef.schema!.package!.manifest!.items) {
-      var fileName = manifestItem.href;
+      var fileName = manifestItem.href ?? '';
       var contentMimeType = manifestItem.mediaType!;
       var contentType = getContentTypeByContentMimeType(contentMimeType);
       switch (contentType) {
@@ -26,17 +20,17 @@ class ContentReader {
         case EpubContentType.xml:
         case EpubContentType.dtbook:
         case EpubContentType.dtbookNCX:
-          var epubTextContentFile = EpubTextContentFileRef(bookRef);
-
-          epubTextContentFile.fileName = Uri.decodeFull(fileName!);
-          epubTextContentFile.contentMimeType = contentMimeType;
-          epubTextContentFile.contentType = contentType;
+          var epubTextContentFile = EpubTextContentFileRef(
+            epubBookRef: bookRef,
+            fileName: Uri.decodeFull(fileName),
+            contentMimeType: contentMimeType,
+          );
 
           switch (contentType) {
             case EpubContentType.xhtml11:
-              result.html![fileName] = epubTextContentFile;
+              result.html[fileName] = epubTextContentFile;
             case EpubContentType.css:
-              result.css![fileName] = epubTextContentFile;
+              result.css[fileName] = epubTextContentFile;
             case EpubContentType.dtbook:
             case EpubContentType.dtbookNCX:
             case EpubContentType.oeb1Document:
@@ -52,13 +46,14 @@ class ContentReader {
             case EpubContentType.other:
               break;
           }
-          result.allFiles![fileName] = epubTextContentFile;
+          result.allFiles[fileName] = epubTextContentFile;
         default:
-          var epubByteContentFile = EpubByteContentFileRef(bookRef);
-
-          epubByteContentFile.fileName = Uri.decodeFull(fileName!);
-          epubByteContentFile.contentMimeType = contentMimeType;
-          epubByteContentFile.contentType = contentType;
+          var epubByteContentFile = EpubByteContentFileRef(
+            epubBookRef: bookRef,
+            fileName: Uri.decodeFull(fileName),
+            contentMimeType: contentMimeType,
+            contentType: contentType,
+          );
 
           switch (contentType) {
             case EpubContentType.imageGIF:
@@ -66,10 +61,10 @@ class ContentReader {
             case EpubContentType.imagePNG:
             case EpubContentType.imageSVG:
             case EpubContentType.imageBMP:
-              result.images![fileName] = epubByteContentFile;
+              result.images[fileName] = epubByteContentFile;
             case EpubContentType.fontTrueType:
             case EpubContentType.fontOpenType:
-              result.fonts![fileName] = epubByteContentFile;
+              result.fonts[fileName] = epubByteContentFile;
             case EpubContentType.css:
             case EpubContentType.xhtml11:
             case EpubContentType.dtbook:
@@ -80,7 +75,7 @@ class ContentReader {
             case EpubContentType.other:
               break;
           }
-          result.allFiles![fileName] = epubByteContentFile;
+          result.allFiles[fileName] = epubByteContentFile;
       }
     }
     return result;

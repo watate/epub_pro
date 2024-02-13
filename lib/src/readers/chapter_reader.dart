@@ -32,13 +32,13 @@ class ChapterReader {
       }
       contentFileName = Uri.decodeFull(contentFileName!);
       EpubTextContentFileRef? htmlContentFileRef;
-      if (!bookRef.content!.html!.containsKey(contentFileName)) {
+      if (!bookRef.content!.html.containsKey(contentFileName)) {
         throw Exception(
           'Incorrect EPUB manifest: item with href = "$contentFileName" is missing.',
         );
       }
 
-      htmlContentFileRef = bookRef.content!.html![contentFileName];
+      htmlContentFileRef = bookRef.content!.html[contentFileName];
       var chapterRef = EpubChapterRef(htmlContentFileRef);
       chapterRef.contentFileName = contentFileName;
       chapterRef.anchor = anchor;
