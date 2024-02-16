@@ -11,13 +11,17 @@ class EpubContent {
   final Map<String, EpubByteContentFile> fonts;
   final Map<String, EpubContentFile> allFiles;
 
-  const EpubContent({
-    this.html = const <String, EpubTextContentFile>{},
-    this.css = const <String, EpubTextContentFile>{},
-    this.images = const <String, EpubByteContentFile>{},
-    this.fonts = const <String, EpubByteContentFile>{},
-    this.allFiles = const <String, EpubContentFile>{},
-  });
+  EpubContent({
+    Map<String, EpubTextContentFile>? html,
+    Map<String, EpubTextContentFile>? css,
+    Map<String, EpubByteContentFile>? images,
+    Map<String, EpubByteContentFile>? fonts,
+    Map<String, EpubContentFile>? allFiles,
+  })  : html = html ?? <String, EpubTextContentFile>{},
+        css = css ?? <String, EpubTextContentFile>{},
+        images = images ?? <String, EpubByteContentFile>{},
+        fonts = fonts ?? <String, EpubByteContentFile>{},
+        allFiles = allFiles ?? <String, EpubContentFile>{};
 
   @override
   int get hashCode {

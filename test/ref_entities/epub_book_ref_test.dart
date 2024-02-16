@@ -36,8 +36,9 @@ main() async {
           fileName: "orthros.txt",
         );
 
-        EpubContentRef content = EpubContentRef();
-        content.allFiles["hello"] = file;
+        EpubContentRef content = EpubContentRef(
+          allFiles: {"hello": file},
+        );
 
         testBookRef = testBookRef.copyWith(content: content);
 
@@ -81,8 +82,9 @@ main() async {
           fileName: "orthros.txt",
         );
 
-        EpubContentRef content = EpubContentRef();
-        content.allFiles["hello"] = file;
+        EpubContentRef content = EpubContentRef(
+          allFiles: {"hello": file},
+        );
 
         testBookRef = testBookRef.copyWith(content: content);
 

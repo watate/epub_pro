@@ -1,42 +1,44 @@
 import 'dart:async';
 
-import 'package:quiver/collection.dart' as collections;
-import 'package:quiver/core.dart';
+import 'package:collection/collection.dart';
 
 import 'epub_text_content_file_ref.dart';
 
 class EpubChapterRef {
-  EpubTextContentFileRef? epubTextContentFileRef;
+  final EpubTextContentFileRef? epubTextContentFileRef;
+  final String? title;
+  final String? contentFileName;
+  final String? anchor;
+  final List<EpubChapterRef> subChapters;
 
-  String? title;
-  String? contentFileName;
-  String? anchor;
-  List<EpubChapterRef>? subChapters;
-
-  EpubChapterRef(this.epubTextContentFileRef);
+  const EpubChapterRef({
+    this.epubTextContentFileRef,
+    this.title,
+    this.contentFileName,
+    this.anchor,
+    this.subChapters = const <EpubChapterRef>[],
+  });
 
   @override
   int get hashCode {
-    var objects = [
-      title.hashCode,
-      contentFileName.hashCode,
-      anchor.hashCode,
-      epubTextContentFileRef.hashCode,
-      ...subChapters?.map((subChapter) => subChapter.hashCode) ?? [0],
-    ];
-    return hashObjects(objects);
+    final hash = const DeepCollectionEquality().hash;
+    return epubTextContentFileRef.hashCode ^
+        title.hashCode ^
+        contentFileName.hashCode ^
+        anchor.hashCode ^
+        hash(subChapters);
   }
 
   @override
-  bool operator ==(other) {
-    if (other is! EpubChapterRef) {
-      return false;
-    }
-    return title == other.title &&
-        contentFileName == other.contentFileName &&
-        anchor == other.anchor &&
-        epubTextContentFileRef == other.epubTextContentFileRef &&
-        collections.listsEqual(subChapters, other.subChapters);
+  bool operator ==(covariant EpubChapterRef other) {
+    if (identical(this, other)) return true;
+    final listEquals = const DeepCollectionEquality().equals;
+
+    return other.epubTextContentFileRef == epubTextContentFileRef &&
+        other.title == title &&
+        other.contentFileName == contentFileName &&
+        other.anchor == anchor &&
+        listEquals(other.subChapters, subChapters);
   }
 
   Future<String> readHtmlContent() async {
@@ -45,6 +47,6 @@ class EpubChapterRef {
 
   @override
   String toString() {
-    return 'Title: $title, Subchapter count: ${subChapters!.length}';
+    return 'Title: $title, Subchapter count: ${subChapters.length}';
   }
 }

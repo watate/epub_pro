@@ -39,13 +39,14 @@ class ChapterReader {
       }
 
       htmlContentFileRef = bookRef.content!.html[contentFileName];
-      var chapterRef = EpubChapterRef(htmlContentFileRef);
-      chapterRef.contentFileName = contentFileName;
-      chapterRef.anchor = anchor;
-      chapterRef.title = navigationPoint.navigationLabels.first.text;
-      chapterRef.subChapters =
-          getChaptersImpl(bookRef, navigationPoint.childNavigationPoints);
-
+      var chapterRef = EpubChapterRef(
+        epubTextContentFileRef: htmlContentFileRef,
+        title: navigationPoint.navigationLabels.first.text,
+        contentFileName: contentFileName,
+        anchor: anchor,
+        subChapters:
+            getChaptersImpl(bookRef, navigationPoint.childNavigationPoints),
+      );
       result.add(chapterRef);
     }
 

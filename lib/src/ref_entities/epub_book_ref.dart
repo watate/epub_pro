@@ -14,7 +14,7 @@ class EpubBookRef {
   final Archive epubArchive;
   final String? title;
   final String? author;
-  final List<String?> authors;
+  final List<String> authors;
   final EpubSchema? schema;
   final EpubContentRef? content;
 
@@ -29,8 +29,7 @@ class EpubBookRef {
 
   @override
   int get hashCode {
-    return epubArchive.hashCode ^
-        title.hashCode ^
+    return title.hashCode ^
         author.hashCode ^
         authors.hashCode ^
         schema.hashCode ^
@@ -42,8 +41,7 @@ class EpubBookRef {
     if (identical(this, other)) return true;
     final listEquals = const DeepCollectionEquality().equals;
 
-    return other.epubArchive == epubArchive &&
-        other.title == title &&
+    return other.title == title &&
         other.author == author &&
         listEquals(other.authors, authors) &&
         other.schema == schema &&

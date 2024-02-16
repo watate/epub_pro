@@ -65,6 +65,7 @@ class EpubReader {
         .firstWhere((String name) => true, orElse: () => '');
     final authors = schema.package!.metadata!.creators
         .map((EpubMetadataCreator creator) => creator.creator)
+        .whereType<String>()
         .toList();
     final author = authors.join(', ');
 
@@ -213,7 +214,7 @@ class EpubReader {
       final contentFileName = chapterRef.contentFileName;
       final anchor = chapterRef.anchor;
       final htmlContent = await chapterRef.readHtmlContent();
-      final subChapters = await readChapters(chapterRef.subChapters!);
+      final subChapters = await readChapters(chapterRef.subChapters);
 
       final chapter = EpubChapter(
         title: title,

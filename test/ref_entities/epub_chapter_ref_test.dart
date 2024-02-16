@@ -9,13 +9,13 @@ main() async {
   var arch = Archive();
   var bookRef = EpubBookRef(epubArchive: arch);
   var contentFileRef = EpubTextContentFileRef(epubBookRef: bookRef);
-  var reference = EpubChapterRef(contentFileRef);
-
-  reference
-    ..anchor = "anchor"
-    ..contentFileName = "orthros"
-    ..subChapters = []
-    ..title = "A New Look at Chapters";
+  var reference = EpubChapterRef(
+    epubTextContentFileRef: contentFileRef,
+    anchor: "anchor",
+    contentFileName: "orthros",
+    subChapters: [],
+    title: "A New Look at Chapters",
+  );
 
   late EpubBookRef bookRef2;
   late EpubChapterRef testChapterRef;
@@ -25,12 +25,8 @@ main() async {
     bookRef2 = EpubBookRef(epubArchive: arch2);
     var contentFileRef2 = EpubTextContentFileRef(epubBookRef: bookRef2);
 
-    testChapterRef = EpubChapterRef(contentFileRef2);
-    testChapterRef
-      ..anchor = "anchor"
-      ..contentFileName = "orthros"
-      ..subChapters = []
-      ..title = "A New Look at Chapters";
+    testChapterRef =
+        reference.copyWith(epubTextContentFileRef: contentFileRef2);
   });
 
   group("EpubChapterRef", () {
@@ -40,28 +36,30 @@ main() async {
       });
 
       test("is false when Anchor changes", () async {
-        testChapterRef.anchor = "NotAnAnchor";
+        testChapterRef = testChapterRef.copyWith(anchor: "NotAnAnchor");
         expect(testChapterRef, isNot(reference));
       });
 
       test("is false when ContentFileName changes", () async {
-        testChapterRef.contentFileName = "NotOrthros";
+        testChapterRef = testChapterRef.copyWith(contentFileName: "NotOrthros");
         expect(testChapterRef, isNot(reference));
       });
 
       test("is false when SubChapters changes", () async {
         var subchapterContentFileRef =
             EpubTextContentFileRef(epubBookRef: bookRef2);
-        var chapter = EpubChapterRef(subchapterContentFileRef);
-        chapter
-          ..title = "A Brave new Epub"
-          ..contentFileName = "orthros.txt";
-        testChapterRef.subChapters = [chapter];
+        var chapter = EpubChapterRef(
+          epubTextContentFileRef: subchapterContentFileRef,
+          title: "A Brave new Epub",
+          contentFileName: "orthros.txt",
+        );
+
+        testChapterRef = testChapterRef.copyWith(subChapters: [chapter]);
         expect(testChapterRef, isNot(reference));
       });
 
       test("is false when Title changes", () async {
-        testChapterRef.title = "A Boring Old World";
+        testChapterRef = testChapterRef.copyWith(title: "A Boring Old World");
         expect(testChapterRef, isNot(reference));
       });
     });
@@ -76,30 +74,50 @@ main() async {
       });
 
       test("is false when Anchor changes", () async {
-        testChapterRef.anchor = "NotAnAnchor";
+        testChapterRef = testChapterRef.copyWith(anchor: "NotAnAnchor");
         expect(testChapterRef.hashCode, isNot(reference.hashCode));
       });
 
       test("is false when ContentFileName changes", () async {
-        testChapterRef.contentFileName = "NotOrthros";
+        testChapterRef = testChapterRef.copyWith(contentFileName: "NotOrthros");
         expect(testChapterRef.hashCode, isNot(reference.hashCode));
       });
 
       test("is false when SubChapters changes", () async {
         var subchapterContentFileRef =
             EpubTextContentFileRef(epubBookRef: bookRef2);
-        var chapter = EpubChapterRef(subchapterContentFileRef);
-        chapter
-          ..title = "A Brave new Epub"
-          ..contentFileName = "orthros.txt";
-        testChapterRef.subChapters = [chapter];
+        var chapter = EpubChapterRef(
+          epubTextContentFileRef: subchapterContentFileRef,
+          title: "A Brave new Epub",
+          contentFileName: "orthros.txt",
+        );
+        testChapterRef = testChapterRef.copyWith(subChapters: [chapter]);
         expect(testChapterRef, isNot(reference));
       });
 
       test("is false when Title changes", () async {
-        testChapterRef.title = "A Boring Old World";
+        testChapterRef = testChapterRef.copyWith(title: "A Boring Old World");
         expect(testChapterRef.hashCode, isNot(reference.hashCode));
       });
     });
   });
+}
+
+extension on EpubChapterRef {
+  EpubChapterRef copyWith({
+    EpubTextContentFileRef? epubTextContentFileRef,
+    String? anchor,
+    String? contentFileName,
+    List<EpubChapterRef>? subChapters,
+    String? title,
+  }) {
+    return EpubChapterRef(
+      epubTextContentFileRef:
+          epubTextContentFileRef ?? this.epubTextContentFileRef,
+      anchor: anchor ?? this.anchor,
+      contentFileName: contentFileName ?? this.contentFileName,
+      subChapters: subChapters ?? this.subChapters,
+      title: title ?? this.title,
+    );
+  }
 }
