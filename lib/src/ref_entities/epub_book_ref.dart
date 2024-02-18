@@ -48,7 +48,7 @@ class EpubBookRef {
         other.content == content;
   }
 
-  Future<List<EpubChapterRef>> getChapters() async {
+  List<EpubChapterRef> getChapters() {
     return ChapterReader.getChapters(this);
   }
 

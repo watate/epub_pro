@@ -151,8 +151,7 @@ class PackageReader {
     final metaItems = <EpubMetadataMeta>[];
     metadataNode.children.whereType<XmlElement>().forEach(
       (XmlElement metadataItemNode) {
-        var innerText = metadataItemNode.value;
-        if (innerText == null) return;
+        final innerText = metadataItemNode.innerText;
 
         return switch (metadataItemNode.name.local.toLowerCase()) {
           'title' => titles.add(innerText),
@@ -214,7 +213,7 @@ class PackageReader {
           fileAs = attributeValue;
       }
     }
-    contributor = metadataContributorNode.value;
+    contributor = metadataContributorNode.innerText;
 
     return EpubMetadataContributor(
       contributor: contributor,
@@ -237,7 +236,7 @@ class PackageReader {
           fileAs = attributeValue;
       }
     }
-    creator = metadataCreatorNode.value;
+    creator = metadataCreatorNode.innerText;
 
     return EpubMetadataCreator(
       creator: creator,
@@ -254,7 +253,7 @@ class PackageReader {
     if (eventAttribute != null && eventAttribute.isNotEmpty) {
       event = eventAttribute;
     }
-    date = metadataDateNode.value;
+    date = metadataDateNode.innerText;
 
     return EpubMetadataDate(
       date: date,
@@ -277,7 +276,7 @@ class PackageReader {
           scheme = attributeValue;
       }
     }
-    identifier = metadataIdentifierNode.value;
+    identifier = metadataIdentifierNode.innerText;
 
     return EpubMetadataIdentifier(
       id: id,
@@ -327,7 +326,7 @@ class PackageReader {
           scheme = attributeValue;
       }
     }
-    content = metadataMetaNode.value;
+    content = metadataMetaNode.innerText;
 
     return EpubMetadataMeta(
       id: id,

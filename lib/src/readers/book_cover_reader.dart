@@ -6,27 +6,25 @@ import 'package:image/image.dart' as images;
 
 import '../ref_entities/epub_book_ref.dart';
 import '../ref_entities/epub_byte_content_file_ref.dart';
-import '../schema/opf/epub_manifest_item.dart';
-import '../schema/opf/epub_metadata_meta.dart';
 
 class BookCoverReader {
   static Future<images.Image?> readBookCover(EpubBookRef bookRef) async {
-    var metaItems = bookRef.schema!.package!.metadata!.metaItems;
-    if (metaItems.isEmpty) return null;
+    final metaItems = bookRef.schema?.package?.metadata?.metaItems;
+    if (metaItems == null || metaItems.isEmpty) return null;
 
-    var coverMetaItem = metaItems.firstWhereOrNull(
-        (EpubMetadataMeta metaItem) =>
-            metaItem.name != null && metaItem.name!.toLowerCase() == 'cover');
+    final coverMetaItem = metaItems.firstWhereOrNull((metaItem) =>
+        metaItem.name != null && metaItem.name!.toLowerCase() == 'cover');
     if (coverMetaItem == null) return null;
     if (coverMetaItem.content == null || coverMetaItem.content!.isEmpty) {
       throw Exception(
-          'Incorrect EPUB metadata: cover item content is missing.');
+        'Incorrect EPUB metadata: cover item content is missing.',
+      );
     }
 
-    var coverManifestItem = bookRef.schema!.package!.manifest!.items
-        .firstWhereOrNull((EpubManifestItem manifestItem) =>
-            manifestItem.id!.toLowerCase() ==
-            coverMetaItem.content!.toLowerCase());
+    var coverManifestItem = bookRef.schema?.package?.manifest?.items
+        .firstWhereOrNull((manifestItem) =>
+            manifestItem.id?.toLowerCase() ==
+            coverMetaItem.content?.toLowerCase());
     if (coverManifestItem == null) {
       throw Exception(
         'Incorrect EPUB manifest: item with ID = "${coverMetaItem.content}" is missing.',

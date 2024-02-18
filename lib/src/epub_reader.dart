@@ -100,7 +100,7 @@ class EpubReader {
     final author = epubBookRef.author;
     final content = await readContent(epubBookRef.content!);
     final coverImage = await epubBookRef.readCover();
-    final chapterRefs = await epubBookRef.getChapters();
+    final chapterRefs = epubBookRef.getChapters();
     final chapters = await readChapters(chapterRefs);
 
     return EpubBook(

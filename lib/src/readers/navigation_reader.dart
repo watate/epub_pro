@@ -271,9 +271,8 @@ class NavigationReader {
     final authors = <String>[];
     docAuthorNode.children.whereType<xml.XmlElement>().forEach(
       (xml.XmlElement textNode) {
-        if (textNode.name.local.toLowerCase() == 'text' &&
-            textNode.value != null) {
-          authors.add(textNode.value!);
+        if (textNode.name.local.toLowerCase() == 'text') {
+          authors.add(textNode.innerText);
         }
       },
     );
@@ -286,9 +285,8 @@ class NavigationReader {
     final titles = <String>[];
     docTitleNode.children.whereType<xml.XmlElement>().forEach(
       (xml.XmlElement textNode) {
-        if (textNode.name.local.toLowerCase() == 'text' &&
-            textNode.value != null) {
-          titles.add(textNode.value!);
+        if (textNode.name.local.toLowerCase() == 'text') {
+          titles.add(textNode.innerText);
         }
       },
     );
@@ -352,7 +350,7 @@ class NavigationReader {
       );
     }
 
-    final text = navigationLabelTextNode.value;
+    final text = navigationLabelTextNode.innerText;
 
     return EpubNavigationLabel(text: text);
   }
@@ -360,7 +358,7 @@ class NavigationReader {
   static EpubNavigationLabel readNavigationLabelV3(
     xml.XmlElement navigationLabelNode,
   ) {
-    final text = navigationLabelNode.value?.trim();
+    final text = navigationLabelNode.innerText.trim();
     return EpubNavigationLabel(text: text);
   }
 

@@ -148,7 +148,6 @@ class EpubState extends State<EpubWidget> {
 }
 
 Widget buildEpubWidget(epub.EpubBookRef book) {
-  var chapters = book.getChapters();
   var cover = book.readCover();
   return Column(
     children: <Widget>[
@@ -174,24 +173,15 @@ Widget buildEpubWidget(epub.EpubBookRef book) {
       const Padding(
         padding: EdgeInsets.only(top: 15.0),
       ),
-      FutureBuilder<List<epub.EpubChapterRef>>(
-          future: chapters,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return Column(
-                children: <Widget>[
-                  const Text("Chapters", style: TextStyle(fontSize: 20.0)),
-                  Text(
-                    snapshot.data!.length.toString(),
-                    style: const TextStyle(fontSize: 15.0),
-                  )
-                ],
-              );
-            } else if (snapshot.hasError) {
-              return Text("${snapshot.error}");
-            }
-            return Container();
-          }),
+      Column(
+        children: <Widget>[
+          const Text("Chapters", style: TextStyle(fontSize: 20.0)),
+          Text(
+            book.getChapters().length.toString(),
+            style: const TextStyle(fontSize: 15.0),
+          )
+        ],
+      ),
       const Padding(
         padding: EdgeInsets.only(top: 15.0),
       ),
