@@ -4,6 +4,7 @@ import 'dart:io' as io;
 
 import 'package:path/path.dart' as path;
 import 'package:epub_plus/epub_plus.dart';
+import 'package:collection/collection.dart';
 
 main(List<String> args) async {
   //Get the epub into memory somehow
@@ -34,10 +35,10 @@ main(List<String> args) async {
 // Enumerating chapters
   epubBook.chapters.forEach((EpubChapter chapter) {
     // Title of chapter
-    String chapterTitle = chapter.title!;
+    String? chapterTitle = chapter.title;
 
     // HTML content of current chapter
-    String chapterHtmlContent = chapter.htmlContent!;
+    String? chapterHtmlContent = chapter.htmlContent;
 
     // Nested chapters
     List<EpubChapter> subChapters = chapter.subChapters;
@@ -46,15 +47,15 @@ main(List<String> args) async {
 // CONTENT
 
 // Book's content (HTML files, stlylesheets, images, fonts, etc.)
-  EpubContent bookContent = epubBook.content!;
+  EpubContent? bookContent = epubBook.content;
 
 // IMAGES
 
 // All images in the book (file name is the key)
-  Map<String, EpubByteContentFile> images = bookContent.images;
+  Map<String, EpubByteContentFile>? images = bookContent?.images;
 
   EpubByteContentFile? firstImage =
-      images.isNotEmpty ? images.values.first : null;
+      images?.values.firstOrNull; // Get the first image in the book
 
 // Content type (e.g. EpubContentType.IMAGE_JPEG, EpubContentType.IMAGE_PNG)
   EpubContentType contentType = firstImage!.contentType!;
@@ -65,36 +66,36 @@ main(List<String> args) async {
 // HTML & CSS
 
 // All XHTML files in the book (file name is the key)
-  Map<String?, EpubTextContentFile> htmlFiles = bookContent.html;
+  Map<String, EpubTextContentFile>? htmlFiles = bookContent?.html;
 
 // All CSS files in the book (file name is the key)
-  Map<String, EpubTextContentFile> cssFiles = bookContent.css;
+  Map<String, EpubTextContentFile>? cssFiles = bookContent?.css;
 
 // Entire HTML content of the book
-  htmlFiles.values.forEach((EpubTextContentFile htmlFile) {
-    String htmlContent = htmlFile.content!;
+  htmlFiles?.values.forEach((EpubTextContentFile htmlFile) {
+    String? htmlContent = htmlFile.content;
   });
 
 // All CSS content in the book
-  cssFiles.values.forEach((EpubTextContentFile cssFile) {
+  cssFiles?.values.forEach((EpubTextContentFile cssFile) {
     String cssContent = cssFile.content!;
   });
 
 // OTHER CONTENT
 
 // All fonts in the book (file name is the key)
-  Map<String, EpubByteContentFile> fonts = bookContent.fonts;
+  Map<String, EpubByteContentFile>? fonts = bookContent?.fonts;
 
 // All files in the book (including HTML, CSS, images, fonts, and other types of files)
-  Map<String, EpubContentFile> allFiles = bookContent.allFiles;
+  Map<String, EpubContentFile>? allFiles = bookContent?.allFiles;
 
 // ACCESSING RAW SCHEMA INFORMATION
 
 // EPUB OPF data
-  EpubPackage package = epubBook.schema!.package!;
+  EpubPackage? package = epubBook.schema?.package;
 
 // Enumerating book's contributors
-  package.metadata!.contributors.forEach((contributor) {
+  package?.metadata?.contributors.forEach((contributor) {
     String contributorName = contributor.contributor!;
     String contributorRole = contributor.role!;
   });
@@ -103,13 +104,16 @@ main(List<String> args) async {
   EpubNavigation navigation = epubBook.schema!.navigation!;
 
 // Enumerating NCX metadata
-  navigation.head!.metadata.forEach((meta) {
+  navigation.head?.metadata.forEach((meta) {
     String metadataItemName = meta.name!;
     String metadataItemContent = meta.content!;
   });
 
   // Write the Book
   var written = EpubWriter.writeBook(epubBook);
-  // Read the book into a new object!
-  var newBook = await EpubReader.readBook(written!);
+
+  if (written != null) {
+    // Read the book into a new object!
+    var newBook = await EpubReader.readBook(written);
+  }
 }

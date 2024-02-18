@@ -91,12 +91,7 @@ class EpubReader {
 
   /// Opens the book asynchronously and reads all of its content into the memory. Does not hold the handle to the EPUB file.
   static Future<EpubBook> readBook(FutureOr<List<int>> bytes) async {
-    List<int> loadedBytes;
-    if (bytes is Future) {
-      loadedBytes = await bytes;
-    } else {
-      loadedBytes = bytes;
-    }
+    List<int> loadedBytes = await bytes;
 
     var epubBookRef = await openBook(loadedBytes);
     final schema = epubBookRef.schema;
