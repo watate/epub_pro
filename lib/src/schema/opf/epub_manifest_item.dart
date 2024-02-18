@@ -1,49 +1,56 @@
-import 'package:quiver/core.dart';
-
 class EpubManifestItem {
-  String? Id;
-  String? Href;
-  String? MediaType;
-  String? MediaOverlay;
-  String? RequiredNamespace;
-  String? RequiredModules;
-  String? Fallback;
-  String? FallbackStyle;
-  String? Properties;
+  final String? id;
+  final String? href;
+  final String? mediaType;
+  final String? mediaOverlay;
+  final String? requiredNamespace;
+  final String? requiredModules;
+  final String? fallback;
+  final String? fallbackStyle;
+  final String? properties;
+
+  const EpubManifestItem({
+    this.id,
+    this.href,
+    this.mediaType,
+    this.mediaOverlay,
+    this.requiredNamespace,
+    this.requiredModules,
+    this.fallback,
+    this.fallbackStyle,
+    this.properties,
+  });
 
   @override
-  int get hashCode => hashObjects([
-        Id.hashCode,
-        Href.hashCode,
-        MediaType.hashCode,
-        MediaOverlay.hashCode,
-        RequiredNamespace.hashCode,
-        RequiredModules.hashCode,
-        Fallback.hashCode,
-        FallbackStyle.hashCode,
-        Properties.hashCode
-      ]);
+  int get hashCode {
+    return id.hashCode ^
+        href.hashCode ^
+        mediaType.hashCode ^
+        mediaOverlay.hashCode ^
+        requiredNamespace.hashCode ^
+        requiredModules.hashCode ^
+        fallback.hashCode ^
+        fallbackStyle.hashCode ^
+        properties.hashCode;
+  }
 
   @override
-  bool operator ==(other) {
-    var otherAs = other as EpubManifestItem?;
-    if (otherAs == null) {
-      return false;
-    }
+  bool operator ==(covariant EpubManifestItem other) {
+    if (identical(this, other)) return true;
 
-    return Id == otherAs.Id &&
-        Href == otherAs.Href &&
-        MediaType == otherAs.MediaType &&
-        MediaOverlay == otherAs.MediaOverlay &&
-        RequiredNamespace == otherAs.RequiredNamespace &&
-        RequiredModules == otherAs.RequiredModules &&
-        Fallback == otherAs.Fallback &&
-        FallbackStyle == otherAs.FallbackStyle &&
-        Properties == otherAs.Properties;
+    return other.id == id &&
+        other.href == href &&
+        other.mediaType == mediaType &&
+        other.mediaOverlay == mediaOverlay &&
+        other.requiredNamespace == requiredNamespace &&
+        other.requiredModules == requiredModules &&
+        other.fallback == fallback &&
+        other.fallbackStyle == fallbackStyle &&
+        other.properties == properties;
   }
 
   @override
   String toString() {
-    return 'Id: $Id, Href = $Href, MediaType = $MediaType, Properties = $Properties, MediaOverlay = $MediaOverlay';
+    return 'Id: $id, Href = $href, MediaType = $mediaType, Properties = $properties, MediaOverlay = $mediaOverlay';
   }
 }

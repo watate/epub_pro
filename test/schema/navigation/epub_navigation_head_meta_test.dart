@@ -2,7 +2,7 @@ library epubreadertest;
 
 import 'dart:math';
 
-import 'package:epubx/src/schema/navigation/epub_navigation_head_meta.dart';
+import 'package:epub_plus/src/schema/navigation/epub_navigation_head_meta.dart';
 import 'package:test/test.dart';
 
 import '../../random_data_generator.dart';
@@ -14,10 +14,7 @@ main() async {
   late EpubNavigationHeadMeta testNavigationDocTitle;
 
   setUp(() async {
-    testNavigationDocTitle = EpubNavigationHeadMeta()
-      ..Content = reference.Content
-      ..Name = reference.Name
-      ..Scheme = reference.Scheme;
+    testNavigationDocTitle = reference.copyWith();
   });
 
   group("EpubNavigationHeadMeta", () {
@@ -27,15 +24,18 @@ main() async {
       });
 
       test("is false when Content changes", () async {
-        testNavigationDocTitle.Content = generator.randomString();
+        testNavigationDocTitle =
+            testNavigationDocTitle.copyWith(content: generator.randomString());
         expect(testNavigationDocTitle, isNot(reference));
       });
       test("is false when Name changes", () async {
-        testNavigationDocTitle.Name = generator.randomString();
+        testNavigationDocTitle =
+            testNavigationDocTitle.copyWith(name: generator.randomString());
         expect(testNavigationDocTitle, isNot(reference));
       });
       test("is false when Scheme changes", () async {
-        testNavigationDocTitle.Scheme = generator.randomString();
+        testNavigationDocTitle =
+            testNavigationDocTitle.copyWith(scheme: generator.randomString());
         expect(testNavigationDocTitle, isNot(reference));
       });
     });
@@ -46,17 +46,34 @@ main() async {
       });
 
       test("is false when Content changes", () async {
-        testNavigationDocTitle.Content = generator.randomString();
+        testNavigationDocTitle =
+            testNavigationDocTitle.copyWith(content: generator.randomString());
         expect(testNavigationDocTitle.hashCode, isNot(reference.hashCode));
       });
       test("is false when Name changes", () async {
-        testNavigationDocTitle.Name = generator.randomString();
+        testNavigationDocTitle =
+            testNavigationDocTitle.copyWith(name: generator.randomString());
         expect(testNavigationDocTitle.hashCode, isNot(reference.hashCode));
       });
       test("is false when Scheme changes", () async {
-        testNavigationDocTitle.Scheme = generator.randomString();
+        testNavigationDocTitle =
+            testNavigationDocTitle.copyWith(scheme: generator.randomString());
         expect(testNavigationDocTitle.hashCode, isNot(reference.hashCode));
       });
     });
   });
+}
+
+extension on EpubNavigationHeadMeta {
+  EpubNavigationHeadMeta copyWith({
+    String? content,
+    String? name,
+    String? scheme,
+  }) {
+    return EpubNavigationHeadMeta(
+      content: content ?? this.content,
+      name: name ?? this.name,
+      scheme: scheme ?? this.scheme,
+    );
+  }
 }

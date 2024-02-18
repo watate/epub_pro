@@ -1,22 +1,23 @@
-import 'package:quiver/core.dart';
-
 class EpubNavigationHeadMeta {
-  String? Name;
-  String? Content;
-  String? Scheme;
+  final String? name;
+  final String? content;
+  final String? scheme;
+
+  const EpubNavigationHeadMeta({
+    this.name,
+    this.content,
+    this.scheme,
+  });
 
   @override
-  int get hashCode => hash3(Name.hashCode, Content.hashCode, Scheme.hashCode);
+  int get hashCode => name.hashCode ^ content.hashCode ^ scheme.hashCode;
 
   @override
-  bool operator ==(other) {
-    var otherAs = other as EpubNavigationHeadMeta?;
-    if (otherAs == null) {
-      return false;
-    }
+  bool operator ==(covariant EpubNavigationHeadMeta other) {
+    if (identical(this, other)) return true;
 
-    return Name == otherAs.Name &&
-        Content == otherAs.Content &&
-        Scheme == otherAs.Scheme;
+    return other.name == name &&
+        other.content == content &&
+        other.scheme == scheme;
   }
 }

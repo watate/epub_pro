@@ -1,52 +1,40 @@
-import 'package:quiver/collection.dart' as collections;
-import 'package:quiver/core.dart';
+import 'package:collection/collection.dart';
 
 import 'epub_byte_content_file.dart';
 import 'epub_content_file.dart';
 import 'epub_text_content_file.dart';
 
 class EpubContent {
-  Map<String, EpubTextContentFile>? Html;
-  Map<String, EpubTextContentFile>? Css;
-  Map<String, EpubByteContentFile>? Images;
-  Map<String, EpubByteContentFile>? Fonts;
-  Map<String, EpubContentFile>? AllFiles;
+  final Map<String, EpubTextContentFile> html;
+  final Map<String, EpubTextContentFile> css;
+  final Map<String, EpubByteContentFile> images;
+  final Map<String, EpubByteContentFile> fonts;
+  final Map<String, EpubContentFile> allFiles;
 
-  EpubContent() {
-    Html = <String, EpubTextContentFile>{};
-    Css = <String, EpubTextContentFile>{};
-    Images = <String, EpubByteContentFile>{};
-    Fonts = <String, EpubByteContentFile>{};
-    AllFiles = <String, EpubContentFile>{};
-  }
+  const EpubContent({
+    this.html = const <String, EpubTextContentFile>{},
+    this.css = const <String, EpubTextContentFile>{},
+    this.images = const <String, EpubByteContentFile>{},
+    this.fonts = const <String, EpubByteContentFile>{},
+    this.allFiles = const <String, EpubContentFile>{},
+  });
 
   @override
   int get hashCode {
-    var objects = [
-      ...Html!.keys.map((key) => key.hashCode),
-      ...Html!.values.map((value) => value.hashCode),
-      ...Css!.keys.map((key) => key.hashCode),
-      ...Css!.values.map((value) => value.hashCode),
-      ...Images!.keys.map((key) => key.hashCode),
-      ...Images!.values.map((value) => value.hashCode),
-      ...Fonts!.keys.map((key) => key.hashCode),
-      ...Fonts!.values.map((value) => value.hashCode),
-      ...AllFiles!.keys.map((key) => key.hashCode),
-      ...AllFiles!.values.map((value) => value.hashCode),
-    ];
+    final hash = const DeepCollectionEquality().hash;
 
-    return hashObjects(objects);
+    return hash(html) ^ hash(css) ^ hash(images) ^ hash(fonts) ^ hash(allFiles);
   }
 
   @override
-  bool operator ==(other) {
-    if (!(other is EpubContent)) {
-      return false;
-    }
-    return collections.mapsEqual(Html, other.Html) &&
-        collections.mapsEqual(Css, other.Css) &&
-        collections.mapsEqual(Images, other.Images) &&
-        collections.mapsEqual(Fonts, other.Fonts) &&
-        collections.mapsEqual(AllFiles, other.AllFiles);
+  bool operator ==(covariant EpubContent other) {
+    if (identical(this, other)) return true;
+    final mapEquals = const DeepCollectionEquality().equals;
+
+    return mapEquals(other.html, html) &&
+        mapEquals(other.css, css) &&
+        mapEquals(other.images, images) &&
+        mapEquals(other.fonts, fonts) &&
+        mapEquals(other.allFiles, allFiles);
   }
 }

@@ -1,6 +1,6 @@
 library epubreadertest;
 
-import 'package:epubx/epubx.dart';
+import 'package:epub_plus/epub_plus.dart';
 import 'package:test/test.dart';
 
 main() async {
@@ -13,18 +13,19 @@ main() async {
   setUp(() async {
     testContent = EpubContent();
 
-    textContentFile = EpubTextContentFile();
-    textContentFile
-      ..Content = "Some string"
-      ..ContentMimeType = "application/text"
-      ..ContentType = EpubContentType.OTHER
-      ..FileName = "orthros.txt";
+    textContentFile = EpubTextContentFile(
+      content: "Some string",
+      contentMimeType: "application/text",
+      contentType: EpubContentType.other,
+      fileName: "orthros.txt",
+    );
 
-    byteContentFile = EpubByteContentFile()
-      ..Content = [0, 1, 2, 3]
-      ..ContentMimeType = "application/orthros"
-      ..ContentType = EpubContentType.OTHER
-      ..FileName = "orthros.bin";
+    byteContentFile = EpubByteContentFile(
+      content: [0, 1, 2, 3],
+      contentMimeType: "application/orthros",
+      contentType: EpubContentType.other,
+      fileName: "orthros.bin",
+    );
   });
 
   group("EpubContent", () {
@@ -34,27 +35,29 @@ main() async {
       });
 
       test("is false when Html changes", () async {
-        testContent.Html?["someKey"] = textContentFile;
+        testContent = testContent.copyWith(html: {"someKey": textContentFile});
         expect(testContent, isNot(reference));
       });
 
       test("is false when Css changes", () async {
-        testContent.Css?["someKey"] = textContentFile;
+        testContent = testContent.copyWith(css: {"someKey": textContentFile});
         expect(testContent, isNot(reference));
       });
 
       test("is false when Images changes", () async {
-        testContent.Images?["someKey"] = byteContentFile;
+        testContent =
+            testContent.copyWith(images: {"someKey": byteContentFile});
         expect(testContent, isNot(reference));
       });
 
       test("is false when Fonts changes", () async {
-        testContent.Fonts?["someKey"] = byteContentFile;
+        testContent = testContent.copyWith(fonts: {"someKey": byteContentFile});
         expect(testContent, isNot(reference));
       });
 
       test("is false when AllFiles changes", () async {
-        testContent.AllFiles?["someKey"] = byteContentFile;
+        testContent =
+            testContent.copyWith(allFiles: {"someKey": byteContentFile});
         expect(testContent, isNot(reference));
       });
     });
@@ -65,29 +68,49 @@ main() async {
       });
 
       test("is false when Html changes", () async {
-        testContent.Html?["someKey"] = textContentFile;
+        testContent = testContent.copyWith(html: {"someKey": textContentFile});
         expect(testContent.hashCode, isNot(reference.hashCode));
       });
 
       test("is false when Css changes", () async {
-        testContent.Css?["someKey"] = textContentFile;
+        testContent = testContent.copyWith(css: {"someKey": textContentFile});
         expect(testContent.hashCode, isNot(reference.hashCode));
       });
 
       test("is false when Images changes", () async {
-        testContent.Images?["someKey"] = byteContentFile;
+        testContent =
+            testContent.copyWith(images: {"someKey": byteContentFile});
         expect(testContent.hashCode, isNot(reference.hashCode));
       });
 
       test("is false when Fonts changes", () async {
-        testContent.Fonts?["someKey"] = byteContentFile;
+        testContent = testContent.copyWith(fonts: {"someKey": byteContentFile});
         expect(testContent.hashCode, isNot(reference.hashCode));
       });
 
       test("is false when AllFiles changes", () async {
-        testContent.AllFiles?["someKey"] = byteContentFile;
+        testContent =
+            testContent.copyWith(allFiles: {"someKey": byteContentFile});
         expect(testContent.hashCode, isNot(reference.hashCode));
       });
     });
   });
+}
+
+extension on EpubContent {
+  EpubContent copyWith({
+    Map<String, EpubTextContentFile>? html,
+    Map<String, EpubTextContentFile>? css,
+    Map<String, EpubByteContentFile>? images,
+    Map<String, EpubByteContentFile>? fonts,
+    Map<String, EpubContentFile>? allFiles,
+  }) {
+    return EpubContent(
+      html: html ?? this.html,
+      css: css ?? this.css,
+      images: images ?? this.images,
+      fonts: fonts ?? this.fonts,
+      allFiles: allFiles ?? this.allFiles,
+    );
+  }
 }

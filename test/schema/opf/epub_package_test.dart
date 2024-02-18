@@ -2,7 +2,7 @@ library epubreadertest;
 
 import 'dart:math';
 
-import 'package:epubx/epubx.dart';
+import 'package:epub_plus/epub_plus.dart';
 import 'package:test/test.dart';
 
 import '../../random_data_generator.dart';
@@ -13,17 +13,13 @@ main() async {
   final RandomDataGenerator generator =
       RandomDataGenerator(Random(123778), length);
 
-  var reference = generator.randomEpubPackage()..Version = EpubVersion.Epub3;
+  final reference =
+      generator.randomEpubPackage().copyWith(version: EpubVersion.epub3);
 
   late EpubPackage testPackage;
 
   setUp(() async {
-    testPackage = EpubPackage()
-      ..Guide = reference.Guide
-      ..Manifest = reference.Manifest
-      ..Metadata = reference.Metadata
-      ..Spine = reference.Spine
-      ..Version = reference.Version;
+    testPackage = reference.copyWith();
   });
 
   group("EpubSpine", () {
@@ -32,25 +28,28 @@ main() async {
         expect(testPackage, equals(reference));
       });
       test("is false when Guide changes", () async {
-        testPackage.Guide = generator.randomEpubGuide();
+        testPackage = testPackage.copyWith(guide: generator.randomEpubGuide());
         expect(testPackage, isNot(reference));
       });
       test("is false when Manifest changes", () async {
-        testPackage.Manifest = generator.randomEpubManifest();
+        testPackage =
+            testPackage.copyWith(manifest: generator.randomEpubManifest());
         expect(testPackage, isNot(reference));
       });
       test("is false when Metadata changes", () async {
-        testPackage.Metadata = generator.randomEpubMetadata();
+        testPackage =
+            testPackage.copyWith(metadata: generator.randomEpubMetadata());
         expect(testPackage, isNot(reference));
       });
       test("is false when Spine changes", () async {
-        testPackage.Spine = generator.randomEpubSpine();
+        testPackage = testPackage.copyWith(spine: generator.randomEpubSpine());
         expect(testPackage, isNot(reference));
       });
       test("is false when Version changes", () async {
-        testPackage.Version = testPackage.Version == EpubVersion.Epub2
-            ? EpubVersion.Epub3
-            : EpubVersion.Epub2;
+        testPackage = testPackage.copyWith(
+            version: testPackage.version == EpubVersion.epub2
+                ? EpubVersion.epub3
+                : EpubVersion.epub2);
         expect(testPackage, isNot(reference));
       });
     });
@@ -60,25 +59,28 @@ main() async {
         expect(testPackage.hashCode, equals(reference.hashCode));
       });
       test("is false when Guide changes", () async {
-        testPackage.Guide = generator.randomEpubGuide();
+        testPackage = testPackage.copyWith(guide: generator.randomEpubGuide());
         expect(testPackage.hashCode, isNot(reference.hashCode));
       });
       test("is false when Manifest changes", () async {
-        testPackage.Manifest = generator.randomEpubManifest();
+        testPackage =
+            testPackage.copyWith(manifest: generator.randomEpubManifest());
         expect(testPackage.hashCode, isNot(reference.hashCode));
       });
       test("is false when Metadata changes", () async {
-        testPackage.Metadata = generator.randomEpubMetadata();
+        testPackage =
+            testPackage.copyWith(metadata: generator.randomEpubMetadata());
         expect(testPackage.hashCode, isNot(reference.hashCode));
       });
       test("is false when Spine changes", () async {
-        testPackage.Spine = generator.randomEpubSpine();
+        testPackage = testPackage.copyWith(spine: generator.randomEpubSpine());
         expect(testPackage.hashCode, isNot(reference.hashCode));
       });
       test("is false when Version changes", () async {
-        testPackage.Version = testPackage.Version == EpubVersion.Epub2
-            ? EpubVersion.Epub3
-            : EpubVersion.Epub2;
+        testPackage = testPackage.copyWith(
+            version: testPackage.version == EpubVersion.epub2
+                ? EpubVersion.epub3
+                : EpubVersion.epub2);
         expect(testPackage.hashCode, isNot(reference.hashCode));
       });
     });

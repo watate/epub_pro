@@ -1,21 +1,19 @@
 library epubreadertest;
 
-import 'package:epubx/src/schema/opf/epub_metadata_identifier.dart';
+import 'package:epub_plus/src/schema/opf/epub_metadata_identifier.dart';
 import 'package:test/test.dart';
 
 main() async {
-  var reference = EpubMetadataIdentifier()
-    ..Id = "Unique"
-    ..Identifier = "Identifier"
-    ..Scheme = "A plot";
+  var reference = EpubMetadataIdentifier(
+    id: "Unique",
+    identifier: "Identifier",
+    scheme: "A plot",
+  );
 
   late EpubMetadataIdentifier testMetadataIdentifier;
 
   setUp(() async {
-    testMetadataIdentifier = EpubMetadataIdentifier()
-      ..Id = reference.Id
-      ..Identifier = reference.Identifier
-      ..Scheme = reference.Scheme;
+    testMetadataIdentifier = reference.copyWith();
   });
 
   group("EpubMetadataIdentifier", () {
@@ -25,15 +23,18 @@ main() async {
       });
 
       test("is false when Id changes", () async {
-        testMetadataIdentifier.Id = "A different ID";
+        testMetadataIdentifier =
+            testMetadataIdentifier.copyWith(id: "Different");
         expect(testMetadataIdentifier, isNot(reference));
       });
       test("is false when Identifier changes", () async {
-        testMetadataIdentifier.Identifier = "A different identifier";
+        testMetadataIdentifier =
+            testMetadataIdentifier.copyWith(identifier: "Different");
         expect(testMetadataIdentifier, isNot(reference));
       });
       test("is false when Scheme changes", () async {
-        testMetadataIdentifier.Scheme = "A strange scheme";
+        testMetadataIdentifier =
+            testMetadataIdentifier.copyWith(scheme: "Different");
         expect(testMetadataIdentifier, isNot(reference));
       });
     });
@@ -44,17 +45,34 @@ main() async {
       });
 
       test("is false when Id changes", () async {
-        testMetadataIdentifier.Id = "A different Id";
+        testMetadataIdentifier =
+            testMetadataIdentifier.copyWith(id: "Different");
         expect(testMetadataIdentifier.hashCode, isNot(reference.hashCode));
       });
       test("is false when Identifier changes", () async {
-        testMetadataIdentifier.Identifier = "A different identifier";
+        testMetadataIdentifier =
+            testMetadataIdentifier.copyWith(identifier: "Different");
         expect(testMetadataIdentifier.hashCode, isNot(reference.hashCode));
       });
       test("is false when Scheme changes", () async {
-        testMetadataIdentifier.Scheme = "A strange scheme";
+        testMetadataIdentifier =
+            testMetadataIdentifier.copyWith(scheme: "Different");
         expect(testMetadataIdentifier.hashCode, isNot(reference.hashCode));
       });
     });
   });
+}
+
+extension on EpubMetadataIdentifier {
+  EpubMetadataIdentifier copyWith({
+    String? id,
+    String? scheme,
+    String? identifier,
+  }) {
+    return EpubMetadataIdentifier(
+      id: id ?? this.id,
+      scheme: scheme ?? this.scheme,
+      identifier: identifier ?? this.identifier,
+    );
+  }
 }

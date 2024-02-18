@@ -1,24 +1,20 @@
-import 'package:quiver/collection.dart' as collections;
-import 'package:quiver/core.dart';
+import 'package:collection/collection.dart';
 
 class EpubNavigationDocAuthor {
-  List<String>? Authors;
+  final List<String> authors;
 
-  EpubNavigationDocAuthor() {
-    Authors = <String>[];
-  }
-
-  @override
-  int get hashCode {
-    var objects = [...Authors!.map((author) => author.hashCode)];
-    return hashObjects(objects);
-  }
+  const EpubNavigationDocAuthor({
+    this.authors = const <String>[],
+  });
 
   @override
-  bool operator ==(other) {
-    var otherAs = other as EpubNavigationDocAuthor?;
-    if (otherAs == null) return false;
+  int get hashCode => const DeepCollectionEquality().hash(authors);
 
-    return collections.listsEqual(Authors, otherAs.Authors);
+  @override
+  bool operator ==(covariant EpubNavigationDocAuthor other) {
+    if (identical(this, other)) return true;
+    final listEquals = const DeepCollectionEquality().equals;
+
+    return listEquals(other.authors, authors);
   }
 }

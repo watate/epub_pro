@@ -2,7 +2,7 @@ library epubreadertest;
 
 import 'dart:math';
 
-import 'package:epubx/src/schema/navigation/epub_navigation_head.dart';
+import 'package:epub_plus/src/schema/navigation/epub_navigation_head.dart';
 import 'package:test/test.dart';
 
 import '../../random_data_generator.dart';
@@ -15,8 +15,9 @@ main() async {
   late EpubNavigationHead testGuideReference;
 
   setUp(() async {
-    testGuideReference = EpubNavigationHead()
-      ..Metadata = List.from(reference.Metadata ?? []);
+    testGuideReference = EpubNavigationHead(
+      metadata: List.from(reference.metadata),
+    );
   });
 
   group("EpubNavigationHead", () {
@@ -26,7 +27,7 @@ main() async {
       });
 
       test("is false when Metadata changes", () async {
-        testGuideReference.Metadata?.add(generator.randomNavigationHeadMeta());
+        testGuideReference.metadata.add(generator.randomNavigationHeadMeta());
         expect(testGuideReference, isNot(reference));
       });
     });
@@ -37,7 +38,7 @@ main() async {
       });
 
       test("is false when Metadata changes", () async {
-        testGuideReference.Metadata?.add(generator.randomNavigationHeadMeta());
+        testGuideReference.metadata.add(generator.randomNavigationHeadMeta());
         expect(testGuideReference.hashCode, isNot(reference.hashCode));
       });
     });

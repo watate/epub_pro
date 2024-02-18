@@ -1,9 +1,8 @@
 import 'dart:async';
 
 import 'package:archive/archive.dart';
+import 'package:collection/collection.dart';
 import 'package:image/image.dart';
-import 'package:quiver/collection.dart' as collections;
-import 'package:quiver/core.dart';
 
 import '../entities/epub_schema.dart';
 import '../readers/book_cover_reader.dart';
@@ -12,44 +11,41 @@ import 'epub_chapter_ref.dart';
 import 'epub_content_ref.dart';
 
 class EpubBookRef {
-  Archive? _epubArchive;
+  final Archive epubArchive;
+  final String? title;
+  final String? author;
+  final List<String> authors;
+  final EpubSchema? schema;
+  final EpubContentRef? content;
 
-  String? Title;
-  String? Author;
-  List<String?>? AuthorList;
-  EpubSchema? Schema;
-  EpubContentRef? Content;
-  EpubBookRef(Archive epubArchive) {
-    _epubArchive = epubArchive;
-  }
+  const EpubBookRef({
+    required this.epubArchive,
+    this.title,
+    this.author,
+    this.authors = const [],
+    this.schema,
+    this.content,
+  });
 
   @override
   int get hashCode {
-    var objects = [
-      Title.hashCode,
-      Author.hashCode,
-      Schema.hashCode,
-      Content.hashCode,
-      ...AuthorList?.map((author) => author.hashCode) ?? [0],
-    ];
-    return hashObjects(objects);
+    return title.hashCode ^
+        author.hashCode ^
+        authors.hashCode ^
+        schema.hashCode ^
+        content.hashCode;
   }
 
   @override
-  bool operator ==(other) {
-    if (!(other is EpubBookRef)) {
-      return false;
-    }
+  bool operator ==(covariant EpubBookRef other) {
+    if (identical(this, other)) return true;
+    final listEquals = const DeepCollectionEquality().equals;
 
-    return Title == other.Title &&
-        Author == other.Author &&
-        Schema == other.Schema &&
-        Content == other.Content &&
-        collections.listsEqual(AuthorList, other.AuthorList);
-  }
-
-  Archive? EpubArchive() {
-    return _epubArchive;
+    return other.title == title &&
+        other.author == author &&
+        listEquals(other.authors, authors) &&
+        other.schema == schema &&
+        other.content == content;
   }
 
   Future<List<EpubChapterRef>> getChapters() async {

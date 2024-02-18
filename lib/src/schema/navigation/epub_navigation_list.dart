@@ -1,41 +1,37 @@
-import 'package:quiver/collection.dart' as collections;
-import 'package:quiver/core.dart';
+import 'package:collection/collection.dart';
 
 import 'epub_navigation_label.dart';
 import 'epub_navigation_target.dart';
 
 class EpubNavigationList {
-  String? Id;
-  String? Class;
-  List<EpubNavigationLabel>? NavigationLabels;
-  List<EpubNavigationTarget>? NavigationTargets;
+  final String? id;
+  final String? classs;
+  final List<EpubNavigationLabel> navigationLabels;
+  final List<EpubNavigationTarget> navigationTargets;
+
+  const EpubNavigationList({
+    this.id,
+    this.classs,
+    this.navigationLabels = const <EpubNavigationLabel>[],
+    this.navigationTargets = const <EpubNavigationTarget>[],
+  });
 
   @override
   int get hashCode {
-    var objects = [
-      Id.hashCode,
-      Class.hashCode,
-      ...NavigationLabels?.map((label) => label.hashCode) ?? [0],
-      ...NavigationTargets?.map((target) => target.hashCode) ?? [0]
-    ];
-    return hashObjects(objects);
+    return id.hashCode ^
+        classs.hashCode ^
+        const DeepCollectionEquality().hash(navigationLabels) ^
+        const DeepCollectionEquality().hash(navigationTargets);
   }
 
   @override
-  bool operator ==(other) {
-    var otherAs = other as EpubNavigationList?;
-    if (otherAs == null) return false;
+  bool operator ==(covariant EpubNavigationList other) {
+    if (identical(this, other)) return true;
+    final listEquals = const DeepCollectionEquality().equals;
 
-    if (!(Id == otherAs.Id && Class == otherAs.Class)) {
-      return false;
-    }
-
-    if (!collections.listsEqual(NavigationLabels, otherAs.NavigationLabels)) {
-      return false;
-    }
-    if (!collections.listsEqual(NavigationTargets, otherAs.NavigationTargets)) {
-      return false;
-    }
-    return true;
+    return other.id == id &&
+        other.classs == classs &&
+        listEquals(other.navigationLabels, navigationLabels) &&
+        listEquals(other.navigationTargets, navigationTargets);
   }
 }

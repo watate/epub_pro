@@ -11,34 +11,36 @@ import '../schema/opf/epub_metadata_meta.dart';
 
 class BookCoverReader {
   static Future<images.Image?> readBookCover(EpubBookRef bookRef) async {
-    var metaItems = bookRef.Schema!.Package!.Metadata!.MetaItems;
-    if (metaItems == null || metaItems.isEmpty) return null;
+    var metaItems = bookRef.schema!.package!.metadata!.metaItems;
+    if (metaItems.isEmpty) return null;
 
     var coverMetaItem = metaItems.firstWhereOrNull(
         (EpubMetadataMeta metaItem) =>
-            metaItem.Name != null && metaItem.Name!.toLowerCase() == 'cover');
+            metaItem.name != null && metaItem.name!.toLowerCase() == 'cover');
     if (coverMetaItem == null) return null;
-    if (coverMetaItem.Content == null || coverMetaItem.Content!.isEmpty) {
+    if (coverMetaItem.content == null || coverMetaItem.content!.isEmpty) {
       throw Exception(
           'Incorrect EPUB metadata: cover item content is missing.');
     }
 
-    var coverManifestItem = bookRef.Schema!.Package!.Manifest!.Items!
+    var coverManifestItem = bookRef.schema!.package!.manifest!.items
         .firstWhereOrNull((EpubManifestItem manifestItem) =>
-            manifestItem.Id!.toLowerCase() ==
-            coverMetaItem.Content!.toLowerCase());
+            manifestItem.id!.toLowerCase() ==
+            coverMetaItem.content!.toLowerCase());
     if (coverManifestItem == null) {
       throw Exception(
-          'Incorrect EPUB manifest: item with ID = \"${coverMetaItem.Content}\" is missing.');
+        'Incorrect EPUB manifest: item with ID = "${coverMetaItem.content}" is missing.',
+      );
     }
 
     EpubByteContentFileRef? coverImageContentFileRef;
-    if (!bookRef.Content!.Images!.containsKey(coverManifestItem.Href)) {
+    if (!bookRef.content!.images.containsKey(coverManifestItem.href)) {
       throw Exception(
-          'Incorrect EPUB manifest: item with href = \"${coverManifestItem.Href}\" is missing.');
+        'Incorrect EPUB manifest: item with href = "${coverManifestItem.href}" is missing.',
+      );
     }
 
-    coverImageContentFileRef = bookRef.Content!.Images![coverManifestItem.Href];
+    coverImageContentFileRef = bookRef.content!.images[coverManifestItem.href];
     var coverImageContent =
         await coverImageContentFileRef!.readContentAsBytes();
     var retval = images.decodeImage(Uint8List.fromList(coverImageContent));

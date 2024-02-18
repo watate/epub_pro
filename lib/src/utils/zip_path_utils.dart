@@ -12,7 +12,7 @@ class ZipPathUtils {
     if (directory == null || directory == '') {
       return fileName;
     } else {
-      return directory + '/' + fileName!;
+      return '$directory/${fileName!}';
     }
   }
 }

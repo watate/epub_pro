@@ -1,30 +1,32 @@
-import 'package:quiver/collection.dart' as collections;
-import 'package:quiver/core.dart';
+import 'package:collection/collection.dart';
 
 import 'epub_content_file.dart';
 
 class EpubByteContentFile extends EpubContentFile {
-  List<int>? Content;
+  final List<int>? content;
+
+  const EpubByteContentFile({
+    super.fileName,
+    super.contentMimeType,
+    super.contentType,
+    this.content,
+  });
 
   @override
-  int get hashCode {
-    var objects = [
-      ContentMimeType.hashCode,
-      ContentType.hashCode,
-      FileName.hashCode,
-      ...Content?.map((content) => content.hashCode) ?? [0],
-    ];
-    return hashObjects(objects);
-  }
+  int get hashCode =>
+      fileName.hashCode ^
+      contentMimeType.hashCode ^
+      contentType.hashCode ^
+      const DeepCollectionEquality().hash(content);
 
   @override
-  bool operator ==(other) {
-    if (!(other is EpubByteContentFile)) {
-      return false;
-    }
-    return collections.listsEqual(Content, other.Content) &&
-        ContentMimeType == other.ContentMimeType &&
-        ContentType == other.ContentType &&
-        FileName == other.FileName;
+  bool operator ==(covariant EpubByteContentFile other) {
+    if (identical(this, other)) return true;
+    final listEquals = const DeepCollectionEquality().equals;
+
+    return fileName == other.fileName &&
+        contentMimeType == other.contentMimeType &&
+        contentType == other.contentType &&
+        listEquals(content, other.content);
   }
 }

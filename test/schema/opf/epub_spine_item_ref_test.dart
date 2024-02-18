@@ -2,7 +2,7 @@ library epubreadertest;
 
 import 'dart:math';
 
-import 'package:epubx/src/schema/opf/epub_spine_item_ref.dart';
+import 'package:epub_plus/src/schema/opf/epub_spine_item_ref.dart';
 import 'package:test/test.dart';
 
 import '../../random_data_generator.dart';
@@ -11,16 +11,15 @@ main() async {
   final int length = 10;
   final RandomString randomString = RandomString(Random(123788));
 
-  var reference = EpubSpineItemRef()
-    ..IsLinear = true
-    ..IdRef = randomString.randomAlpha(length);
+  var reference = EpubSpineItemRef(
+    idRef: randomString.randomAlpha(length),
+    isLinear: true,
+  );
 
   late EpubSpineItemRef testSpineItemRef;
 
   setUp(() async {
-    testSpineItemRef = EpubSpineItemRef()
-      ..IsLinear = reference.IsLinear
-      ..IdRef = reference.IdRef;
+    testSpineItemRef = reference.copyWith();
   });
 
   group("EpubSpineItemRef", () {
@@ -29,12 +28,14 @@ main() async {
         expect(testSpineItemRef, equals(reference));
       });
       test("is false when IsLinear changes", () async {
-        testSpineItemRef.IsLinear = !(testSpineItemRef.IsLinear ?? false);
-        ;
+        testSpineItemRef =
+            testSpineItemRef.copyWith(isLinear: !testSpineItemRef.isLinear);
+
         expect(testSpineItemRef, isNot(reference));
       });
       test("is false when IdRef changes", () async {
-        testSpineItemRef.IdRef = randomString.randomAlpha(length);
+        testSpineItemRef =
+            testSpineItemRef.copyWith(idRef: randomString.randomAlpha(length));
         expect(testSpineItemRef, isNot(reference));
       });
     });
@@ -44,13 +45,27 @@ main() async {
         expect(testSpineItemRef.hashCode, equals(reference.hashCode));
       });
       test("is false when IsLinear changes", () async {
-        testSpineItemRef.IsLinear = !(testSpineItemRef.IsLinear ?? false);
+        testSpineItemRef =
+            testSpineItemRef.copyWith(isLinear: !testSpineItemRef.isLinear);
         expect(testSpineItemRef.hashCode, isNot(reference.hashCode));
       });
       test("is false when IdRef changes", () async {
-        testSpineItemRef.IdRef = randomString.randomAlpha(length);
+        testSpineItemRef =
+            testSpineItemRef.copyWith(idRef: randomString.randomAlpha(length));
         expect(testSpineItemRef.hashCode, isNot(reference.hashCode));
       });
     });
   });
+}
+
+extension on EpubSpineItemRef {
+  EpubSpineItemRef copyWith({
+    String? idRef,
+    bool? isLinear,
+  }) {
+    return EpubSpineItemRef(
+      idRef: idRef ?? this.idRef,
+      isLinear: isLinear ?? this.isLinear,
+    );
+  }
 }

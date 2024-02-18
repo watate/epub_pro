@@ -2,7 +2,7 @@ library epubreadertest;
 
 import 'dart:math';
 
-import 'package:epubx/src/schema/navigation/epub_navigation_label.dart';
+import 'package:epub_plus/src/schema/navigation/epub_navigation_label.dart';
 import 'package:test/test.dart';
 
 import '../../random_data_generator.dart';
@@ -14,7 +14,7 @@ main() async {
 
   late EpubNavigationLabel testNavigationLabel;
   setUp(() async {
-    testNavigationLabel = EpubNavigationLabel()..Text = reference.Text;
+    testNavigationLabel = reference.copyWith();
   });
 
   group("EpubNavigationLabel", () {
@@ -24,7 +24,8 @@ main() async {
       });
 
       test("is false when Text changes", () async {
-        testNavigationLabel.Text = generator.randomString();
+        testNavigationLabel =
+            reference.copyWith(text: generator.randomString());
         expect(testNavigationLabel, isNot(reference));
       });
     });
@@ -35,9 +36,21 @@ main() async {
       });
 
       test("is false when Metadata changes", () async {
-        testNavigationLabel.Text = generator.randomString();
+        testNavigationLabel = reference.copyWith(
+          text: generator.randomString(),
+        );
         expect(testNavigationLabel.hashCode, isNot(reference.hashCode));
       });
     });
   });
+}
+
+extension on EpubNavigationLabel {
+  EpubNavigationLabel copyWith({
+    String? text,
+  }) {
+    return EpubNavigationLabel(
+      text: text ?? this.text,
+    );
+  }
 }

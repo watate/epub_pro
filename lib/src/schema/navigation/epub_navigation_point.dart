@@ -1,52 +1,51 @@
-import 'package:quiver/collection.dart' as collections;
-import 'package:quiver/core.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:collection/collection.dart';
 
 import 'epub_metadata.dart';
 import 'epub_navigation_label.dart';
 
 class EpubNavigationPoint {
-  String? Id;
-  String? Class;
-  String? PlayOrder;
-  List<EpubNavigationLabel>? NavigationLabels;
-  EpubNavigationContent? Content;
-  List<EpubNavigationPoint>? ChildNavigationPoints;
+  final String? id;
+  final String? classs;
+  final String? playOrder;
+  final List<EpubNavigationLabel> navigationLabels;
+  final EpubNavigationContent? content;
+  final List<EpubNavigationPoint> childNavigationPoints;
+
+  const EpubNavigationPoint({
+    this.id,
+    this.classs,
+    this.playOrder,
+    this.navigationLabels = const <EpubNavigationLabel>[],
+    this.content,
+    this.childNavigationPoints = const <EpubNavigationPoint>[],
+  });
 
   @override
   int get hashCode {
-    var objects = [
-      Id.hashCode,
-      Class.hashCode,
-      PlayOrder.hashCode,
-      Content.hashCode,
-      ...NavigationLabels!.map((label) => label.hashCode),
-      ...ChildNavigationPoints!.map((point) => point.hashCode)
-    ];
-    return hashObjects(objects);
+    return id.hashCode ^
+        classs.hashCode ^
+        playOrder.hashCode ^
+        const DeepCollectionEquality().hash(navigationLabels) ^
+        content.hashCode ^
+        const DeepCollectionEquality().hash(childNavigationPoints);
   }
 
   @override
-  bool operator ==(other) {
-    var otherAs = other as EpubNavigationPoint?;
-    if (otherAs == null) {
-      return false;
-    }
+  bool operator ==(covariant EpubNavigationPoint other) {
+    if (identical(this, other)) return true;
+    final listEquals = const DeepCollectionEquality().equals;
 
-    if (!collections.listsEqual(NavigationLabels, otherAs.NavigationLabels)) {
-      return false;
-    }
-
-    if (!collections.listsEqual(
-        ChildNavigationPoints, otherAs.ChildNavigationPoints)) return false;
-
-    return Id == otherAs.Id &&
-        Class == otherAs.Class &&
-        PlayOrder == otherAs.PlayOrder &&
-        Content == otherAs.Content;
+    return other.id == id &&
+        other.classs == classs &&
+        other.playOrder == playOrder &&
+        listEquals(other.navigationLabels, navigationLabels) &&
+        other.content == content &&
+        listEquals(other.childNavigationPoints, childNavigationPoints);
   }
 
   @override
   String toString() {
-    return 'Id: $Id, Content.Source: ${Content!.Source}';
+    return 'Id: $id, Content.Source: ${content?.source}';
   }
 }

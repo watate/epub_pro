@@ -1,27 +1,26 @@
-import 'package:quiver/core.dart';
-
 class EpubGuideReference {
-  String? Type;
-  String? Title;
-  String? Href;
+  final String? type;
+  final String? title;
+  final String? href;
+
+  const EpubGuideReference({
+    this.type,
+    this.title,
+    this.href,
+  });
 
   @override
-  int get hashCode => hash3(Type.hashCode, Title.hashCode, Href.hashCode);
+  int get hashCode => type.hashCode ^ title.hashCode ^ href.hashCode;
 
   @override
-  bool operator ==(other) {
-    var otherAs = other as EpubGuideReference?;
-    if (otherAs == null) {
-      return false;
-    }
+  bool operator ==(covariant EpubGuideReference other) {
+    if (identical(this, other)) return true;
 
-    return Type == otherAs.Type &&
-        Title == otherAs.Title &&
-        Href == otherAs.Href;
+    return other.type == type && other.title == title && other.href == href;
   }
 
   @override
   String toString() {
-    return 'Type: $Type, Href: $Href';
+    return 'Type: $type, Href: $href';
   }
 }

@@ -1,43 +1,45 @@
-import 'package:quiver/collection.dart' as collections;
-import 'package:quiver/core.dart';
+import 'package:collection/collection.dart';
 
 import 'epub_metadata.dart';
 import 'epub_navigation_label.dart';
 
 class EpubNavigationTarget {
-  String? Id;
-  String? Class;
-  String? Value;
-  String? PlayOrder;
-  List<EpubNavigationLabel>? NavigationLabels;
-  EpubNavigationContent? Content;
+  final String? id;
+  final String? classs;
+  final String? value;
+  final String? playOrder;
+  final List<EpubNavigationLabel> navigationLabels;
+  final EpubNavigationContent? content;
+
+  const EpubNavigationTarget({
+    this.id,
+    this.classs,
+    this.value,
+    this.playOrder,
+    this.navigationLabels = const <EpubNavigationLabel>[],
+    this.content,
+  });
 
   @override
   int get hashCode {
-    var objects = [
-      Id.hashCode,
-      Class.hashCode,
-      Value.hashCode,
-      PlayOrder.hashCode,
-      Content.hashCode,
-      ...NavigationLabels!.map((label) => label.hashCode)
-    ];
-    return hashObjects(objects);
+    return id.hashCode ^
+        classs.hashCode ^
+        value.hashCode ^
+        playOrder.hashCode ^
+        const DeepCollectionEquality().hash(navigationLabels) ^
+        content.hashCode;
   }
 
   @override
-  bool operator ==(other) {
-    var otherAs = other as EpubNavigationTarget?;
-    if (otherAs == null) return false;
+  bool operator ==(covariant EpubNavigationTarget other) {
+    if (identical(this, other)) return true;
+    final listEquals = const DeepCollectionEquality().equals;
 
-    if (!(Id == otherAs.Id &&
-        Class == otherAs.Class &&
-        Value == otherAs.Value &&
-        PlayOrder == otherAs.PlayOrder &&
-        Content == otherAs.Content)) {
-      return false;
-    }
-
-    return collections.listsEqual(NavigationLabels, otherAs.NavigationLabels);
+    return other.id == id &&
+        other.classs == classs &&
+        other.value == value &&
+        other.playOrder == playOrder &&
+        listEquals(other.navigationLabels, navigationLabels) &&
+        other.content == content;
   }
 }

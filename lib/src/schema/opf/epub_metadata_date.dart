@@ -1,16 +1,19 @@
-import 'package:quiver/core.dart';
-
 class EpubMetadataDate {
-  String? Date;
-  String? Event;
+  final String? date;
+  final String? event;
+
+  const EpubMetadataDate({
+    this.date,
+    this.event,
+  });
 
   @override
-  int get hashCode => hash2(Date.hashCode, Event.hashCode);
+  int get hashCode => date.hashCode ^ event.hashCode;
 
   @override
-  bool operator ==(other) {
-    var otherAs = other as EpubMetadataDate?;
-    if (otherAs == null) return false;
-    return Date == otherAs.Date && Event == otherAs.Event;
+  bool operator ==(covariant EpubMetadataDate other) {
+    if (identical(this, other)) return true;
+
+    return other.date == date && other.event == event;
   }
 }

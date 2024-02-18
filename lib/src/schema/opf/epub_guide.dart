@@ -1,29 +1,23 @@
-import 'package:quiver/collection.dart' as collections;
-import 'package:quiver/core.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:collection/collection.dart';
 
 import 'epub_guide_reference.dart';
 
 class EpubGuide {
-  List<EpubGuideReference>? Items;
+  final List<EpubGuideReference> items;
 
-  EpubGuide() {
-    Items = <EpubGuideReference>[];
-  }
-
-  @override
-  int get hashCode {
-    var objects = [];
-    objects.addAll(Items!.map((item) => item.hashCode));
-    return hashObjects(objects);
-  }
+  const EpubGuide({
+    this.items = const <EpubGuideReference>[],
+  });
 
   @override
-  bool operator ==(other) {
-    var otherAs = other as EpubGuide?;
-    if (otherAs == null) {
-      return false;
-    }
+  int get hashCode => const DeepCollectionEquality().hash(items);
 
-    return collections.listsEqual(Items, otherAs.Items);
+  @override
+  bool operator ==(covariant EpubGuide other) {
+    if (identical(this, other)) return true;
+    final listEquals = const DeepCollectionEquality().equals;
+
+    return listEquals(other.items, items);
   }
 }

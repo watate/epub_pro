@@ -2,7 +2,7 @@ library epubreadertest;
 
 import 'dart:math';
 
-import 'package:epubx/src/schema/navigation/epub_navigation_doc_title.dart';
+import 'package:epub_plus/src/schema/navigation/epub_navigation_doc_title.dart';
 import 'package:test/test.dart';
 
 import '../../random_data_generator.dart';
@@ -13,8 +13,9 @@ main() async {
 
   late EpubNavigationDocTitle testNavigationDocTitle;
   setUp(() async {
-    testNavigationDocTitle = EpubNavigationDocTitle()
-      ..Titles = List.from(reference.Titles ?? []);
+    testNavigationDocTitle = EpubNavigationDocTitle(
+      titles: List.from(reference.titles),
+    );
   });
 
   group("EpubNavigationDocTitle", () {
@@ -24,7 +25,7 @@ main() async {
       });
 
       test("is false when Titles changes", () async {
-        testNavigationDocTitle.Titles?.add(generator.randomString());
+        testNavigationDocTitle.titles.add(generator.randomString());
         expect(testNavigationDocTitle, isNot(reference));
       });
     });
@@ -35,7 +36,7 @@ main() async {
       });
 
       test("is false when Titles changes", () async {
-        testNavigationDocTitle.Titles?.add(generator.randomString());
+        testNavigationDocTitle.titles.add(generator.randomString());
         expect(testNavigationDocTitle.hashCode, isNot(reference.hashCode));
       });
     });

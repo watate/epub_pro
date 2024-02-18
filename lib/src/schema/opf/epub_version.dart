@@ -1,1 +1,4 @@
-enum EpubVersion { Epub2, Epub3 }
+enum EpubVersion {
+  epub2,
+  epub3,
+}

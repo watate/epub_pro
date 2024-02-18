@@ -9,9 +9,10 @@ environment:
 
 dependencies:
   http: ^1.2.0
-  epubx:
+  epub_plus:
     path: ../../
 
 dev_dependencies:
+  lints: ^3.0.0
   build_runner: ^2.4.8
   build_web_compilers: ^4.0.9

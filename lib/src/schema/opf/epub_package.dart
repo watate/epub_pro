@@ -1,5 +1,3 @@
-import 'package:quiver/core.dart';
-
 import 'epub_guide.dart';
 import 'epub_manifest.dart';
 import 'epub_metadata.dart';
@@ -7,32 +5,53 @@ import 'epub_spine.dart';
 import 'epub_version.dart';
 
 class EpubPackage {
-  EpubVersion? Version;
-  EpubMetadata? Metadata;
-  EpubManifest? Manifest;
-  EpubSpine? Spine;
-  EpubGuide? Guide;
+  final EpubVersion? version;
+  final EpubMetadata? metadata;
+  final EpubManifest? manifest;
+  final EpubSpine? spine;
+  final EpubGuide? guide;
+
+  const EpubPackage({
+    this.version,
+    this.metadata,
+    this.manifest,
+    this.spine,
+    this.guide,
+  });
+
+  EpubPackage copyWith({
+    EpubVersion? version,
+    EpubMetadata? metadata,
+    EpubManifest? manifest,
+    EpubSpine? spine,
+    EpubGuide? guide,
+  }) {
+    return EpubPackage(
+      version: version ?? this.version,
+      metadata: metadata ?? this.metadata,
+      manifest: manifest ?? this.manifest,
+      spine: spine ?? this.spine,
+      guide: guide ?? this.guide,
+    );
+  }
 
   @override
-  int get hashCode => hashObjects([
-        Version.hashCode,
-        Metadata.hashCode,
-        Manifest.hashCode,
-        Spine.hashCode,
-        Guide.hashCode
-      ]);
+  int get hashCode {
+    return version.hashCode ^
+        metadata.hashCode ^
+        manifest.hashCode ^
+        spine.hashCode ^
+        guide.hashCode;
+  }
 
   @override
-  bool operator ==(other) {
-    var otherAs = other as EpubPackage?;
-    if (otherAs == null) {
-      return false;
-    }
+  bool operator ==(covariant EpubPackage other) {
+    if (identical(this, other)) return true;
 
-    return Version == otherAs.Version &&
-        Metadata == otherAs.Metadata &&
-        Manifest == otherAs.Manifest &&
-        Spine == otherAs.Spine &&
-        Guide == otherAs.Guide;
+    return other.version == version &&
+        other.metadata == metadata &&
+        other.manifest == manifest &&
+        other.spine == spine &&
+        other.guide == guide;
   }
 }

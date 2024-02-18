@@ -1,5 +1,5 @@
-import 'package:quiver/collection.dart' as collections;
-import 'package:quiver/core.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:collection/collection.dart';
 
 import 'epub_navigation_doc_author.dart';
 import 'epub_navigation_doc_title.dart';
@@ -9,43 +9,42 @@ import 'epub_navigation_map.dart';
 import 'epub_navigation_page_list.dart';
 
 class EpubNavigation {
-  EpubNavigationHead? Head;
-  EpubNavigationDocTitle? DocTitle;
-  List<EpubNavigationDocAuthor>? DocAuthors;
-  EpubNavigationMap? NavMap;
-  EpubNavigationPageList? PageList;
-  List<EpubNavigationList>? NavLists;
+  final EpubNavigationHead? head;
+  final EpubNavigationDocTitle? docTitle;
+  final List<EpubNavigationDocAuthor> docAuthors;
+  final EpubNavigationMap? navMap;
+  final EpubNavigationPageList? pageList;
+  final List<EpubNavigationList> navLists;
+
+  const EpubNavigation({
+    this.head,
+    this.docTitle,
+    this.docAuthors = const <EpubNavigationDocAuthor>[],
+    this.navMap,
+    this.pageList,
+    this.navLists = const <EpubNavigationList>[],
+  });
 
   @override
   int get hashCode {
-    var objects = [
-      Head.hashCode,
-      DocTitle.hashCode,
-      NavMap.hashCode,
-      PageList.hashCode,
-      ...DocAuthors?.map((author) => author.hashCode) ?? [0],
-      ...NavLists?.map((navList) => navList.hashCode) ?? [0]
-    ];
-    return hashObjects(objects);
+    return head.hashCode ^
+        docTitle.hashCode ^
+        const DeepCollectionEquality().hash(docAuthors) ^
+        navMap.hashCode ^
+        pageList.hashCode ^
+        const DeepCollectionEquality().hash(navLists);
   }
 
   @override
-  bool operator ==(other) {
-    var otherAs = other as EpubNavigation?;
-    if (otherAs == null) {
-      return false;
-    }
+  bool operator ==(covariant EpubNavigation other) {
+    if (identical(this, other)) return true;
+    final listEquals = const DeepCollectionEquality().equals;
 
-    if (!collections.listsEqual(DocAuthors, otherAs.DocAuthors)) {
-      return false;
-    }
-    if (!collections.listsEqual(NavLists, otherAs.NavLists)) {
-      return false;
-    }
-
-    return Head == otherAs.Head &&
-        DocTitle == otherAs.DocTitle &&
-        NavMap == otherAs.NavMap &&
-        PageList == otherAs.PageList;
+    return other.head == head &&
+        other.docTitle == docTitle &&
+        listEquals(other.docAuthors, docAuthors) &&
+        other.navMap == navMap &&
+        other.pageList == pageList &&
+        listEquals(other.navLists, navLists);
   }
 }
