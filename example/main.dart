@@ -16,7 +16,7 @@ void main(List<String> args) async {
     'assets',
     fileName,
   );
-  var targetFile = new io.File(fullPath);
+  var targetFile = io.File(fullPath);
   List<int> bytes = await targetFile.readAsBytes();
 
   // Opens a book and reads all of its content into the memory
@@ -39,7 +39,7 @@ void main(List<String> args) async {
   // CHAPTERS
 
   // Enumerating chapters
-  epubBook.chapters.forEach((EpubChapter chapter) {
+  for (var chapter in epubBook.chapters) {
     // Title of chapter
     String? chapterTitle = chapter.title;
 
@@ -48,7 +48,7 @@ void main(List<String> args) async {
 
     // Nested chapters
     List<EpubChapter> subChapters = chapter.subChapters;
-  });
+  }
 
   // CONTENT
 
