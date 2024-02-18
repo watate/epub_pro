@@ -11,7 +11,7 @@ This does not rely on the ```dart:io``` package in any way, so it is avilable fo
 [![pub package](https://img.shields.io/pub/v/epub_plus.svg)](https://pub.dartlang.org/packages/epub_plus)
 ## Installing
 Add the package to the ```dependencies``` section of your pubspec.yaml
-```
+```yaml
 dependencies:
   epub_plus: any
 ```
@@ -19,116 +19,113 @@ dependencies:
 ## Example
 ```dart
 
-//Get the epub into memory somehow
-String fileName = 'sample.epub';
-String fullPath = path.join(io.Directory.current.path, fileName);
-var targetFile = new io.File(fullPath);
-List<int> bytes = await targetFile.readAsBytes();
+  //Get the epub into memory somehow
+  String fileName = 'sample.epub';
+  String fullPath = path.join(io.Directory.current.path, fileName);
+  var targetFile = new io.File(fullPath);
+  List<int> bytes = await targetFile.readAsBytes();
 
+  // Opens a book and reads all of its content into the memory
+  EpubBook epubBook = await EpubReader.readBook(bytes);
 
-// Opens a book and reads all of its content into memory
-EpubBook epubBook = await EpubReader.readBook(bytes);
-            
-// COMMON PROPERTIES
+  // COMMON PROPERTIES
 
-// Book's title
-String title = epubBook.Title;
+  // Book's title
+  String? title = epubBook.title;
 
-// Book's authors (comma separated list)
-String author = epubBook.Author;
+  // Book's authors (comma separated list)
+  String? author = epubBook.author;
 
-// Book's authors (list of authors names)
-List<String> authors = epubBook.AuthorList;
+  // Book's authors (list of authors names)
+  List<String?>? authors = epubBook.authors;
 
-// Book's cover image (null if there is no cover)
-Image coverImage = epubBook.CoverImage;
+  // Book's cover image (null if there is no cover)
+  Image? coverImage = epubBook.coverImage;
 
-            
-// CHAPTERS
+  // CHAPTERS
 
-// Enumerating chapters
-epubBook.Chapters.forEach((EpubChapter chapter) {
-  // Title of chapter
-  String chapterTitle = chapter.Title;
-              
-  // HTML content of current chapter
-  String chapterHtmlContent = chapter.HtmlContent;
+  // Enumerating chapters
+  epubBook.chapters.forEach((EpubChapter chapter) {
+    // Title of chapter
+    String? chapterTitle = chapter.title;
 
-  // Nested chapters
-  List<EpubChapter> subChapters = chapter.SubChapters;
-});
+    // HTML content of current chapter
+    String? chapterHtmlContent = chapter.htmlContent;
 
-            
-// CONTENT
+    // Nested chapters
+    List<EpubChapter> subChapters = chapter.subChapters;
+  });
 
-// Book's content (HTML files, stylesheets, images, fonts, etc.)
-EpubContent bookContent = epubBook.Content;
+  // CONTENT
 
-            
-// IMAGES
+  // Book's content (HTML files, stlylesheets, images, fonts, etc.)
+  EpubContent? bookContent = epubBook.content;
 
-// All images in the book (file name is the key)
-Map<String, EpubByteContentFile> images = bookContent.Images;
+  // IMAGES
 
-EpubByteContentFile firstImage = images.values.first;
+  // All images in the book (file name is the key)
+  Map<String, EpubByteContentFile>? images = bookContent?.images;
 
-// Content type (e.g. EpubContentType.IMAGE_JPEG, EpubContentType.IMAGE_PNG)
-EpubContentType contentType = firstImage.ContentType;
+  EpubByteContentFile? firstImage =
+      images?.values.firstOrNull; // Get the first image in the book
 
-// MIME type (e.g. "image/jpeg", "image/png")
-String mimeContentType = firstImage.ContentMimeType;
+  // Content type (e.g. EpubContentType.IMAGE_JPEG, EpubContentType.IMAGE_PNG)
+  EpubContentType contentType = firstImage!.contentType!;
 
-// HTML & CSS
+  // MIME type (e.g. "image/jpeg", "image/png")
+  String mimeContentType = firstImage.contentMimeType!;
 
-// All XHTML files in the book (file name is the key)
-Map<String, EpubTextContentFile> htmlFiles = bookContent.Html;
+  // HTML & CSS
 
-// All CSS files in the book (file name is the key)
-Map<String, EpubTextContentFile> cssFiles = bookContent.Css;
+  // All XHTML files in the book (file name is the key)
+  Map<String, EpubTextContentFile>? htmlFiles = bookContent?.html;
 
-// Entire HTML content of the book
-htmlFiles.values.forEach((EpubTextContentFile htmlFile) {
-  String htmlContent = htmlFile.Content;
-});
+  // All CSS files in the book (file name is the key)
+  Map<String, EpubTextContentFile>? cssFiles = bookContent?.css;
 
-// All CSS content in the book
-cssFiles.values.forEach((EpubTextContentFile cssFile){
-  String cssContent = cssFile.Content;
-});
+  // Entire HTML content of the book
+  htmlFiles?.values.forEach((EpubTextContentFile htmlFile) {
+    String? htmlContent = htmlFile.content;
+  });
 
+  // All CSS content in the book
+  cssFiles?.values.forEach((EpubTextContentFile cssFile) {
+    String cssContent = cssFile.content!;
+  });
 
-// OTHER CONTENT
+  // OTHER CONTENT
 
-// All fonts in the book (file name is the key)
-Map<String, EpubByteContentFile> fonts = bookContent.Fonts;
+  // All fonts in the book (file name is the key)
+  Map<String, EpubByteContentFile>? fonts = bookContent?.fonts;
 
-// All files in the book (including HTML, CSS, images, fonts, and other types of files)
-Map<String, EpubContentFile> allFiles = bookContent.AllFiles;
+  // All files in the book (including HTML, CSS, images, fonts, and other types of files)
+  Map<String, EpubContentFile>? allFiles = bookContent?.allFiles;
 
+  // ACCESSING RAW SCHEMA INFORMATION
 
-// ACCESSING RAW SCHEMA INFORMATION
+  // EPUB OPF data
+  EpubPackage? package = epubBook.schema?.package;
 
-// EPUB OPF data
-EpubPackage package = epubBook.Schema.Package;
+  // Enumerating book's contributors
+  package?.metadata?.contributors.forEach((contributor) {
+    String contributorName = contributor.contributor!;
+    String contributorRole = contributor.role!;
+  });
 
-// Enumerating book's contributors
-package.Metadata.Contributors.forEach((EpubMetadataContributor contributor){
-  String contributorName = contributor.Contributor;
-  String contributorRole = contributor.Role;
-});
+  // EPUB NCX data
+  EpubNavigation navigation = epubBook.schema!.navigation!;
 
-// EPUB NCX data
-EpubNavigation navigation = epubBook.Schema.Navigation;
+  // Enumerating NCX metadata
+  navigation.head?.metadata.forEach((meta) {
+    String metadataItemName = meta.name!;
+    String metadataItemContent = meta.content!;
+  });
 
-// Enumerating NCX metadata
-navigation.Head.Metadata.forEach((EpubNavigationHeadMeta meta){
-  String metadataItemName = meta.Name;
-  String metadataItemContent = meta.Content;
-});
+  // Write the Book
+  var written = EpubWriter.writeBook(epubBook);
 
-// Writing Data
-var written = await EpubWriter.writeBook(epubBook);
-
-// You can even re-read the book into a new object! 
-var bookRoundTrip = await EpubReader.readBook(written);
+  if (written != null) {
+    // Read the book into a new object!
+    var newBook = await EpubReader.readBook(written);
+  }
 ```

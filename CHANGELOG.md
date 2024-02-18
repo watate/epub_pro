@@ -1,3 +1,6 @@
+## 5.0.0
+- Migrate to Dart code-style and null-safety
+
 ## 4.0.0
 
 - Merge all pull requests
