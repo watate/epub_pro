@@ -1,4 +1,4 @@
-# epubx
+# epub_plus
 
 It package is [dart-epub](https://github.com/orthros/dart-epub) fork
 
@@ -8,12 +8,12 @@ Epub Reader and Writer for Dart inspired by [this fantastic C# Epub Reader](http
 
 This does not rely on the ```dart:io``` package in any way, so it is avilable for both desktop and web-based implementations
 
-[![pub package](https://img.shields.io/pub/v/epubx.svg)](https://pub.dartlang.org/packages/epubx)
+[![pub package](https://img.shields.io/pub/v/epub_plus.svg)](https://pub.dartlang.org/packages/epub_plus)
 ## Installing
 Add the package to the ```dependencies``` section of your pubspec.yaml
 ```
 dependencies:
-  epubx: any
+  epub_plus: any
 ```
 
 ## Example

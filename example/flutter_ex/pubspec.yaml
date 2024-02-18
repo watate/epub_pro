@@ -10,7 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   # Epub
-  epubx:
+  epub_plus:
     path: ../../
   # To get the epub from the internet
   http: ^1.2.0

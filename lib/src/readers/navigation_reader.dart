@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:archive/archive.dart';
 import 'dart:convert' as convert;
 import 'package:collection/collection.dart' show IterableExtension;
-import 'package:epubx/src/schema/opf/epub_version.dart';
+import 'package:epub_plus/src/schema/opf/epub_version.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:path/path.dart' as path;
 
@@ -21,7 +21,6 @@ import '../schema/navigation/epub_navigation_page_target.dart';
 import '../schema/navigation/epub_navigation_page_target_type.dart';
 import '../schema/navigation/epub_navigation_point.dart';
 import '../schema/navigation/epub_navigation_target.dart';
-import '../schema/opf/epub_manifest_item.dart';
 import '../schema/opf/epub_package.dart';
 import '../utils/enum_from_string.dart';
 import '../utils/zip_path_utils.dart';
@@ -34,17 +33,15 @@ class NavigationReader {
   static Future<EpubNavigation> readNavigation(Archive epubArchive,
       String contentDirectoryPath, EpubPackage package) async {
     if (package.version == EpubVersion.epub2) {
-      var tocId = package.spine!.tableOfContents;
+      var tocId = package.spine?.tableOfContents;
       if (tocId == null || tocId.isEmpty) {
         throw Exception('EPUB parsing error: TOC ID is empty.');
       }
 
-      var tocManifestItem =
-          package.manifest!.items.cast<EpubManifestItem?>().firstWhere(
-                (EpubManifestItem? item) =>
-                    item!.id!.toLowerCase() == tocId.toLowerCase(),
-                orElse: () => null,
-              );
+      final tocManifestItem = package.manifest?.items.firstWhereOrNull(
+        (item) => item.id?.toLowerCase() == tocId.toLowerCase(),
+      );
+
       if (tocManifestItem == null) {
         throw Exception(
           'EPUB parsing error: TOC item $tocId not found in EPUB manifest.',
@@ -53,10 +50,9 @@ class NavigationReader {
 
       _tocFileEntryPath =
           ZipPathUtils.combine(contentDirectoryPath, tocManifestItem.href);
-      var tocFileEntry = epubArchive.files.cast<ArchiveFile?>().firstWhere(
-          (ArchiveFile? file) =>
-              file!.name.toLowerCase() == _tocFileEntryPath!.toLowerCase(),
-          orElse: () => null);
+      final tocFileEntry = epubArchive.files.firstWhereOrNull(
+        (file) => file.name.toLowerCase() == _tocFileEntryPath?.toLowerCase(),
+      );
       if (tocFileEntry == null) {
         throw Exception(
           'EPUB parsing error: TOC file $_tocFileEntryPath not found in archive.',
@@ -67,27 +63,18 @@ class NavigationReader {
         convert.utf8.decode(tocFileEntry.content),
       );
 
-      var ncxNamespace = 'http://www.daisy.org/z3986/2005/ncx/';
-      var ncxNode = containerDocument
+      const ncxNamespace = 'http://www.daisy.org/z3986/2005/ncx/';
+      final ncxNode = containerDocument
           .findAllElements('ncx', namespace: ncxNamespace)
-          .cast<xml.XmlElement?>()
-          .firstWhere(
-            (xml.XmlElement? elem) => elem != null,
-            orElse: () => null,
-          );
+          .firstOrNull;
 
       if (ncxNode == null) {
         throw Exception(
             'EPUB parsing error: TOC file does not contain ncx element.');
       }
 
-      var headNode = ncxNode
-          .findAllElements('head', namespace: ncxNamespace)
-          .cast<xml.XmlElement?>()
-          .firstWhere(
-            (xml.XmlElement? elem) => elem != null,
-            orElse: () => null,
-          );
+      final headNode =
+          ncxNode.findAllElements('head', namespace: ncxNamespace).firstOrNull;
 
       if (headNode == null) {
         throw Exception(
@@ -97,56 +84,45 @@ class NavigationReader {
 
       final navigationHead = readNavigationHead(headNode);
 
-      final docTitleNode = ncxNode
-          .findElements('docTitle', namespace: ncxNamespace)
-          .cast<xml.XmlElement?>()
-          .firstWhere(
-            (xml.XmlElement? elem) => elem != null,
-            orElse: () => null,
-          );
+      final docTitleNode =
+          ncxNode.findElements('docTitle', namespace: ncxNamespace).firstOrNull;
 
       if (docTitleNode == null) {
         throw Exception(
-            'EPUB parsing error: TOC file does not contain docTitle element.');
+          'EPUB parsing error: TOC file does not contain docTitle element.',
+        );
       }
 
       final navigationDocTitle = readNavigationDocTitle(docTitleNode);
-      final docAuthors = <EpubNavigationDocAuthor>[];
-      ncxNode.findElements('docAuthor', namespace: ncxNamespace).forEach(
-        (xml.XmlElement docAuthorNode) {
-          var navigationDocAuthor = readNavigationDocAuthor(docAuthorNode);
-          docAuthors.add(navigationDocAuthor);
-        },
-      );
+      final docAuthors = ncxNode
+          .findElements('docAuthor', namespace: ncxNamespace)
+          .map<EpubNavigationDocAuthor>(
+            (docAuthorNode) => readNavigationDocAuthor(docAuthorNode),
+          )
+          .toList();
 
-      var navMapNode = ncxNode
-          .findElements('navMap', namespace: ncxNamespace)
-          .cast<xml.XmlElement?>()
-          .firstWhere((xml.XmlElement? elem) => elem != null,
-              orElse: () => null);
+      final navMapNode =
+          ncxNode.findElements('navMap', namespace: ncxNamespace).firstOrNull;
       if (navMapNode == null) {
         throw Exception(
-            'EPUB parsing error: TOC file does not contain navMap element.');
+          'EPUB parsing error: TOC file does not contain navMap element.',
+        );
       }
 
       final navMap = readNavigationMap(navMapNode);
-      var pageListNode = ncxNode
-          .findElements('pageList', namespace: ncxNamespace)
-          .cast<xml.XmlElement?>()
-          .firstWhere((xml.XmlElement? elem) => elem != null,
-              orElse: () => null);
+      final pageListNode =
+          ncxNode.findElements('pageList', namespace: ncxNamespace).firstOrNull;
       final pageList = switch (pageListNode) {
         xml.XmlElement element => readNavigationPageList(element),
         null => null,
       };
 
-      final navLists = <EpubNavigationList>[];
-      ncxNode.findElements('navList', namespace: ncxNamespace).forEach(
-        (xml.XmlElement navigationListNode) {
-          final navigationList = readNavigationList(navigationListNode);
-          navLists.add(navigationList);
-        },
-      );
+      final navLists = ncxNode
+          .findElements('navList', namespace: ncxNamespace)
+          .map<EpubNavigationList>(
+            (navigationListNode) => readNavigationList(navigationListNode),
+          )
+          .toList();
 
       return EpubNavigation(
         head: navigationHead,
@@ -159,22 +135,20 @@ class NavigationReader {
     } else {
       //Version 3
 
-      var tocManifestItem = package.manifest!.items
-          .cast<EpubManifestItem?>()
-          .firstWhere((element) => element!.properties == 'nav',
-              orElse: () => null);
+      final tocManifestItem = package.manifest?.items.firstWhereOrNull(
+        (element) => element.properties == 'nav',
+      );
       if (tocManifestItem == null) {
         throw Exception(
-            'EPUB parsing error: TOC item, not found in EPUB manifest.');
+          'EPUB parsing error: TOC item, not found in EPUB manifest.',
+        );
       }
 
       _tocFileEntryPath =
           ZipPathUtils.combine(contentDirectoryPath, tocManifestItem.href);
-      final tocFileEntry = epubArchive.files.cast<ArchiveFile?>().firstWhere(
-            (ArchiveFile? file) =>
-                file!.name.toLowerCase() == _tocFileEntryPath!.toLowerCase(),
-            orElse: () => null,
-          );
+      final tocFileEntry = epubArchive.files.firstWhereOrNull(
+        (file) => file.name.toLowerCase() == _tocFileEntryPath!.toLowerCase(),
+      );
       if (tocFileEntry == null) {
         throw Exception(
           'EPUB parsing error: TOC file $_tocFileEntryPath not found in archive.',
@@ -187,26 +161,17 @@ class NavigationReader {
       var containerDocument =
           xml.XmlDocument.parse(convert.utf8.decode(tocFileEntry.content));
 
-      final headNode = containerDocument
-          .findAllElements('head')
-          .cast<xml.XmlElement?>()
-          .firstWhere(
-            (xml.XmlElement? elem) => elem != null,
-            orElse: () => null,
-          );
+      final headNode = containerDocument.findAllElements('head').firstOrNull;
       if (headNode == null) {
         throw Exception(
-            'EPUB parsing error: TOC file does not contain head element.');
+          'EPUB parsing error: TOC file does not contain head element.',
+        );
       }
 
       final titles = package.metadata!.titles;
       final docTitle = EpubNavigationDocTitle(titles: titles);
 
-      final navNode = containerDocument
-          .findAllElements('nav')
-          .cast<xml.XmlElement?>()
-          .firstWhere((xml.XmlElement? elem) => elem != null,
-              orElse: () => null);
+      final navNode = containerDocument.findAllElements('nav').firstOrNull;
       if (navNode == null) {
         throw Exception(
           'EPUB parsing error: TOC file does not contain head element.',

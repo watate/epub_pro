@@ -1,6 +1,6 @@
 import 'dart:html';
 import 'package:http/http.dart' as http;
-import 'package:epubx/epubx.dart' as epub;
+import 'package:epub_plus/epub_plus.dart' as epub;
 
 void main() async {
   querySelector('#output')?.text = 'Your Dart app is running.';

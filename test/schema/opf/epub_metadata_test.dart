@@ -2,12 +2,12 @@ library epubreadertest;
 
 import 'dart:math';
 
-import 'package:epubx/src/schema/opf/epub_metadata.dart';
-import 'package:epubx/src/schema/opf/epub_metadata_contributor.dart';
-import 'package:epubx/src/schema/opf/epub_metadata_creator.dart';
-import 'package:epubx/src/schema/opf/epub_metadata_date.dart';
-import 'package:epubx/src/schema/opf/epub_metadata_identifier.dart';
-import 'package:epubx/src/schema/opf/epub_metadata_meta.dart';
+import 'package:epub_plus/src/schema/opf/epub_metadata.dart';
+import 'package:epub_plus/src/schema/opf/epub_metadata_contributor.dart';
+import 'package:epub_plus/src/schema/opf/epub_metadata_creator.dart';
+import 'package:epub_plus/src/schema/opf/epub_metadata_date.dart';
+import 'package:epub_plus/src/schema/opf/epub_metadata_identifier.dart';
+import 'package:epub_plus/src/schema/opf/epub_metadata_meta.dart';
 import 'package:test/test.dart';
 
 import '../../random_data_generator.dart';

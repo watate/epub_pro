@@ -1,5 +1,5 @@
-import 'package:epubx/src/schema/opf/epub_metadata.dart';
-import 'package:epubx/src/schema/opf/epub_version.dart';
+import 'package:epub_plus/src/schema/opf/epub_metadata.dart';
+import 'package:epub_plus/src/schema/opf/epub_version.dart';
 import 'package:xml/xml.dart' show XmlBuilder;
 
 class EpubMetadataWriter {

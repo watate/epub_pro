@@ -8,5 +8,5 @@ environment:
 
 dependencies:
   # Epub
-  epubx:
+  epub_plus:
     path: ../../

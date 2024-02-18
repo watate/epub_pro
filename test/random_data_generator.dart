@@ -1,11 +1,11 @@
 import 'dart:math' show Random;
 
-import 'package:epubx/epubx.dart';
-import 'package:epubx/src/schema/navigation/epub_navigation_target.dart';
-import 'package:epubx/src/schema/opf/epub_metadata_contributor.dart';
-import 'package:epubx/src/schema/opf/epub_metadata_date.dart';
-import 'package:epubx/src/schema/opf/epub_metadata_identifier.dart';
-import 'package:epubx/src/schema/opf/epub_metadata_meta.dart';
+import 'package:epub_plus/epub_plus.dart';
+import 'package:epub_plus/src/schema/navigation/epub_navigation_target.dart';
+import 'package:epub_plus/src/schema/opf/epub_metadata_contributor.dart';
+import 'package:epub_plus/src/schema/opf/epub_metadata_date.dart';
+import 'package:epub_plus/src/schema/opf/epub_metadata_identifier.dart';
+import 'package:epub_plus/src/schema/opf/epub_metadata_meta.dart';
 
 class RandomString {
   final Random rng;

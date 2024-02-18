@@ -126,39 +126,24 @@ class EpubReader {
     final fonts = await readByteContentFiles(contentRef.fonts);
     final allFiles = <String, EpubContentFile>{};
 
-    final result = EpubContent(
+    html.forEach((key, value) => allFiles[key] = value);
+    css.forEach((key, value) => allFiles[key] = value);
+    images.forEach((key, value) => allFiles[key] = value);
+    fonts.forEach((key, value) => allFiles[key] = value);
+
+    await Future.forEach(
+      contentRef.allFiles.keys.where((key) => !allFiles.containsKey(key)),
+      (key) async =>
+          allFiles[key] = await readByteContentFile(contentRef.allFiles[key]!),
+    );
+
+    return EpubContent(
       html: html,
       css: css,
       images: images,
       fonts: fonts,
       allFiles: allFiles,
     );
-
-    result.html.forEach((String key, EpubTextContentFile value) {
-      result.allFiles[key] = value;
-    });
-    result.css.forEach((String key, EpubTextContentFile value) {
-      result.allFiles[key] = value;
-    });
-
-    result.images.forEach((String key, EpubByteContentFile value) {
-      result.allFiles[key] = value;
-    });
-    result.fonts.forEach((String key, EpubByteContentFile value) {
-      result.allFiles[key] = value;
-    });
-
-    await Future.forEach(
-      contentRef.allFiles.keys,
-      (dynamic key) async {
-        if (!result.allFiles.containsKey(key)) {
-          result.allFiles[key] =
-              await readByteContentFile(contentRef.allFiles[key]!);
-        }
-      },
-    );
-
-    return result;
   }
 
   static Future<Map<String, EpubTextContentFile>> readTextContentFiles(

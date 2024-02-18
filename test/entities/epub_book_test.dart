@@ -1,6 +1,6 @@
 library epubreadertest;
 
-import 'package:epubx/epubx.dart';
+import 'package:epub_plus/epub_plus.dart';
 import 'package:test/test.dart';
 
 main() async {
@@ -33,8 +33,9 @@ main() async {
           fileName: "orthros.txt",
         );
 
-        EpubContent content = EpubContent();
-        content.allFiles["hello"] = file;
+        EpubContent content = EpubContent(
+          allFiles: {"hello": file},
+        );
         testBook = testBook.copyWith(content: content);
 
         expect(testBook, isNot(reference));
@@ -92,8 +93,9 @@ main() async {
           fileName: "orthros.txt",
         );
 
-        EpubContent content = EpubContent();
-        content.allFiles["hello"] = file;
+        EpubContent content = EpubContent(
+          allFiles: {"hello": file},
+        );
         testBook = testBook.copyWith(content: content);
 
         expect(testBook.hashCode, isNot(reference.hashCode));

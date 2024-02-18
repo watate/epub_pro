@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:epubx/epubx.dart' as epub;
+import 'package:epub_plus/epub_plus.dart' as epub;
 import 'package:image/image.dart' as image;
 
 void main() => runApp(const EpubWidget());

@@ -2,7 +2,7 @@ library epubtest;
 
 import 'package:test/test.dart';
 
-import 'package:epubx/epubx.dart';
+import 'package:epub_plus/epub_plus.dart';
 
 main() {
   test("Enum One", () {

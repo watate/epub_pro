@@ -154,50 +154,30 @@ class PackageReader {
         var innerText = metadataItemNode.value;
         if (innerText == null) return;
 
-        switch (metadataItemNode.name.local.toLowerCase()) {
-          case 'title':
-            titles.add(innerText);
-          case 'creator':
-            final creator = readMetadataCreator(metadataItemNode);
-            creators.add(creator);
-          case 'subject':
-            subjects.add(innerText);
-          case 'description':
-            description = innerText;
-          case 'publisher':
-            publishers.add(innerText);
-          case 'contributor':
-            var contributor = readMetadataContributor(metadataItemNode);
-            contributors.add(contributor);
-          case 'date':
-            var date = readMetadataDate(metadataItemNode);
-            dates.add(date);
-          case 'type':
-            types.add(innerText);
-          case 'format':
-            formats.add(innerText);
-          case 'identifier':
-            final identifier = readMetadataIdentifier(metadataItemNode);
-            identifiers.add(identifier);
-          case 'source':
-            sources.add(innerText);
-          case 'language':
-            languages.add(innerText);
-          case 'relation':
-            relations.add(innerText);
-          case 'coverage':
-            coverages.add(innerText);
-          case 'rights':
-            rights.add(innerText);
-          case 'meta':
-            if (epubVersion == EpubVersion.epub2) {
-              final meta = readMetadataMetaVersion2(metadataItemNode);
-              metaItems.add(meta);
-            } else if (epubVersion == EpubVersion.epub3) {
-              final meta = readMetadataMetaVersion3(metadataItemNode);
-              metaItems.add(meta);
-            }
-        }
+        return switch (metadataItemNode.name.local.toLowerCase()) {
+          'title' => titles.add(innerText),
+          'creator' => creators.add(readMetadataCreator(metadataItemNode)),
+          'subject' => subjects.add(innerText),
+          'description' => description = innerText,
+          'publisher' => publishers.add(innerText),
+          'contributor' =>
+            contributors.add(readMetadataContributor(metadataItemNode)),
+          'date' => dates.add(readMetadataDate(metadataItemNode)),
+          'type' => types.add(innerText),
+          'format' => formats.add(innerText),
+          'identifier' =>
+            identifiers.add(readMetadataIdentifier(metadataItemNode)),
+          'source' => sources.add(innerText),
+          'language' => languages.add(innerText),
+          'relation' => relations.add(innerText),
+          'coverage' => coverages.add(innerText),
+          'rights' => rights.add(innerText),
+          'meta' when epubVersion == EpubVersion.epub2 =>
+            metaItems.add(readMetadataMetaVersion2(metadataItemNode)),
+          'meta' when epubVersion == EpubVersion.epub3 =>
+            metaItems.add(readMetadataMetaVersion3(metadataItemNode)),
+          _ => null,
+        };
       },
     );
     return EpubMetadata(
