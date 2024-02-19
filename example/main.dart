@@ -11,8 +11,6 @@ void main(List<String> args) async {
   String fileName = "alicesAdventuresUnderGround.epub";
   String fullPath = path.join(
     io.Directory.current.path,
-    '..',
-    '..',
     'assets',
     fileName,
   );
