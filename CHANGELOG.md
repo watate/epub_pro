@@ -1,3 +1,8 @@
+# 5.0.1
+- Remove deprecated examples
+- Remove unused dependencies
+- Fix bugs
+
 ## 5.0.0
 - Migrate to Dart code-style and null-safety
 
