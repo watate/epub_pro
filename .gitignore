@@ -29,3 +29,6 @@ pubspec.lock
 
 #Ignore VSCode Directory
 .vscode/
+
+# test books
+assets/davinci.epub

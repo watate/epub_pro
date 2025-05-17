@@ -1,3 +1,6 @@
+# 5.0.3
+- Fixed readBook crashing when cover image not found
+
 # 5.0.2
 - Updated dependencies
 

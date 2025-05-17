@@ -2,6 +2,8 @@
 
 This is a fork of a [fork](https://github.com/4akloon/epub_pro), of a [fork](https://github.com/ScerIO/epubx.dart), of [dart-epub](https://github.com/orthros/dart-epub). All of which seem unmaintained.
 
+I'm maintaining this so that I can read EPUBs on my app.
+
 ## What's different?
 1. Updated dependencies (so your installs will work)
 
