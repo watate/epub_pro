@@ -5,7 +5,7 @@ import 'package:collection/collection.dart' show IterableExtension;
 import 'package:image/image.dart' as images;
 
 import '../ref_entities/epub_book_ref.dart';
-import '../ref_entities/epub_byte_content_file_ref.dart';
+// import '../ref_entities/epub_byte_content_file_ref.dart';
 
 class BookCoverReader {
   static Future<images.Image?> readBookCover(EpubBookRef bookRef) async {

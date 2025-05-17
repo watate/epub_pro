@@ -7,6 +7,9 @@ I'm maintaining this so that I can read EPUBs on my app.
 ## What's different?
 1. Updated dependencies (so your installs will work)
 
+## Internal
+dart pub publish --dry-run
+
 # Documentation from previous forks
 
 Epub Reader and Writer for Dart inspired by [this fantastic C# Epub Reader](https://github.com/versfx/EpubReader)
