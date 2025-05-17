@@ -1,3 +1,6 @@
+# 5.0.2
+- Updated dependencies
+
 # 5.0.1
 - Remove deprecated examples
 - Remove unused dependencies
