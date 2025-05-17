@@ -1,7 +1,7 @@
 import 'package:archive/archive.dart';
 import 'dart:convert' as convert;
-import 'package:epub_plus/src/utils/zip_path_utils.dart';
-import 'package:epub_plus/src/writers/epub_package_writer.dart';
+import 'package:epub_pro/src/utils/zip_path_utils.dart';
+import 'package:epub_pro/src/writers/epub_package_writer.dart';
 
 import 'entities/epub_book.dart';
 import 'entities/epub_byte_content_file.dart';

@@ -1,8 +1,8 @@
-import 'package:epub_plus/src/schema/navigation/epub_navigation.dart';
-import 'package:epub_plus/src/schema/navigation/epub_navigation_doc_title.dart';
-import 'package:epub_plus/src/schema/navigation/epub_navigation_head.dart';
-import 'package:epub_plus/src/schema/navigation/epub_navigation_map.dart';
-import 'package:epub_plus/src/schema/navigation/epub_navigation_point.dart';
+import 'package:epub_pro/src/schema/navigation/epub_navigation.dart';
+import 'package:epub_pro/src/schema/navigation/epub_navigation_doc_title.dart';
+import 'package:epub_pro/src/schema/navigation/epub_navigation_head.dart';
+import 'package:epub_pro/src/schema/navigation/epub_navigation_map.dart';
+import 'package:epub_pro/src/schema/navigation/epub_navigation_point.dart';
 import 'package:xml/xml.dart' show XmlBuilder;
 
 class EpubNavigationWriter {

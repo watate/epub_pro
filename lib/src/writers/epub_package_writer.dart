@@ -1,8 +1,8 @@
-import 'package:epub_plus/src/schema/opf/epub_package.dart';
-import 'package:epub_plus/src/schema/opf/epub_version.dart';
-import 'package:epub_plus/src/writers/epub_guide_writer.dart';
-import 'package:epub_plus/src/writers/epub_manifest_writer.dart';
-import 'package:epub_plus/src/writers/epub_spine_writer.dart';
+import 'package:epub_pro/src/schema/opf/epub_package.dart';
+import 'package:epub_pro/src/schema/opf/epub_version.dart';
+import 'package:epub_pro/src/writers/epub_guide_writer.dart';
+import 'package:epub_pro/src/writers/epub_manifest_writer.dart';
+import 'package:epub_pro/src/writers/epub_spine_writer.dart';
 import 'package:xml/xml.dart' show XmlBuilder;
 import 'epub_metadata_writer.dart';
 

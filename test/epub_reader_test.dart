@@ -4,7 +4,7 @@ import 'dart:io' as io;
 
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
-import 'package:epub_plus/epub_plus.dart';
+import 'package:epub_pro/epub_pro.dart';
 
 void main() async {
   const fileName = "alicesAdventuresUnderGround.epub";

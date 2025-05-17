@@ -154,3 +154,9 @@
 ## 1.2.1
 ### Fixed
 - Made code in line with Dart styleguide
+
+## 1.0.0
+- Initial release of epub_pro
+- Forked from epub_plus with updated dependencies
+- Fixed equality comparison in EpubContentFileRef
+- Removed unnecessary library name

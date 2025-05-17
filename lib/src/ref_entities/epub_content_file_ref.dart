@@ -30,10 +30,9 @@ abstract class EpubContentFileRef {
   }
 
   @override
-  bool operator ==(covariant EpubContentFileRef other) {
+  bool operator ==(Object other) {
     if (identical(this, other)) return true;
-
-    return other.epubBookRef == epubBookRef &&
+    return other is EpubContentFileRef &&
         other.fileName == fileName &&
         other.contentType == contentType &&
         other.contentMimeType == contentMimeType;

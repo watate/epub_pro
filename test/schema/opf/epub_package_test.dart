@@ -2,7 +2,7 @@ library epubreadertest;
 
 import 'dart:math';
 
-import 'package:epub_plus/epub_plus.dart';
+import 'package:epub_pro/epub_pro.dart';
 import 'package:test/test.dart';
 
 import '../../random_data_generator.dart';

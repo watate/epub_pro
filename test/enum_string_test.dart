@@ -2,7 +2,7 @@ library epubtest;
 
 import 'package:test/test.dart';
 
-import 'package:epub_plus/epub_plus.dart';
+import 'package:epub_pro/epub_pro.dart';
 
 void main() {
   group('EnumFromString', () {

@@ -1,19 +1,22 @@
-# epub_plus
+# epub_pro
 
-It package is [dart-epub](https://github.com/orthros/dart-epub) fork
+This is a fork of a [fork](https://github.com/4akloon/epub_pro), of a [fork](https://github.com/ScerIO/epubx.dart), of [dart-epub](https://github.com/orthros/dart-epub). All of which seem unmaintained.
 
-[Flutter UI implementation](https://pub.dev/packages/epub_view)
+## What's different?
+1. Updated dependencies (so your installs will work)
+
+# Documentation from previous forks
 
 Epub Reader and Writer for Dart inspired by [this fantastic C# Epub Reader](https://github.com/versfx/EpubReader)
 
 This does not rely on the ```dart:io``` package in any way, so it is avilable for both desktop and web-based implementations
 
-[![pub package](https://img.shields.io/pub/v/epub_plus.svg)](https://pub.dartlang.org/packages/epub_plus)
+[![pub package](https://img.shields.io/pub/v/epub_pro.svg)](https://pub.dartlang.org/packages/epub_pro)
 ## Installing
 Add the package to the ```dependencies``` section of your pubspec.yaml
 ```yaml
 dependencies:
-  epub_plus: any
+  epub_pro: any
 ```
 
 ## Example
