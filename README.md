@@ -6,6 +6,8 @@ I'm maintaining this so that I can read EPUBs on my app.
 
 ## What's different?
 1. Updated dependencies (so your installs will work)
+2. Fixed readBook crashing when EPUB manifest cover image doesn't exist
+3. Handle unreliable toc.ncx. When your NCX conflicts with your Spine, we try to grab the missing chapters that are in your Spine instead (this seems to be how Apple Books handles it for example)
 
 ## Internal
 dart pub publish --dry-run

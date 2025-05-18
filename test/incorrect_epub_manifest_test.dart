@@ -17,6 +17,7 @@ void main() async {
     final fileName = path.basename(filePath);
     group('Testing $fileName', () {
       late EpubBookRef epubRef;
+      late EpubBook epubBook;
       final targetFile = io.File(filePath);
 
       setUpAll(() async {
@@ -25,6 +26,7 @@ void main() async {
         }
         final bytes = await targetFile.readAsBytes();
         epubRef = await EpubReader.openBook(bytes);
+        epubBook = await EpubReader.readBook(bytes);
       });
 
       test("Check version", () async {
@@ -33,6 +35,7 @@ void main() async {
 
       test("Check chapters", () async {
         var chapters = epubRef.getChapters();
+        // print("chapters: $chapters");
         expect(chapters.length, greaterThan(0));
       });
 
@@ -51,6 +54,12 @@ void main() async {
         final book = await EpubReader.readBook(bytes);
         expect(book, isNotNull);
       });
+
+      // test("Check chapter content with readBook", () async {
+      //   final chapterContent = epubBook.chapters[6].htmlContent;
+      //   print("Chapter: $chapterContent");
+      //   expect(chapterContent, isNotNull);
+      // });
     });
   }
 } 

@@ -32,3 +32,7 @@ pubspec.lock
 
 # test books
 assets/davinci.epub
+assets/andthentherewerenone.epub
+assets/alice_unzipped/
+assets/andthen_unzipped/
+assets/davinci_unzipped/

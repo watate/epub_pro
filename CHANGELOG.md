@@ -1,3 +1,6 @@
+# 5.0.4
+- Fixed chapter retrieval logic for EPUB2. Spine might contain additional split files that aren't in the NCX. We modify ChapterReader to create chapters for all spine items, even if they're not in the NCX. Basically this helps you handle unreliable "toc.ncx" in your EPUBs
+
 # 5.0.3
 - Fixed readBook crashing when cover image not found
 
