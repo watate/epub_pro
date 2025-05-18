@@ -13,8 +13,9 @@ class ChapterReader {
 
     // For EPUB2, we need to consider both the NCX navigation and spine order
     if (bookRef.schema!.package?.version == EpubVersion.epub2) {
-      final navChapters = getChaptersImpl(bookRef, bookRef.schema!.navigation!.navMap!.points);
-      
+      final navChapters =
+          getChaptersImpl(bookRef, bookRef.schema!.navigation!.navMap!.points);
+
       // Create a map of content files to their chapter references
       final contentFileToChapter = <String, EpubChapterRef>{};
       for (var chapter in navChapters) {
@@ -25,16 +26,17 @@ class ChapterReader {
 
       // Get chapters in spine order
       final spineChapters = <EpubChapterRef>[];
-      
+
       for (var spineItem in bookRef.schema!.package!.spine!.items) {
-        final manifestItem = bookRef.schema!.package!.manifest!.items.firstWhereOrNull(
+        final manifestItem =
+            bookRef.schema!.package!.manifest!.items.firstWhereOrNull(
           (item) => item.id == spineItem.idRef,
         );
-        
+
         if (manifestItem != null && manifestItem.href != null) {
           final contentFileName = manifestItem.href!;
           var chapter = contentFileToChapter[contentFileName];
-          
+
           // If chapter not in NCX, create a new one
           if (chapter == null) {
             if (bookRef.content!.html.containsKey(contentFileName)) {
@@ -48,7 +50,7 @@ class ChapterReader {
               );
             }
           }
-          
+
           if (chapter != null) {
             spineChapters.add(chapter);
           }

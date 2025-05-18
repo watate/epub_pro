@@ -11,6 +11,7 @@ I'm maintaining this so that I can read EPUBs on my app.
 
 ## Internal
 dart pub publish --dry-run
+dart format .
 
 # Documentation from previous forks
 

@@ -14,17 +14,21 @@ class BookCoverReader {
     if (metaItems != null && metaItems.isNotEmpty) {
       final coverMetaItem = metaItems.firstWhereOrNull((metaItem) =>
           metaItem.name != null && metaItem.name!.toLowerCase() == 'cover');
-      
-      if (coverMetaItem?.content != null && coverMetaItem!.content!.isNotEmpty) {
+
+      if (coverMetaItem?.content != null &&
+          coverMetaItem!.content!.isNotEmpty) {
         var coverManifestItem = bookRef.schema?.package?.manifest?.items
             .firstWhereOrNull((manifestItem) =>
                 manifestItem.id?.toLowerCase() ==
                 coverMetaItem.content?.toLowerCase());
-                
-        if (coverManifestItem != null && 
-            bookRef.content?.images.containsKey(coverManifestItem.href) == true) {
-          var coverImageContentFileRef = bookRef.content!.images[coverManifestItem.href];
-          var coverImageContent = await coverImageContentFileRef!.readContentAsBytes();
+
+        if (coverManifestItem != null &&
+            bookRef.content?.images.containsKey(coverManifestItem.href) ==
+                true) {
+          var coverImageContentFileRef =
+              bookRef.content!.images[coverManifestItem.href];
+          var coverImageContent =
+              await coverImageContentFileRef!.readContentAsBytes();
           return images.decodeImage(Uint8List.fromList(coverImageContent));
         }
       }

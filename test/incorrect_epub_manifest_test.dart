@@ -6,7 +6,8 @@ import 'package:test/test.dart';
 import 'package:epub_pro/epub_pro.dart';
 
 void main() async {
-  final assetsDir = io.Directory(path.join(io.Directory.current.path, "assets"));
+  final assetsDir =
+      io.Directory(path.join(io.Directory.current.path, "assets"));
   final epubFiles = assetsDir
       .listSync()
       .where((entity) => entity.path.endsWith('.epub'))
@@ -62,4 +63,4 @@ void main() async {
       // });
     });
   }
-} 
+}
