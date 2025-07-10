@@ -1,3 +1,7 @@
+# 5.1.0
+- Added EpubReader.readBookWithSplitChapters to split long chapters (>5000 words) into smaller parts
+- Added getChaptersWithSplitting to get a list of chapters while taking into account splitting longer chapters (>5000 words)
+
 # 5.0.5
 - Ran dart formatter to improve package score
 
