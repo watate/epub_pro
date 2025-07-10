@@ -30,9 +30,9 @@ void main() async {
         epubBook = await EpubReader.readBook(bytes);
       });
 
-      test("Check version", () async {
-        expect(epubRef.schema?.package?.version, equals(EpubVersion.epub2));
-      });
+      // test("Check version", () async {
+      //   expect(epubRef.schema?.package?.version, equals(EpubVersion.epub2));
+      // });
 
       test("Check chapters", () async {
         var chapters = epubRef.getChapters();

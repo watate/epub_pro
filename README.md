@@ -8,10 +8,12 @@ I'm maintaining this so that I can read EPUBs on my app.
 1. Updated dependencies (so your installs will work)
 2. Fixed readBook crashing when EPUB manifest cover image doesn't exist
 3. Handle unreliable toc.ncx. When your NCX conflicts with your Spine, we try to grab the missing chapters that are in your Spine instead (this seems to be how Apple Books handles it for example)
+4. Added chapter splitting functionality - automatically split long chapters (>5000 words) into smaller, more manageable parts
 
 ## Internal
 dart pub publish --dry-run
 dart format .
+dart test
 
 # Documentation from previous forks
 
@@ -138,5 +140,28 @@ dependencies:
   if (written != null) {
     // Read the book into a new object!
     var newBook = await EpubReader.readBook(written);
+  }
+
+  // CHAPTER SPLITTING
+
+  // Read book with automatic chapter splitting (chapters > 5000 words are split)
+  EpubBook splitBook = await EpubReader.readBookWithSplitChapters(bytes);
+  
+  // The chapters are now split into manageable parts
+  splitBook.chapters.forEach((EpubChapter chapter) {
+    // Chapters with >5000 words will have titles like:
+    // "Original Chapter Title - Part 1"
+    // "Original Chapter Title - Part 2"
+    String? chapterTitle = chapter.title;
+    String? chapterHtmlContent = chapter.htmlContent;
+  });
+
+  // For lazy loading with chapter splitting
+  EpubBookRef bookRef = await EpubReader.openBook(bytes);
+  List<EpubChapter> splitChapters = await bookRef.getChaptersWithSplitting();
+  
+  // Each chapter is guaranteed to have ≤5000 words
+  for (var chapter in splitChapters) {
+    print('${chapter.title}: ${chapter.htmlContent?.length} characters');
   }
 ```

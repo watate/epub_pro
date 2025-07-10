@@ -17,6 +17,7 @@ import 'ref_entities/epub_content_file_ref.dart';
 import 'ref_entities/epub_content_ref.dart';
 import 'ref_entities/epub_text_content_file_ref.dart';
 import 'schema/opf/epub_metadata_creator.dart';
+import 'utils/chapter_splitter.dart';
 
 /// A class that provides the primary interface to read Epub files.
 ///
@@ -206,6 +207,54 @@ class EpubReader {
 
       result.add(chapter);
     });
+    return result;
+  }
+
+  /// Reads the book and automatically splits chapters that exceed 5000 words.
+  ///
+  /// This is identical to [readBook] but also splits long chapters into
+  /// smaller parts of approximately 5000 words each.
+  ///
+  /// Opens the book asynchronously and reads all of its content into the memory.
+  /// This is a very expensive operation so it is recommended to use
+  /// [openBook()] instead to load the book gradually.
+  ///
+  /// Argument [bytes] should be the bytes of the epub file you have loaded with
+  /// something like the [dart:io] package's [readAsBytes()].
+  static Future<EpubBook> readBookWithSplitChapters(List<int> bytes) async {
+    final epubBookRef = await openBook(bytes);
+
+    final schema = epubBookRef.schema;
+    final title = epubBookRef.title;
+    final authors = epubBookRef.authors;
+    final author = epubBookRef.author;
+    final content = await readContent(epubBookRef.content!);
+    final coverImage = await epubBookRef.readCover();
+    final chapterRefs = epubBookRef.getChapters();
+    final chapters = await readChaptersWithSplitting(chapterRefs);
+
+    return EpubBook(
+      title: title,
+      author: author,
+      authors: authors,
+      schema: schema,
+      content: content,
+      coverImage: coverImage,
+      chapters: chapters,
+    );
+  }
+
+  /// Reads chapters and splits any that exceed 5000 words.
+  static Future<List<EpubChapter>> readChaptersWithSplitting(
+    List<EpubChapterRef> chapterRefs,
+  ) async {
+    var result = <EpubChapter>[];
+
+    for (final chapterRef in chapterRefs) {
+      final splitChapters = await ChapterSplitter.splitChapterRef(chapterRef);
+      result.addAll(splitChapters);
+    }
+
     return result;
   }
 }
