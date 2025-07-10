@@ -31,12 +31,17 @@ The library follows a clear separation between:
 **Main Entry Points**:
 - `EpubReader`: Read EPUB files (supports both byte arrays and lazy loading)
   - `readBook()`: Standard reading method
-  - `readBookWithSplitChapters()`: Automatically splits chapters >5000 words
+  - `readBookWithSplitChapters()`: Automatically splits chapters >5000 words (eager loading)
+  - `openBook()`: Opens book for lazy loading
+  - `openBookWithSplitChapters()`: Opens book with lazy loading and automatic chapter splitting
 - `EpubWriter`: Write EPUB files back to disk
 - `EpubBook`: Complete book representation
 - `EpubBookRef`: Reference-based book for lazy loading
   - `getChapters()`: Standard chapter retrieval
-  - `getChaptersWithSplitting()`: Retrieves chapters with automatic splitting
+  - `getChaptersWithSplitting()`: Retrieves chapters with automatic splitting (eager)
+  - `getChapterRefsWithSplitting()`: Returns chapter references with lazy splitting
+- `EpubBookSplitRef`: Wrapper for lazy loading books with split chapter support
+- `EpubChapterSplitRef`: Represents a split chapter part with lazy content loading
 
 **Reader Architecture**:
 - `PackageReader`: Parses OPF package document (the EPUB manifest)
@@ -56,6 +61,11 @@ Each writer handles a specific OPF component:
   - Splits chapters exceeding 5000 words
   - Maintains paragraph boundaries when splitting
   - Preserves sub-chapters in the first part only
+  - Supports both eager and lazy splitting:
+    - `splitChapter()`: Splits a loaded chapter
+    - `splitChapterRef()`: Splits a chapter reference (loads content)
+    - `createSplitRefs()`: Creates lazy-loading split references
+    - `analyzeChapterForSplitting()`: Analyzes if splitting is needed
 
 ### Important Implementation Details
 
@@ -64,9 +74,11 @@ Each writer handles a specific OPF component:
    - NCX/spine mismatches (includes spine items not in NCX for EPUB2)
    - Invalid manifest references
 
-2. **Memory Efficiency**: Two loading modes:
+2. **Memory Efficiency**: Multiple loading modes:
    - Eager loading: `EpubReader.readBook()` - loads everything into memory
+   - Eager with splitting: `EpubReader.readBookWithSplitChapters()` - loads and splits all chapters
    - Lazy loading: `EpubReader.openBook()` - loads content on-demand via refs
+   - Lazy with splitting: `EpubReader.openBookWithSplitChapters()` - splits chapters on-demand
 
 3. **Chapter Structure**: Chapters can be hierarchical. The library correctly handles:
    - EPUB2: NCX-based navigation with spine fallback
@@ -79,7 +91,11 @@ Each writer handles a specific OPF component:
    - Split titles follow the pattern: "Original Title - Part 1", "Original Title - Part 2", etc.
    - Splitting attempts to break at paragraph boundaries for better readability
    - Sub-chapters are preserved only in the first part of a split chapter
-   - Available through `readBookWithSplitChapters()` and `getChaptersWithSplitting()` methods
+   - Available through multiple methods:
+     - `readBookWithSplitChapters()`: Eager loading with splitting
+     - `getChaptersWithSplitting()`: Get split chapters from a book reference
+     - `openBookWithSplitChapters()`: Lazy loading with on-demand splitting
+     - `getChapterRefsWithSplitting()`: Get split chapter references for lazy loading
 
 ### Testing Approach
 
@@ -88,3 +104,6 @@ Tests use real EPUB files from `test/assets/` including classics like "Alice's A
 - Schema parsing accuracy
 - Reader/writer round-trip consistency
 - Edge case handling (malformed EPUBs)
+- Chapter splitting functionality (both eager and lazy)
+- Memory efficiency of lazy loading
+- Performance characteristics of different loading modes

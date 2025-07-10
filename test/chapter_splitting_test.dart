@@ -78,12 +78,13 @@ void main() {
 
     test('handles chapters with exactly 5000 words', () {
       // Create content with exactly 5000 words
-      final exactContent = List.generate(50, (i) => '<p>${'word ' * 100}</p>').join();
+      final exactContent =
+          List.generate(50, (i) => '<p>${'word ' * 100}</p>').join();
       final chapter = EpubChapter(
         title: 'Exact 5000',
         htmlContent: exactContent,
       );
-      
+
       final result = ChapterSplitter.splitChapter(chapter);
       expect(result.length, equals(1));
       expect(ChapterSplitter.countWords(result[0].htmlContent), equals(5000));
@@ -94,12 +95,12 @@ void main() {
         title: 'Empty',
         htmlContent: '',
       );
-      
+
       final nullChapter = EpubChapter(
         title: 'Null',
         htmlContent: null,
       );
-      
+
       expect(ChapterSplitter.splitChapter(emptyChapter).length, equals(1));
       expect(ChapterSplitter.splitChapter(nullChapter).length, equals(1));
     });
@@ -109,28 +110,29 @@ void main() {
         title: 'Whitespace',
         htmlContent: '   \n\t   ',
       );
-      
+
       final result = ChapterSplitter.splitChapter(whitespaceChapter);
       expect(result.length, equals(1));
       expect(result[0].title, equals('Whitespace'));
     });
 
     test('preserves anchor and contentFileName correctly', () {
-      final content = List.generate(30, (i) => '<p>${'word ' * 200}</p>').join();
+      final content =
+          List.generate(30, (i) => '<p>${'word ' * 200}</p>').join();
       final chapter = EpubChapter(
         title: 'Anchored Chapter',
         contentFileName: 'chapter1.xhtml',
         anchor: 'section1',
         htmlContent: content,
       );
-      
+
       final result = ChapterSplitter.splitChapter(chapter);
       expect(result.length, equals(2));
-      
+
       // First part gets the anchor
       expect(result[0].contentFileName, equals('chapter1.xhtml'));
       expect(result[0].anchor, equals('section1'));
-      
+
       // Second part has same filename but no anchor
       expect(result[1].contentFileName, equals('chapter1.xhtml'));
       expect(result[1].anchor, isNull);
@@ -148,7 +150,7 @@ void main() {
           ''').join()}
         </table>
       ''';
-      
+
       final listContent = '''
         <h1>Chapter with Lists</h1>
         <ul>
@@ -158,7 +160,7 @@ void main() {
           ${List.generate(100, (i) => '<li>${'step ' * 50}</li>').join()}
         </ol>
       ''';
-      
+
       final blockquoteContent = '''
         <h1>Chapter with Quotes</h1>
         ${List.generate(50, (i) => '''
@@ -168,22 +170,23 @@ void main() {
         </blockquote>
         ''').join()}
       ''';
-      
+
       // Test each structure
       for (final content in [tableContent, listContent, blockquoteContent]) {
         final chapter = EpubChapter(
           title: 'Structured',
           htmlContent: content,
         );
-        
+
         final result = ChapterSplitter.splitChapter(chapter);
-        
+
         // Should split due to high word count
         expect(result.length, greaterThan(1));
-        
+
         // Each part should be under limit
         for (final part in result) {
-          expect(ChapterSplitter.countWords(part.htmlContent), lessThanOrEqualTo(5000));
+          expect(ChapterSplitter.countWords(part.htmlContent),
+              lessThanOrEqualTo(5000));
         }
       }
     });

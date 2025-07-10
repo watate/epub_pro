@@ -9,6 +9,7 @@ I'm maintaining this so that I can read EPUBs on my app.
 2. Fixed readBook crashing when EPUB manifest cover image doesn't exist
 3. Handle unreliable toc.ncx. When your NCX conflicts with your Spine, we try to grab the missing chapters that are in your Spine instead (this seems to be how Apple Books handles it for example)
 4. Added chapter splitting functionality - automatically split long chapters (>5000 words) into smaller, more manageable parts
+5. Added lazy loading support for chapter splitting - read and split chapters on-demand for better memory efficiency
 
 ## Internal
 dart pub publish --dry-run
@@ -156,7 +157,25 @@ dependencies:
     String? chapterHtmlContent = chapter.htmlContent;
   });
 
-  // For lazy loading with chapter splitting
+  // LAZY LOADING WITH CHAPTER SPLITTING
+
+  // Open book for lazy loading with automatic chapter splitting
+  EpubBookRef lazyBookRef = await EpubReader.openBookWithSplitChapters(bytes);
+  
+  // Get chapter references that will be split as needed
+  List<EpubChapterRef> chapterRefs = await lazyBookRef.getChapterRefsWithSplitting();
+  
+  // Content is loaded on-demand when you read it
+  for (var chapterRef in chapterRefs) {
+    if (chapterRef is EpubChapterSplitRef) {
+      // This is a split chapter part
+      print('${chapterRef.title} (Part ${chapterRef.partNumber} of ${chapterRef.totalParts})');
+    }
+    // Content is only loaded when you call readHtmlContent()
+    String content = await chapterRef.readHtmlContent();
+  }
+
+  // For comparison: regular lazy loading with splitting
   EpubBookRef bookRef = await EpubReader.openBook(bytes);
   List<EpubChapter> splitChapters = await bookRef.getChaptersWithSplitting();
   

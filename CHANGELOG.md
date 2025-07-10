@@ -1,3 +1,11 @@
+# 5.2.0
+- Added lazy loading support for chapter splitting
+  - Added `EpubReader.openBookWithSplitChapters()` - opens book with lazy loading and automatic chapter splitting
+  - Added `EpubBookRef.getChapterRefsWithSplitting()` - returns chapter references that split on-demand
+  - Added `EpubChapterSplitRef` class - represents a split chapter part with lazy content loading
+  - Added `EpubBookSplitRef` class - wrapper for lazy loading books with split chapter support
+- Memory efficiency improvements - split chapter content is only loaded when accessed
+
 # 5.1.0
 - Added EpubReader.readBookWithSplitChapters to split long chapters (>5000 words) into smaller parts
 - Added getChaptersWithSplitting to get a list of chapters while taking into account splitting longer chapters (>5000 words)

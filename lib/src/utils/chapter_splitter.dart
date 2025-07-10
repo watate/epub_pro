@@ -1,5 +1,6 @@
 import '../entities/epub_chapter.dart';
 import '../ref_entities/epub_chapter_ref.dart';
+import '../ref_entities/epub_chapter_split_ref.dart';
 
 class ChapterSplitter {
   static const int maxWordsPerChapter = 5000;
@@ -224,5 +225,86 @@ class ChapterSplitter {
     }
 
     return splitChapters;
+  }
+
+  /// Analyzes a chapter to determine if it needs splitting without loading full content
+  /// Returns the number of parts the chapter would be split into
+  static Future<int> analyzeChapterForSplitting(
+      EpubChapterRef chapterRef) async {
+    final htmlContent = await chapterRef.readHtmlContent();
+    final wordCount = countWords(htmlContent);
+
+    if (wordCount <= maxWordsPerChapter) {
+      return 1;
+    }
+
+    return (wordCount / maxWordsPerChapter).ceil();
+  }
+
+  /// Creates split chapter references for lazy loading
+  /// This method creates references that load content on-demand
+  static Future<List<EpubChapterRef>> createSplitRefs(
+      EpubChapterRef chapterRef) async {
+    final htmlContent = await chapterRef.readHtmlContent();
+    final wordCount = countWords(htmlContent);
+
+    if (wordCount <= maxWordsPerChapter) {
+      // Process sub-chapters
+      final processedSubChapters = <EpubChapterRef>[];
+      for (final subChapterRef in chapterRef.subChapters) {
+        processedSubChapters.addAll(await createSplitRefs(subChapterRef));
+      }
+
+      // Return a new chapter ref with processed sub-chapters
+      if (processedSubChapters.length != chapterRef.subChapters.length) {
+        return [
+          EpubChapterRef(
+            epubTextContentFileRef: chapterRef.epubTextContentFileRef,
+            title: chapterRef.title,
+            contentFileName: chapterRef.contentFileName,
+            anchor: chapterRef.anchor,
+            subChapters: processedSubChapters,
+          )
+        ];
+      }
+      return [chapterRef];
+    }
+
+    // Calculate split points
+    final parts = splitHtmlContent(htmlContent, maxWordsPerChapter);
+    final splitRefs = <EpubChapterRef>[];
+
+    // Since splitHtmlContent returns new strings, we need to store the content directly
+    // rather than trying to find offsets in the original
+
+    for (var i = 0; i < parts.length; i++) {
+      final partTitle = chapterRef.title != null
+          ? '${chapterRef.title} - Part ${i + 1}'
+          : 'Part ${i + 1}';
+
+      // Process sub-chapters for the first part only
+      final subChapterRefs = <EpubChapterRef>[];
+      if (i == 0) {
+        for (final subChapterRef in chapterRef.subChapters) {
+          subChapterRefs.addAll(await createSplitRefs(subChapterRef));
+        }
+      }
+
+      splitRefs.add(
+        EpubChapterSplitRef(
+          originalChapter: chapterRef,
+          partNumber: i + 1,
+          totalParts: parts.length,
+          partContent: parts[i],
+          originalTitle: chapterRef.title,
+          title: partTitle,
+          contentFileName: chapterRef.contentFileName,
+          anchor: i == 0 ? chapterRef.anchor : null,
+          subChapters: subChapterRefs,
+        ),
+      );
+    }
+
+    return splitRefs;
   }
 }

@@ -11,6 +11,7 @@ import 'entities/epub_text_content_file.dart';
 import 'readers/content_reader.dart';
 import 'readers/schema_reader.dart';
 import 'ref_entities/epub_book_ref.dart';
+import 'ref_entities/epub_book_split_ref.dart';
 import 'ref_entities/epub_byte_content_file_ref.dart';
 import 'ref_entities/epub_chapter_ref.dart';
 import 'ref_entities/epub_content_file_ref.dart';
@@ -256,5 +257,20 @@ class EpubReader {
     }
 
     return result;
+  }
+
+  /// Opens the book for lazy loading with automatic chapter splitting.
+  ///
+  /// This method is similar to [openBook] but returns a reference that
+  /// automatically splits long chapters when they are accessed.
+  ///
+  /// The book's content is not loaded into memory until it is accessed.
+  /// When chapters are retrieved, any chapter exceeding 5000 words will
+  /// be automatically split into smaller parts.
+  ///
+  /// Argument [bytes] should be the bytes of the epub file.
+  static Future<EpubBookRef> openBookWithSplitChapters(List<int> bytes) async {
+    final bookRef = await openBook(bytes);
+    return EpubBookSplitRef.fromBookRef(bookRef);
   }
 }

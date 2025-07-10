@@ -76,4 +76,23 @@ class EpubBookRef {
   Future<Image?> readCover() async {
     return await BookCoverReader.readBookCover(this);
   }
+
+  /// Gets chapter references with automatic splitting for long chapters.
+  ///
+  /// Unlike [getChaptersWithSplitting], this method returns references
+  /// that load content on-demand, maintaining the lazy-loading behavior.
+  ///
+  /// Returns a list of [EpubChapterRef] where long chapters are replaced
+  /// with multiple [EpubChapterSplitRef] instances.
+  Future<List<EpubChapterRef>> getChapterRefsWithSplitting() async {
+    final chapterRefs = getChapters();
+    final result = <EpubChapterRef>[];
+
+    for (final chapterRef in chapterRefs) {
+      final splitRefs = await ChapterSplitter.createSplitRefs(chapterRef);
+      result.addAll(splitRefs);
+    }
+
+    return result;
+  }
 }

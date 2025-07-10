@@ -44,14 +44,10 @@ void main() {
   </metadata>
   <manifest>
     <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
-    ${chapterWordCounts.asMap().entries.map((e) => 
-      '<item id="chapter${e.key + 1}" href="chapter${e.key + 1}.xhtml" media-type="application/xhtml+xml"/>'
-    ).join('\n    ')}
+    ${chapterWordCounts.asMap().entries.map((e) => '<item id="chapter${e.key + 1}" href="chapter${e.key + 1}.xhtml" media-type="application/xhtml+xml"/>').join('\n    ')}
   </manifest>
   <spine toc="ncx">
-    ${chapterWordCounts.asMap().entries.map((e) => 
-      '<itemref idref="chapter${e.key + 1}"/>'
-    ).join('\n    ')}
+    ${chapterWordCounts.asMap().entries.map((e) => '<itemref idref="chapter${e.key + 1}"/>').join('\n    ')}
   </spine>
 </package>''';
       archive.addFile(ArchiveFile(
@@ -89,8 +85,9 @@ void main() {
       for (var i = 0; i < chapterWordCounts.length; i++) {
         final wordCount = chapterWordCounts[i];
         final paragraphs = wordCount == 0 ? 1 : (wordCount / 100).ceil();
-        final wordsPerParagraph = wordCount == 0 ? 0 : (wordCount / paragraphs).ceil();
-        
+        final wordsPerParagraph =
+            wordCount == 0 ? 0 : (wordCount / paragraphs).ceil();
+
         final chapterHtml = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -99,12 +96,10 @@ void main() {
 </head>
 <body>
   <h1>Chapter ${i + 1}</h1>
-  ${List.generate(paragraphs, (p) => 
-    '<p>${List.generate(wordsPerParagraph, (w) => 'word').join(' ')}.</p>'
-  ).join('\n  ')}
+  ${List.generate(paragraphs, (p) => '<p>${List.generate(wordsPerParagraph, (w) => 'word').join(' ')}.</p>').join('\n  ')}
 </body>
 </html>''';
-        
+
         archive.addFile(ArchiveFile(
           'OEBPS/chapter${i + 1}.xhtml',
           chapterHtml.length,
@@ -121,11 +116,11 @@ void main() {
       // Create a book with various chapter lengths
       final epubBytes = createTestEpub(
         chapterWordCounts: [
-          1000,   // Short chapter
-          5000,   // Exactly at limit
-          7500,   // Should split into 2 parts
-          15000,  // Should split into 3 parts
-          500,    // Very short chapter
+          1000, // Short chapter
+          5000, // Exactly at limit
+          7500, // Should split into 2 parts
+          15000, // Should split into 3 parts
+          500, // Very short chapter
         ],
       );
 
@@ -135,24 +130,27 @@ void main() {
 
       // Read with splitting
       final splitBook = await EpubReader.readBookWithSplitChapters(epubBytes);
-      
+
       // Expected: 1 + 1 + 2 + 3 + 1 = 8 chapters
       // But the way paragraphs are distributed might create more splits
       expect(splitBook.chapters.length, greaterThanOrEqualTo(8));
 
       // Verify first chapter title
       expect(splitBook.chapters[0].title, equals('Chapter 1'));
-      
+
       // Chapter 2 might be split depending on how words are distributed in paragraphs
-      final ch2Index = splitBook.chapters.indexWhere((ch) => ch.title?.startsWith('Chapter 2') ?? false);
+      final ch2Index = splitBook.chapters
+          .indexWhere((ch) => ch.title?.startsWith('Chapter 2') ?? false);
       expect(splitBook.chapters[ch2Index].title, startsWith('Chapter 2'));
-      
+
       // Find where Chapter 3 starts (it should be split)
-      final ch3Index = splitBook.chapters.indexWhere((ch) => ch.title?.startsWith('Chapter 3') ?? false);
+      final ch3Index = splitBook.chapters
+          .indexWhere((ch) => ch.title?.startsWith('Chapter 3') ?? false);
       expect(splitBook.chapters[ch3Index].title, contains('Part'));
-      
+
       // Verify last chapter
-      expect(splitBook.chapters.last.title, anyOf(equals('Chapter 5'), contains('Chapter 5 - Part')));
+      expect(splitBook.chapters.last.title,
+          anyOf(equals('Chapter 5'), contains('Chapter 5 - Part')));
     });
 
     test('preserves metadata after splitting', () async {
@@ -162,12 +160,13 @@ void main() {
       );
 
       final splitBook = await EpubReader.readBookWithSplitChapters(epubBytes);
-      
+
       // Book metadata should be preserved
       expect(splitBook.title, equals('Metadata Test Book'));
       expect(splitBook.author, equals('Test Author'));
-      expect(splitBook.schema?.package?.metadata?.titles.first, equals('Metadata Test Book'));
-      
+      expect(splitBook.schema?.package?.metadata?.titles.first,
+          equals('Metadata Test Book'));
+
       // Both split chapters should reference the same content file
       expect(splitBook.chapters[0].contentFileName, equals('chapter1.xhtml'));
       expect(splitBook.chapters[1].contentFileName, equals('chapter1.xhtml'));
@@ -192,7 +191,7 @@ void main() {
     //   final rereadBook = await EpubReader.readBook(writtenBytes!);
     //   expect(rereadBook.chapters.length, equals(3));
     //   expect(rereadBook.title, equals('Round Trip Test'));
-      
+
     //   // Verify content is preserved
     //   for (var i = 0; i < splitBook.chapters.length; i++) {
     //     expect(
@@ -208,7 +207,7 @@ void main() {
       );
 
       final bookRef = await EpubReader.openBook(epubBytes);
-      
+
       // Get normal chapters (lazy)
       final normalChapters = bookRef.getChapters();
       expect(normalChapters.length, equals(3));
@@ -221,7 +220,7 @@ void main() {
       for (final chapter in splitChapters) {
         expect(chapter.htmlContent, isNotNull);
         expect(chapter.htmlContent, isNotEmpty);
-        
+
         // Verify word count
         final wordCount = chapter.htmlContent!
             .replaceAll(RegExp(r'<[^>]*>'), ' ')
@@ -246,7 +245,7 @@ void main() {
 
       // Should complete in reasonable time (less than 5 seconds)
       expect(stopwatch.elapsedMilliseconds, lessThan(5000));
-      
+
       // Should have 100+ chapters (each 10,000 word chapter splits into 2-3 parts)
       expect(splitBook.chapters.length, greaterThanOrEqualTo(100));
     });
@@ -257,7 +256,7 @@ void main() {
       );
 
       final splitBook = await EpubReader.readBookWithSplitChapters(epubBytes);
-      
+
       // Should handle empty chapter gracefully
       expect(splitBook.chapters.length, equals(3));
       expect(splitBook.chapters[1].htmlContent, isNotNull);
@@ -351,15 +350,15 @@ void main() {
 
       final epubBytes = Uint8List.fromList(ZipEncoder().encode(archive));
       final splitBook = await EpubReader.readBookWithSplitChapters(epubBytes);
-      
+
       // Chapter should be split
       expect(splitBook.chapters.length, greaterThan(1));
-      
+
       // All parts should still have the same content file name
       for (final chapter in splitBook.chapters) {
         expect(chapter.contentFileName, equals('chapter1.xhtml'));
       }
-      
+
       // Links should still be present in the content
       expect(splitBook.chapters.first.htmlContent, contains('href="#para'));
       expect(splitBook.chapters.last.htmlContent, contains('href="#top'));
