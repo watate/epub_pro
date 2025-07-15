@@ -55,16 +55,16 @@ void main() {
 
       // Access only specific chapters
       final indicesToAccess = [0, 5, 10, 15];
-      for (final index in indicesToAccess) {
-        if (index < chapterRefs.length) {
-          final content = await chapterRefs[index].readHtmlContent();
-          expect(content, isNotEmpty);
-          accessedChapters.add(index);
-        }
+      final validIndices = indicesToAccess.where((i) => i < chapterRefs.length).toList();
+      
+      for (final index in validIndices) {
+        final content = await chapterRefs[index].readHtmlContent();
+        expect(content, isNotEmpty);
+        accessedChapters.add(index);
       }
 
       // Only the accessed chapters should have been loaded
-      expect(accessedChapters.length, equals(indicesToAccess.length));
+      expect(accessedChapters.length, equals(validIndices.length));
     });
 
     test('split chapter access is efficient', () async {

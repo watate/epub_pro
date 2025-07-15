@@ -8,9 +8,9 @@ import 'package:test/test.dart';
 import 'package:epub_pro/epub_pro.dart';
 
 main() async {
-  String fileName = "MY VAMPIRE SYSTEM (JKSManga) (Z-Library).epub";
+  String fileName = "alicesAdventuresUnderGround.epub";
   String fullPath =
-      path.join(io.Directory.current.path, "test", "res", fileName);
+      path.join(io.Directory.current.path, "assets", fileName);
   var targetFile = io.File(fullPath);
   if (!(await targetFile.exists())) {
     throw Exception("Specified epub file not found: $fullPath");

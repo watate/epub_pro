@@ -5,7 +5,7 @@ import 'dart:math';
 import 'package:epub_pro/src/schema/navigation/epub_navigation_doc_title.dart';
 import 'package:test/test.dart';
 
-import '../../random_data_generator.dart';
+import '../../random_data_generator_helper.dart';
 
 main() async {
   final generator = RandomDataGenerator(Random(7898), 10);

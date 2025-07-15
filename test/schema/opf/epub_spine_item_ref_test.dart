@@ -5,7 +5,7 @@ import 'dart:math';
 import 'package:epub_pro/src/schema/opf/epub_spine_item_ref.dart';
 import 'package:test/test.dart';
 
-import '../../random_data_generator.dart';
+import '../../random_data_generator_helper.dart';
 
 main() async {
   final int length = 10;

@@ -6,7 +6,7 @@ import 'package:epub_pro/epub_pro.dart';
 import 'package:epub_pro/src/schema/navigation/epub_navigation_target.dart';
 import 'package:test/test.dart';
 
-import '../../random_data_generator.dart';
+import '../../random_data_generator_helper.dart';
 
 main() async {
   final RandomDataGenerator generator = RandomDataGenerator(Random(123778), 10);

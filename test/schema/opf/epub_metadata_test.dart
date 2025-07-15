@@ -10,7 +10,7 @@ import 'package:epub_pro/src/schema/opf/epub_metadata_identifier.dart';
 import 'package:epub_pro/src/schema/opf/epub_metadata_meta.dart';
 import 'package:test/test.dart';
 
-import '../../random_data_generator.dart';
+import '../../random_data_generator_helper.dart';
 
 main() async {
   final int length = 10;

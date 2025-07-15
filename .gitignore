@@ -54,3 +54,6 @@ assets/fahrenheit451/page_styles.css
 assets/fahrenheit451/stylesheet.css
 assets/fahrenheit451/titlepage.xhtml
 assets/fahrenheit451/toc.ncx
+assets/piranesi.epub
+assets/piranesi/
+test/piranesi_section_test.dart
