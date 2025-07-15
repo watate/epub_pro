@@ -46,7 +46,11 @@ The library follows a clear separation between:
 **Reader Architecture**:
 - `PackageReader`: Parses OPF package document (the EPUB manifest)
 - `NavigationReader`: Handles both NCX (EPUB2) and Navigation Document (EPUB3)
-- `ChapterReader`: Builds chapter hierarchy, handling spine/NCX conflicts
+- `ChapterReader`: Builds chapter hierarchy with smart NCX/spine reconciliation
+  - Handles EPUBs where NCX doesn't include all spine items
+  - Preserves NCX hierarchy for items in navigation
+  - Inserts orphaned spine items as subchapters under logical parents
+  - Uses spine position to determine parent-child relationships
 - `ContentReader`: Loads actual content files (HTML, CSS, images, fonts)
 - `BookCoverReader`: Extracts cover images with fallback strategies
 
@@ -71,7 +75,11 @@ Each writer handles a specific OPF component:
 
 1. **EPUB Format Handling**: The library robustly handles malformed EPUBs, including:
    - Missing cover images (falls back to first image in manifest)
-   - NCX/spine mismatches (includes spine items not in NCX for EPUB2)
+   - NCX/spine mismatches through smart reconciliation:
+     - Identifies spine items not present in NCX navigation
+     - Groups orphaned items under their logical parent chapters
+     - Maintains spine reading order while preserving NCX hierarchy
+     - Example: If NCX only lists "Part 1" but spine contains "part1.xhtml, chapter01.xhtml, chapter02.xhtml", the chapters become subchapters of Part 1
    - Invalid manifest references
 
 2. **Memory Efficiency**: Multiple loading modes:
@@ -107,3 +115,19 @@ Tests use real EPUB files from `test/assets/` including classics like "Alice's A
 - Chapter splitting functionality (both eager and lazy)
 - Memory efficiency of lazy loading
 - Performance characteristics of different loading modes
+- NCX/spine reconciliation for malformed EPUBs
+
+### NCX/Spine Reconciliation Algorithm
+
+The `ChapterReader` implements a sophisticated algorithm to handle EPUBs where the navigation (NCX) doesn't include all spine items:
+
+1. **Build Spine Position Map**: Maps each spine item to its position in the reading order
+2. **Process NCX Navigation**: Build initial chapter structure from NCX nav points
+3. **Identify Orphaned Items**: Find spine items not referenced in NCX
+4. **Find Logical Parents**: For each orphaned item:
+   - Look for the nearest preceding NCX item in spine order
+   - Insert as a subchapter under that parent
+   - If no parent found, add as top-level chapter
+5. **Maintain Order**: Ensure all items appear in spine order within their hierarchical level
+
+This approach ensures users can access all content while preserving the author's intended navigation structure.

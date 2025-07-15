@@ -34,28 +34,29 @@ void main() async {
 
     test("Chapters count and hierarchy", () async {
       var t = epubRef.getChapters();
-      
+
       // The new implementation preserves the NCX hierarchy better
       // Alice's Adventures has 3 top-level items, with chapters nested under Chapter I
       expect(t.length, equals(3));
-      
+
       // First is the orphaned wrap0000.html
       expect(t[0].contentFileName, equals('wrap0000.html'));
       expect(t[0].title, isNull);
-      
+
       // Second is the title/front matter
       expect(t[1].title, equals("ALICE'S ADVENTURES UNDER GROUND"));
       expect(t[1].subChapters.length, equals(3)); // Has 3 sub-items
-      
+
       // Third is Chapter I which contains the actual chapters
       expect(t[2].title, equals("Chapter I"));
-      expect(t[2].subChapters.length, greaterThan(4)); // Has many sub-items including chapters
-      
+      expect(t[2].subChapters.length,
+          greaterThan(4)); // Has many sub-items including chapters
+
       // Verify Chapter II is in the subchapters of Chapter I
       final chapterII = t[2].subChapters.firstWhere(
-        (ch) => ch.title == "Chapter II",
-        orElse: () => throw Exception("Chapter II not found"),
-      );
+            (ch) => ch.title == "Chapter II",
+            orElse: () => throw Exception("Chapter II not found"),
+          );
       expect(chapterII, isNotNull);
     });
 

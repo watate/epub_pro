@@ -2,10 +2,57 @@ import '../entities/epub_chapter.dart';
 import '../ref_entities/epub_chapter_ref.dart';
 import '../ref_entities/epub_chapter_split_ref.dart';
 
+/// Utility class for splitting long chapters into smaller, more readable parts.
+///
+/// The [ChapterSplitter] provides functionality to automatically split chapters
+/// that exceed a certain word count threshold. This improves readability and
+/// performance when rendering chapters in reading applications.
+///
+/// ## Features
+/// - Word counting that strips HTML tags
+/// - Intelligent splitting at paragraph boundaries
+/// - Preservation of HTML structure
+/// - Support for both eager and lazy splitting
+///
+/// ## Splitting Algorithm
+/// 1. Count words in the HTML content (excluding tags)
+/// 2. If exceeds [maxWordsPerChapter], calculate number of parts needed
+/// 3. Find paragraph boundaries for clean splits
+/// 4. Distribute content evenly across parts
+/// 5. Preserve subchapters only in the first part
+///
+/// ## Example
+/// ```dart
+/// final chapter = EpubChapter(
+///   title: 'Long Chapter',
+///   htmlContent: veryLongHtml, // 10,000 words
+/// );
+///
+/// final parts = ChapterSplitter.splitChapter(chapter);
+/// // Results in:
+/// // - "Long Chapter - Part 1" (≤5000 words)
+/// // - "Long Chapter - Part 2" (≤5000 words)
+/// ```
 class ChapterSplitter {
+  /// Maximum number of words allowed per chapter part.
   static const int maxWordsPerChapter = 5000;
 
-  /// Counts the number of words in HTML content by stripping HTML tags
+  /// Counts the number of words in HTML content.
+  ///
+  /// This method:
+  /// - Removes all HTML tags
+  /// - Removes HTML entities (e.g., &amp;, &nbsp;)
+  /// - Normalizes whitespace
+  /// - Counts remaining words
+  ///
+  /// The [htmlContent] parameter is the HTML string to count words in.
+  /// Returns 0 if the content is null or empty.
+  ///
+  /// ## Example
+  /// ```dart
+  /// final html = '<p>Hello <strong>world</strong>!</p>';
+  /// final count = ChapterSplitter.countWords(html); // Returns 2
+  /// ```
   static int countWords(String? htmlContent) {
     if (htmlContent == null || htmlContent.isEmpty) return 0;
 
@@ -26,7 +73,15 @@ class ChapterSplitter {
         .length;
   }
 
-  /// Splits HTML content into parts based on word count
+  /// Splits HTML content into parts based on word count.
+  ///
+  /// Attempts to split at paragraph boundaries for clean breaks.
+  /// If no paragraphs are found, falls back to character-based splitting.
+  ///
+  /// The [htmlContent] is the HTML to split.
+  /// The [maxWords] is the maximum words per part.
+  ///
+  /// Returns a list of HTML strings, each containing at most [maxWords] words.
   static List<String> splitHtmlContent(String htmlContent, int maxWords) {
     if (htmlContent.isEmpty) return [htmlContent];
 
@@ -110,7 +165,33 @@ class ChapterSplitter {
     return parts;
   }
 
-  /// Splits a chapter into multiple chapters if it exceeds the word limit
+  /// Splits a chapter into multiple parts if it exceeds the word limit.
+  ///
+  /// If the chapter's word count exceeds [maxWordsPerChapter], it is split
+  /// into multiple parts. Each part gets a title like "Original Title - Part N".
+  ///
+  /// Subchapters are preserved only in the first part and are recursively
+  /// split if needed.
+  ///
+  /// The [chapter] parameter is the chapter to potentially split.
+  ///
+  /// Returns a list containing either:
+  /// - The original chapter (if under word limit)
+  /// - Multiple chapter parts (if over word limit)
+  ///
+  /// ## Example
+  /// ```dart
+  /// final longChapter = EpubChapter(
+  ///   title: 'War and Peace',
+  ///   htmlContent: veryLongContent, // 15,000 words
+  /// );
+  ///
+  /// final parts = ChapterSplitter.splitChapter(longChapter);
+  /// // Returns 3 chapters:
+  /// // - "War and Peace - Part 1"
+  /// // - "War and Peace - Part 2"
+  /// // - "War and Peace - Part 3"
+  /// ```
   static List<EpubChapter> splitChapter(EpubChapter chapter) {
     final wordCount = countWords(chapter.htmlContent);
 

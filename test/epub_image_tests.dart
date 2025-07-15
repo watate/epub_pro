@@ -9,8 +9,7 @@ import 'package:epub_pro/epub_pro.dart';
 
 main() async {
   String fileName = "alicesAdventuresUnderGround.epub";
-  String fullPath =
-      path.join(io.Directory.current.path, "assets", fileName);
+  String fullPath = path.join(io.Directory.current.path, "assets", fileName);
   var targetFile = io.File(fullPath);
   if (!(await targetFile.exists())) {
     throw Exception("Specified epub file not found: $fullPath");

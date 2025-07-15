@@ -7,7 +7,11 @@ I'm maintaining this so that I can read EPUBs on my app.
 ## What's different?
 1. Updated dependencies (so your installs will work)
 2. Fixed readBook crashing when EPUB manifest cover image doesn't exist
-3. Handle unreliable toc.ncx. When your NCX conflicts with your Spine, we try to grab the missing chapters that are in your Spine instead (this seems to be how Apple Books handles it for example)
+3. **Smart NCX/Spine reconciliation** - When EPUBs have incomplete navigation (NCX) that doesn't include all spine items, the library automatically reconciles them by:
+   - Preserving the NCX hierarchy for items that are in the navigation
+   - Including orphaned spine items as subchapters under their logical parents
+   - Maintaining the correct reading order from the spine
+   - This matches how Apple Books and other readers handle malformed EPUBs
 4. Added chapter splitting functionality - automatically split long chapters (>5000 words) into smaller, more manageable parts
 5. Added lazy loading support for chapter splitting - read and split chapters on-demand for better memory efficiency
 
@@ -16,13 +20,14 @@ dart pub publish --dry-run
 dart format .
 dart test
 
-# Documentation from previous forks
+## Information from the previous forks
 
 Epub Reader and Writer for Dart inspired by [this fantastic C# Epub Reader](https://github.com/versfx/EpubReader)
 
 This does not rely on the ```dart:io``` package in any way, so it is avilable for both desktop and web-based implementations
 
 [![pub package](https://img.shields.io/pub/v/epub_pro.svg)](https://pub.dartlang.org/packages/epub_pro)
+
 ## Installing
 Add the package to the ```dependencies``` section of your pubspec.yaml
 ```yaml
@@ -183,4 +188,27 @@ dependencies:
   for (var chapter in splitChapters) {
     print('${chapter.title}: ${chapter.htmlContent?.length} characters');
   }
+
+  // SMART NCX/SPINE RECONCILIATION
+  
+  // The library automatically handles EPUBs with incomplete navigation
+  // For example, if an EPUB has chapters in the spine but not in the NCX:
+  // NCX: [Part 1, Part 2]
+  // Spine: [cover.xhtml, part1.xhtml, chapter01.xhtml, chapter02.xhtml, part2.xhtml, chapter03.xhtml]
+  
+  // The library will create a proper hierarchy:
+  epubBook.chapters.forEach((chapter) {
+    print('Chapter: ${chapter.title}');
+    // Orphaned spine items become subchapters
+    chapter.subChapters.forEach((subChapter) {
+      print('  SubChapter: ${subChapter.title ?? subChapter.contentFileName}');
+    });
+  });
+  // Output:
+  // Chapter: null (cover.xhtml)
+  // Chapter: Part 1
+  //   SubChapter: chapter01.xhtml
+  //   SubChapter: chapter02.xhtml
+  // Chapter: Part 2
+  //   SubChapter: chapter03.xhtml
 ```

@@ -20,38 +20,71 @@ import 'ref_entities/epub_text_content_file_ref.dart';
 import 'schema/opf/epub_metadata_creator.dart';
 import 'utils/chapter_splitter.dart';
 
-/// A class that provides the primary interface to read Epub files.
+/// A class that provides the primary interface to read EPUB files.
 ///
-/// To open an Epub and load all data at once use the [readBook()] method.
+/// The [EpubReader] supports multiple reading modes:
+/// - **Eager loading**: Load entire book into memory using [readBook]
+/// - **Lazy loading**: Load metadata only, content on-demand using [openBook]
+/// - **With chapter splitting**: Automatically split long chapters using [readBookWithSplitChapters] or [openBookWithSplitChapters]
 ///
-/// To open an Epub and load only basic metadata use the [openBook()] method.
-/// This is a good option to quickly load text-based metadata, while leaving the
-/// heavier lifting of loading images and main content for subsequent operations.
+/// The reader handles various EPUB formats (EPUB 2 and 3) and malformed files gracefully,
+/// including EPUBs with incomplete navigation through smart NCX/spine reconciliation.
 ///
-/// ## Example
+/// ## Example - Basic Reading
 /// ```dart
-/// // Read the basic metadata.
-/// EpubBookRef epub = await EpubReader.openBook(epubFileBytes);
-/// // Extract values of interest.
-/// String title = epub.Title;
-/// String author = epub.Author;
-/// var metadata = epub.Schema.Package.Metadata;
-/// String genres = metadata.Subjects.join(', ');
+/// // Load entire book into memory
+/// List<int> bytes = await File('book.epub').readAsBytes();
+/// EpubBook book = await EpubReader.readBook(bytes);
+/// print('Title: ${book.title}');
+/// print('Author: ${book.author}');
+/// ```
+///
+/// ## Example - Lazy Loading
+/// ```dart
+/// // Load only metadata, content loaded on-demand
+/// EpubBookRef bookRef = await EpubReader.openBook(bytes);
+/// print('Title: ${bookRef.title}');
+///
+/// // Load chapters when needed
+/// List<EpubChapterRef> chapters = bookRef.getChapters();
+/// String firstChapterContent = await chapters[0].readHtmlContent();
+/// ```
+///
+/// ## Example - With Chapter Splitting
+/// ```dart
+/// // Automatically split chapters exceeding 5000 words
+/// EpubBook book = await EpubReader.readBookWithSplitChapters(bytes);
+/// // Long chapters are now split: "Chapter 1 - Part 1", "Chapter 1 - Part 2", etc.
 /// ```
 class EpubReader {
-  /// Loads basics metadata.
+  /// Opens an EPUB file for lazy loading without reading its content.
   ///
-  /// Opens the book asynchronously without reading its main content.
-  /// Holds the handle to the EPUB file.
+  /// This method loads only the metadata and structure of the EPUB file,
+  /// making it very fast and memory-efficient. Content is loaded on-demand
+  /// when accessed through the returned [EpubBookRef].
   ///
-  /// Argument [bytes] should be the bytes of
-  /// the epub file you have loaded with something like the [dart:io] package's
-  /// [readAsBytes()].
+  /// The [bytes] parameter should contain the complete EPUB file data,
+  /// which can be either a [Future<List<int>>] or [List<int>].
   ///
-  /// This is a fast and convenient way to get the most important information
-  /// about the book, notably the [Title], [Author] and [AuthorList].
-  /// Additional information is loaded in the [Schema] property such as the
-  /// Epub version, Publishers, Languages and more.
+  /// Returns an [EpubBookRef] that provides access to:
+  /// - Basic metadata (title, author, etc.)
+  /// - Schema information (EPUB version, manifest, spine)
+  /// - Chapter references for lazy content loading
+  /// - Cover image extraction
+  ///
+  /// ## Example
+  /// ```dart
+  /// final bytes = await File('book.epub').readAsBytes();
+  /// final bookRef = await EpubReader.openBook(bytes);
+  ///
+  /// // Access metadata immediately
+  /// print('Title: ${bookRef.title}');
+  /// print('Authors: ${bookRef.authors.join(", ")}');
+  ///
+  /// // Content loaded only when needed
+  /// final chapters = bookRef.getChapters();
+  /// final content = await chapters[0].readHtmlContent();
+  /// ```
   static Future<EpubBookRef> openBook(FutureOr<List<int>> bytes) async {
     List<int> loadedBytes;
     if (bytes is Future) {
@@ -91,7 +124,40 @@ class EpubReader {
     );
   }
 
-  /// Opens the book asynchronously and reads all of its content into the memory. Does not hold the handle to the EPUB file.
+  /// Reads an entire EPUB file into memory.
+  ///
+  /// This method loads all content of the EPUB file into memory at once,
+  /// including all chapters, images, stylesheets, and other resources.
+  /// Use this when you need immediate access to all content and have
+  /// sufficient memory available.
+  ///
+  /// The [bytes] parameter should contain the complete EPUB file data,
+  /// which can be either a [Future<List<int>>] or [List<int>].
+  ///
+  /// Returns an [EpubBook] containing:
+  /// - All metadata (title, author, etc.)
+  /// - Complete chapter content with HTML
+  /// - All images, CSS, and fonts
+  /// - Cover image (if available)
+  /// - Properly structured chapter hierarchy with NCX/spine reconciliation
+  ///
+  /// For large EPUB files or memory-constrained environments, consider using
+  /// [openBook] for lazy loading instead.
+  ///
+  /// ## Example
+  /// ```dart
+  /// final bytes = await File('book.epub').readAsBytes();
+  /// final book = await EpubReader.readBook(bytes);
+  ///
+  /// // All content is immediately available
+  /// print('Chapter count: ${book.chapters.length}');
+  /// print('First chapter: ${book.chapters[0].htmlContent}');
+  ///
+  /// // Access images
+  /// book.content?.images?.forEach((name, image) {
+  ///   print('Image: $name, size: ${image.content?.length} bytes');
+  /// });
+  /// ```
   static Future<EpubBook> readBook(FutureOr<List<int>> bytes) async {
     List<int> loadedBytes = await bytes;
 
@@ -211,17 +277,37 @@ class EpubReader {
     return result;
   }
 
-  /// Reads the book and automatically splits chapters that exceed 5000 words.
+  /// Reads an EPUB file and automatically splits long chapters.
   ///
-  /// This is identical to [readBook] but also splits long chapters into
-  /// smaller parts of approximately 5000 words each.
+  /// This method combines full content loading with automatic chapter splitting.
+  /// Any chapter exceeding 5000 words is split into smaller parts at paragraph
+  /// boundaries for better readability.
   ///
-  /// Opens the book asynchronously and reads all of its content into the memory.
-  /// This is a very expensive operation so it is recommended to use
-  /// [openBook()] instead to load the book gradually.
+  /// The [bytes] parameter should contain the complete EPUB file data as [List<int>].
   ///
-  /// Argument [bytes] should be the bytes of the epub file you have loaded with
-  /// something like the [dart:io] package's [readAsBytes()].
+  /// Returns an [EpubBook] where long chapters have been split into parts:
+  /// - Original: "Chapter 1" (10,000 words)
+  /// - Result: "Chapter 1 - Part 1" (5,000 words), "Chapter 1 - Part 2" (5,000 words)
+  ///
+  /// Split chapters maintain:
+  /// - Original content file references
+  /// - Proper HTML structure
+  /// - Subchapters (only in the first part)
+  ///
+  /// ## Example
+  /// ```dart
+  /// final bytes = await File('book.epub').readAsBytes();
+  /// final book = await EpubReader.readBookWithSplitChapters(bytes);
+  ///
+  /// // Long chapters are automatically split
+  /// book.chapters.forEach((chapter) {
+  ///   final wordCount = ChapterSplitter.countWords(chapter.htmlContent);
+  ///   print('${chapter.title}: $wordCount words');
+  ///   // Each chapter guaranteed to have ≤5000 words
+  /// });
+  /// ```
+  ///
+  /// For lazy loading with splitting, use [openBookWithSplitChapters] instead.
   static Future<EpubBook> readBookWithSplitChapters(List<int> bytes) async {
     final epubBookRef = await openBook(bytes);
 
@@ -259,16 +345,35 @@ class EpubReader {
     return result;
   }
 
-  /// Opens the book for lazy loading with automatic chapter splitting.
+  /// Opens an EPUB file for lazy loading with automatic chapter splitting.
   ///
-  /// This method is similar to [openBook] but returns a reference that
-  /// automatically splits long chapters when they are accessed.
+  /// Combines the memory efficiency of lazy loading with automatic chapter
+  /// splitting. Content is loaded on-demand, and long chapters are split
+  /// only when accessed.
   ///
-  /// The book's content is not loaded into memory until it is accessed.
-  /// When chapters are retrieved, any chapter exceeding 5000 words will
-  /// be automatically split into smaller parts.
+  /// The [bytes] parameter should contain the complete EPUB file data as [List<int>].
   ///
-  /// Argument [bytes] should be the bytes of the epub file.
+  /// Returns an [EpubBookRef] that automatically splits chapters when accessed:
+  /// - Metadata loaded immediately
+  /// - Chapter content loaded on-demand
+  /// - Chapters >5000 words split when retrieved
+  ///
+  /// ## Example
+  /// ```dart
+  /// final bytes = await File('book.epub').readAsBytes();
+  /// final bookRef = await EpubReader.openBookWithSplitChapters(bytes);
+  ///
+  /// // Get split chapter references (lazy)
+  /// final chapterRefs = await bookRef.getChapterRefsWithSplitting();
+  ///
+  /// // Content loaded and split on-demand
+  /// for (final ref in chapterRefs) {
+  ///   if (ref is EpubChapterSplitRef) {
+  ///     print('${ref.title} - Part ${ref.partNumber} of ${ref.totalParts}');
+  ///   }
+  ///   final content = await ref.readHtmlContent(); // Loaded here
+  /// }
+  /// ```
   static Future<EpubBookRef> openBookWithSplitChapters(List<int> bytes) async {
     final bookRef = await openBook(bytes);
     return EpubBookSplitRef.fromBookRef(bookRef);

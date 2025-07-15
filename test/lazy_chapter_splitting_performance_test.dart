@@ -46,7 +46,7 @@ void main() {
         return;
       }
       final epubBytes = await epubFile.readAsBytes();
-      
+
       final bookRef = await EpubReader.openBookWithSplitChapters(epubBytes);
       final chapterRefs = await bookRef.getChapterRefsWithSplitting();
 
@@ -55,8 +55,9 @@ void main() {
 
       // Access only specific chapters
       final indicesToAccess = [0, 5, 10, 15];
-      final validIndices = indicesToAccess.where((i) => i < chapterRefs.length).toList();
-      
+      final validIndices =
+          indicesToAccess.where((i) => i < chapterRefs.length).toList();
+
       for (final index in validIndices) {
         final content = await chapterRefs[index].readHtmlContent();
         expect(content, isNotEmpty);

@@ -4,7 +4,42 @@ import '../ref_entities/epub_text_content_file_ref.dart';
 import '../schema/navigation/epub_navigation_point.dart';
 import 'package:collection/collection.dart';
 
+/// Reads and constructs the chapter hierarchy from EPUB navigation.
+///
+/// The [ChapterReader] is responsible for building the chapter structure
+/// from EPUB navigation data (NCX for EPUB2, Navigation Document for EPUB3).
+/// It implements smart NCX/spine reconciliation to handle malformed EPUBs
+/// where the navigation doesn't include all content files.
+///
+/// ## NCX/Spine Reconciliation Algorithm
+///
+/// Many EPUBs have incomplete navigation that doesn't reference all spine items.
+/// This reader ensures all content is accessible by:
+///
+/// 1. **Building a spine position map** - Maps each content file to its reading order
+/// 2. **Processing NCX navigation** - Creates the intended hierarchical structure
+/// 3. **Identifying orphaned items** - Finds spine items not in the navigation
+/// 4. **Finding logical parents** - Places orphans under the nearest preceding NCX item
+/// 5. **Maintaining order** - Preserves spine reading order within each level
+///
+/// ## Example Result
+/// ```
+/// Original NCX: [Part 1, Part 2]
+/// Spine: [cover.xhtml, part1.xhtml, ch1.xhtml, ch2.xhtml, part2.xhtml, ch3.xhtml]
+///
+/// Result:
+/// - cover.xhtml (orphaned, becomes top-level)
+/// - Part 1
+///   - ch1.xhtml (orphaned, under Part 1)
+///   - ch2.xhtml (orphaned, under Part 1)
+/// - Part 2
+///   - ch3.xhtml (orphaned, under Part 2)
+/// ```
 class ChapterReader {
+  /// Gets the complete chapter structure with NCX/spine reconciliation.
+  ///
+  /// Returns a list of [EpubChapterRef] representing the book's navigation,
+  /// including any spine items not present in the NCX/NAV.
   static List<EpubChapterRef> getChapters(EpubBookRef bookRef) {
     if (bookRef.schema!.navigation == null) {
       return <EpubChapterRef>[];
@@ -42,24 +77,24 @@ class ChapterReader {
     final navPoints = bookRef.schema!.navigation!.navMap!.points;
     final spine = bookRef.schema!.package!.spine!.items;
     final manifest = bookRef.schema!.package!.manifest!.items;
-    
+
     // Track which spine items are handled by NCX
     final handledSpineItems = <String>{};
-    
+
     // Build initial NCX structure and collect handled items
     final ncxChapters = <EpubChapterRef>[];
-    
+
     for (var i = 0; i < navPoints.length; i++) {
       final navPoint = navPoints[i];
       final nextNavPoint = i < navPoints.length - 1 ? navPoints[i + 1] : null;
-      
-      final chapter = _processNavPointWithOrphans(
-        bookRef, navPoint, nextNavPoint, spinePositions, spine, manifest, handledSpineItems);
+
+      final chapter = _processNavPointWithOrphans(bookRef, navPoint,
+          nextNavPoint, spinePositions, spine, manifest, handledSpineItems);
       if (chapter != null) {
         ncxChapters.add(chapter);
       }
     }
-    
+
     // Handle any remaining spine items that come before the first NCX item
     // or after the last NCX item
     final remainingOrphans = <EpubChapterRef>[];
@@ -67,7 +102,7 @@ class ChapterReader {
       final manifestItem = manifest.firstWhereOrNull(
         (item) => item.id == spine[i].idRef,
       );
-      if (manifestItem?.href != null && 
+      if (manifestItem?.href != null &&
           !handledSpineItems.contains(manifestItem!.href!) &&
           bookRef.content!.html.containsKey(manifestItem.href!)) {
         final htmlContentFileRef = bookRef.content!.html[manifestItem.href!];
@@ -81,7 +116,7 @@ class ChapterReader {
         remainingOrphans.add(orphanChapter);
       }
     }
-    
+
     // Insert remaining orphans at appropriate positions
     for (var orphan in remainingOrphans) {
       final orphanPos = spinePositions[orphan.contentFileName] ?? -1;
@@ -98,7 +133,7 @@ class ChapterReader {
         ncxChapters.add(orphan);
       }
     }
-    
+
     return ncxChapters;
   }
 
@@ -110,52 +145,57 @@ class ChapterReader {
       List<dynamic> spine,
       List<dynamic> manifest,
       Set<String> handledSpineItems) {
-    
     // Process the navigation point as usual
     String? contentFileName;
     String? anchor;
     if (navPoint.content?.source == null) return null;
-    
+
     var contentSourceAnchorCharIndex = navPoint.content!.source!.indexOf('#');
     if (contentSourceAnchorCharIndex == -1) {
       contentFileName = navPoint.content!.source;
       anchor = null;
     } else {
-      contentFileName = navPoint.content!.source!
-          .substring(0, contentSourceAnchorCharIndex);
-      anchor = navPoint.content!.source!
-          .substring(contentSourceAnchorCharIndex + 1);
+      contentFileName =
+          navPoint.content!.source!.substring(0, contentSourceAnchorCharIndex);
+      anchor =
+          navPoint.content!.source!.substring(contentSourceAnchorCharIndex + 1);
     }
     contentFileName = Uri.decodeFull(contentFileName!);
-    
+
     if (!bookRef.content!.html.containsKey(contentFileName)) {
       throw Exception(
         'Incorrect EPUB manifest: item with href = "$contentFileName" is missing.',
       );
     }
-    
+
     final htmlContentFileRef = bookRef.content!.html[contentFileName];
     handledSpineItems.add(contentFileName);
-    
+
     // Process child navigation points
     final subChapters = <EpubChapterRef>[];
     for (var i = 0; i < navPoint.childNavigationPoints.length; i++) {
       final childNavPoint = navPoint.childNavigationPoints[i];
-      final nextChildNavPoint = i < navPoint.childNavigationPoints.length - 1 
-          ? navPoint.childNavigationPoints[i + 1] 
+      final nextChildNavPoint = i < navPoint.childNavigationPoints.length - 1
+          ? navPoint.childNavigationPoints[i + 1]
           : null;
-      
+
       final childChapter = _processNavPointWithOrphans(
-        bookRef, childNavPoint, nextChildNavPoint, spinePositions, spine, manifest, handledSpineItems);
+          bookRef,
+          childNavPoint,
+          nextChildNavPoint,
+          spinePositions,
+          spine,
+          manifest,
+          handledSpineItems);
       if (childChapter != null) {
         subChapters.add(childChapter);
       }
     }
-    
+
     // Find orphaned spine items that should be children of this nav point
     final mySpinePos = spinePositions[contentFileName] ?? -1;
     var nextNavPos = spine.length;
-    
+
     // Determine the next navigation point's spine position
     if (nextNavPoint != null && nextNavPoint.content?.source != null) {
       var nextFileName = nextNavPoint.content!.source!;
@@ -169,23 +209,22 @@ class ChapterReader {
         nextNavPos = nextPos;
       }
     }
-    
+
     // Debug: Check what we're looking for
     // print('NavPoint ${navPoint.navigationLabels.first.text}: spine pos $mySpinePos, next nav pos $nextNavPos');
-    
+
     // Collect orphaned spine items between this nav point and the next
     for (var i = mySpinePos + 1; i < nextNavPos && i < spine.length; i++) {
       final spineItem = spine[i];
       final manifestItem = manifest.firstWhereOrNull(
         (item) => item.id == spineItem.idRef,
       );
-      
-      if (manifestItem?.href != null && 
+
+      if (manifestItem?.href != null &&
           !handledSpineItems.contains(manifestItem!.href!) &&
           bookRef.content!.html.containsKey(manifestItem.href!)) {
-        
         // print('  Found orphan: ${manifestItem.href} at spine position $i');
-        
+
         final orphanContentRef = bookRef.content!.html[manifestItem.href!];
         final orphanChapter = EpubChapterRef(
           epubTextContentFileRef: orphanContentRef,
@@ -198,7 +237,7 @@ class ChapterReader {
         handledSpineItems.add(manifestItem.href!);
       }
     }
-    
+
     return EpubChapterRef(
       epubTextContentFileRef: htmlContentFileRef,
       title: navPoint.navigationLabels.first.text,

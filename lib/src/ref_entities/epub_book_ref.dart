@@ -12,6 +12,40 @@ import '../utils/chapter_splitter.dart';
 import 'epub_chapter_ref.dart';
 import 'epub_content_ref.dart';
 
+/// Represents a reference to an EPUB book for lazy loading.
+///
+/// An [EpubBookRef] provides access to EPUB content without loading it all into
+/// memory at once. Content is loaded on-demand when accessed, making it ideal
+/// for large EPUB files or memory-constrained environments.
+///
+/// This is the result of calling [EpubReader.openBook] and provides the same
+/// functionality as [EpubBook] but with lazy loading behavior.
+///
+/// ## Key Features
+/// - Metadata available immediately (title, author, schema)
+/// - Chapter structure available without loading content
+/// - Content loaded only when explicitly requested
+/// - Support for chapter splitting on-demand
+///
+/// ## Example
+/// ```dart
+/// final bytes = await File('large_book.epub').readAsBytes();
+/// final bookRef = await EpubReader.openBook(bytes);
+///
+/// // Metadata available immediately
+/// print('Title: ${bookRef.title}');
+/// print('Author: ${bookRef.author}');
+///
+/// // Get chapter references (no content loaded yet)
+/// final chapters = bookRef.getChapters();
+/// print('Chapter count: ${chapters.length}');
+///
+/// // Load content for specific chapter only
+/// final firstChapterContent = await chapters[0].readHtmlContent();
+///
+/// // Or get chapters with automatic splitting
+/// final splitChapters = await bookRef.getChaptersWithSplitting();
+/// ```
 class EpubBookRef {
   final Archive epubArchive;
   final String? title;
@@ -50,6 +84,23 @@ class EpubBookRef {
         other.content == content;
   }
 
+  /// Gets the chapter structure without loading content.
+  ///
+  /// Returns a list of [EpubChapterRef] objects that represent the book's
+  /// navigation structure. The actual HTML content is not loaded until you
+  /// call [readHtmlContent] on a specific chapter reference.
+  ///
+  /// This method includes smart NCX/spine reconciliation to ensure all
+  /// content files are accessible, even in malformed EPUBs.
+  ///
+  /// ## Example
+  /// ```dart
+  /// final chapters = bookRef.getChapters();
+  /// for (final chapter in chapters) {
+  ///   print(chapter.title ?? 'Untitled');
+  ///   // Content not loaded yet
+  /// }
+  /// ```
   List<EpubChapterRef> getChapters() {
     return ChapterReader.getChapters(this);
   }
@@ -73,6 +124,20 @@ class EpubBookRef {
     return result;
   }
 
+  /// Reads the book's cover image.
+  ///
+  /// Attempts to extract the cover image from the EPUB manifest.
+  /// If no cover is specified, falls back to the first image in the manifest.
+  ///
+  /// Returns null if no suitable cover image is found.
+  ///
+  /// ## Example
+  /// ```dart
+  /// final cover = await bookRef.readCover();
+  /// if (cover != null) {
+  ///   print('Cover dimensions: ${cover.width}x${cover.height}');
+  /// }
+  /// ```
   Future<Image?> readCover() async {
     return await BookCoverReader.readBookCover(this);
   }
