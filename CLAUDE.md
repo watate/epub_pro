@@ -66,10 +66,12 @@ Each writer handles a specific OPF component:
   - Maintains paragraph boundaries when splitting
   - Preserves sub-chapters in the first part only
   - Supports both eager and lazy splitting:
-    - `splitChapter()`: Splits a loaded chapter
+    - `splitChapter()`: Splits a loaded chapter, optionally with parent title inheritance
     - `splitChapterRef()`: Splits a chapter reference (loads content)
     - `createSplitRefs()`: Creates lazy-loading split references
     - `analyzeChapterForSplitting()`: Analyzes if splitting is needed
+  - Uses (X/Y) format for split titles to avoid confusion with actual "Part" titles
+  - Handles parent title inheritance for orphaned subchapters when split
 
 ### Important Implementation Details
 
@@ -96,7 +98,8 @@ Each writer handles a specific OPF component:
 
 5. **Chapter Splitting**: For books with very long chapters (like Fahrenheit 451):
    - Chapters exceeding 5000 words are automatically split into parts
-   - Split titles follow the pattern: "Original Title - Part 1", "Original Title - Part 2", etc.
+   - Split titles follow the pattern: "Original Title (1/2)", "Original Title (2/2)", etc.
+   - Orphaned subchapters inherit parent titles when split: "Parent Title (1/3)" instead of generic "Chapter (1/3)"
    - Splitting attempts to break at paragraph boundaries for better readability
    - Sub-chapters are preserved only in the first part of a split chapter
    - Available through multiple methods:
@@ -112,10 +115,12 @@ Tests use real EPUB files from `test/assets/` including classics like "Alice's A
 - Schema parsing accuracy
 - Reader/writer round-trip consistency
 - Edge case handling (malformed EPUBs)
-- Chapter splitting functionality (both eager and lazy)
+- Chapter splitting functionality (both eager and lazy) with (X/Y) format
 - Memory efficiency of lazy loading
 - Performance characteristics of different loading modes
 - NCX/spine reconciliation for malformed EPUBs
+- Parent title inheritance for orphaned subchapters when split
+- Section-wrapped content handling (e.g., piranesi.epub)
 
 ### NCX/Spine Reconciliation Algorithm
 

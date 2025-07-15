@@ -140,9 +140,9 @@ void main() {
 
         final result = ChapterSplitter.splitChapter(chapter);
         expect(result.length, equals(3));
-        expect(result[0].title, equals('Very Long Chapter - Part 1'));
-        expect(result[1].title, equals('Very Long Chapter - Part 2'));
-        expect(result[2].title, equals('Very Long Chapter - Part 3'));
+        expect(result[0].title, equals('Very Long Chapter (1/3)'));
+        expect(result[1].title, equals('Very Long Chapter (2/3)'));
+        expect(result[2].title, equals('Very Long Chapter (3/3)'));
 
         // Verify each part is under the word limit
         for (final part in result) {
@@ -161,8 +161,8 @@ void main() {
 
         final result = ChapterSplitter.splitChapter(chapter);
         expect(result.length, equals(2));
-        expect(result[0].title, equals('Part 1'));
-        expect(result[1].title, equals('Part 2'));
+        expect(result[0].title, equals('Chapter (1/2)'));
+        expect(result[1].title, equals('Chapter (2/2)'));
       });
 
       test('preserves chapter metadata in split parts', () {
@@ -218,7 +218,7 @@ void main() {
         // The sub-chapter should also be split
         final splitSubChapters = result[0].subChapters;
         expect(splitSubChapters.length, equals(2));
-        expect(splitSubChapters[0].title, equals('Sub Chapter - Part 1'));
+        expect(splitSubChapters[0].title, equals('Sub Chapter (1/2)'));
 
         // The sub-sub-chapter should be preserved in the first part of the sub-chapter
         expect(splitSubChapters[0].subChapters.length, equals(1));

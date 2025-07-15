@@ -1,6 +1,6 @@
 # epub_pro
 
-This is a fork of a [fork](https://github.com/4akloon/epub_pro), of a [fork](https://github.com/ScerIO/epubx.dart), of [dart-epub](https://github.com/orthros/dart-epub). All of which seem unmaintained.
+This is a fork of a [fork](https://github.com/4akloon/epub_plus), of a [fork](https://github.com/ScerIO/epubx.dart), of [dart-epub](https://github.com/orthros/dart-epub). All of which seem unmaintained.
 
 I'm maintaining this so that I can read EPUBs on my app.
 
@@ -35,180 +35,199 @@ dependencies:
   epub_pro: any
 ```
 
-## Example
+## Usage Examples
+
+### Basic EPUB Reading
+
 ```dart
+import 'package:epub_pro/epub_pro.dart';
+import 'dart:io';
 
-  //Get the epub into memory somehow
-  String fileName = 'sample.epub';
-  String fullPath = path.join(io.Directory.current.path, fileName);
-  var targetFile = new io.File(fullPath);
-  List<int> bytes = await targetFile.readAsBytes();
+// Load EPUB file
+final epubFile = File('path/to/book.epub');
+final bytes = await epubFile.readAsBytes();
 
-  // Opens a book and reads all of its content into the memory
-  EpubBook epubBook = await EpubReader.readBook(bytes);
+// Read the entire book into memory
+final epubBook = await EpubReader.readBook(bytes);
 
-  // COMMON PROPERTIES
+// Access basic properties
+print('Title: ${epubBook.title}');
+print('Author: ${epubBook.author}');
+print('Authors: ${epubBook.authors.join(", ")}');
 
-  // Book's title
-  String? title = epubBook.title;
+// Access cover image
+if (epubBook.coverImage != null) {
+  print('Cover: ${epubBook.coverImage!.width}x${epubBook.coverImage!.height}');
+}
+```
 
-  // Book's authors (comma separated list)
-  String? author = epubBook.author;
+### Working with Chapters
 
-  // Book's authors (list of authors names)
-  List<String?>? authors = epubBook.authors;
-
-  // Book's cover image (null if there is no cover)
-  Image? coverImage = epubBook.coverImage;
-
-  // CHAPTERS
-
-  // Enumerating chapters
-  epubBook.chapters.forEach((EpubChapter chapter) {
-    // Title of chapter
-    String? chapterTitle = chapter.title;
-
-    // HTML content of current chapter
-    String? chapterHtmlContent = chapter.htmlContent;
-
-    // Nested chapters
-    List<EpubChapter> subChapters = chapter.subChapters;
-  });
-
-  // CONTENT
-
-  // Book's content (HTML files, stlylesheets, images, fonts, etc.)
-  EpubContent? bookContent = epubBook.content;
-
-  // IMAGES
-
-  // All images in the book (file name is the key)
-  Map<String, EpubByteContentFile>? images = bookContent?.images;
-
-  EpubByteContentFile? firstImage =
-      images?.values.firstOrNull; // Get the first image in the book
-
-  // Content type (e.g. EpubContentType.IMAGE_JPEG, EpubContentType.IMAGE_PNG)
-  EpubContentType contentType = firstImage!.contentType!;
-
-  // MIME type (e.g. "image/jpeg", "image/png")
-  String mimeContentType = firstImage.contentMimeType!;
-
-  // HTML & CSS
-
-  // All XHTML files in the book (file name is the key)
-  Map<String, EpubTextContentFile>? htmlFiles = bookContent?.html;
-
-  // All CSS files in the book (file name is the key)
-  Map<String, EpubTextContentFile>? cssFiles = bookContent?.css;
-
-  // Entire HTML content of the book
-  htmlFiles?.values.forEach((EpubTextContentFile htmlFile) {
-    String? htmlContent = htmlFile.content;
-  });
-
-  // All CSS content in the book
-  cssFiles?.values.forEach((EpubTextContentFile cssFile) {
-    String cssContent = cssFile.content!;
-  });
-
-  // OTHER CONTENT
-
-  // All fonts in the book (file name is the key)
-  Map<String, EpubByteContentFile>? fonts = bookContent?.fonts;
-
-  // All files in the book (including HTML, CSS, images, fonts, and other types of files)
-  Map<String, EpubContentFile>? allFiles = bookContent?.allFiles;
-
-  // ACCESSING RAW SCHEMA INFORMATION
-
-  // EPUB OPF data
-  EpubPackage? package = epubBook.schema?.package;
-
-  // Enumerating book's contributors
-  package?.metadata?.contributors.forEach((contributor) {
-    String contributorName = contributor.contributor!;
-    String contributorRole = contributor.role!;
-  });
-
-  // EPUB NCX data
-  EpubNavigation navigation = epubBook.schema!.navigation!;
-
-  // Enumerating NCX metadata
-  navigation.head?.metadata.forEach((meta) {
-    String metadataItemName = meta.name!;
-    String metadataItemContent = meta.content!;
-  });
-
-  // Write the Book
-  var written = EpubWriter.writeBook(epubBook);
-
-  if (written != null) {
-    // Read the book into a new object!
-    var newBook = await EpubReader.readBook(written);
+```dart
+// Iterate through chapters
+for (final chapter in epubBook.chapters) {
+  print('Chapter: ${chapter.title ?? "[No Title]"}');
+  print('Content length: ${chapter.htmlContent?.length ?? 0} characters');
+  
+  // Handle nested chapters (subchapters)
+  for (final subChapter in chapter.subChapters) {
+    print('  SubChapter: ${subChapter.title ?? subChapter.contentFileName}');
   }
+}
+```
 
-  // CHAPTER SPLITTING
+### Accessing Content Files
 
-  // Read book with automatic chapter splitting (chapters > 5000 words are split)
-  EpubBook splitBook = await EpubReader.readBookWithSplitChapters(bytes);
+```dart
+// Get all content
+final content = epubBook.content;
+
+// Access images
+content?.images?.forEach((fileName, imageFile) {
+  print('Image: $fileName (${imageFile.contentMimeType})');
+  print('Size: ${imageFile.content?.length ?? 0} bytes');
+});
+
+// Access HTML files
+content?.html?.forEach((fileName, htmlFile) {
+  print('HTML: $fileName');
+  print('Content: ${htmlFile.content?.substring(0, 100)}...');
+});
+
+// Access CSS files
+content?.css?.forEach((fileName, cssFile) {
+  print('CSS: $fileName');
+});
+```
+
+### Chapter Splitting for Long Chapters
+
+```dart
+// Automatically split chapters longer than 5000 words
+final splitBook = await EpubReader.readBookWithSplitChapters(bytes);
+
+print('Original chapters: ${epubBook.chapters.length}');
+print('After splitting: ${splitBook.chapters.length}');
+
+// Split chapters use (X/Y) format
+for (final chapter in splitBook.chapters) {
+  print('Chapter: ${chapter.title}');
+  // Example output:
+  // "Chapter 1 (1/3)" for the first part of a chapter split into 3 parts
+  // "Chapter 1 (2/3)" for the second part
+  // "Chapter 1 (3/3)" for the third part
+}
+```
+
+### Lazy Loading for Memory Efficiency
+
+```dart
+// Open book for lazy loading (metadata only)
+final bookRef = await EpubReader.openBook(bytes);
+
+print('Title: ${bookRef.title}'); // Available immediately
+print('Author: ${bookRef.author}'); // Available immediately
+
+// Get chapter references (no content loaded yet)
+final chapterRefs = bookRef.getChapters();
+
+// Load content only when needed
+for (final chapterRef in chapterRefs) {
+  print('Chapter: ${chapterRef.title}');
   
-  // The chapters are now split into manageable parts
-  splitBook.chapters.forEach((EpubChapter chapter) {
-    // Chapters with >5000 words will have titles like:
-    // "Original Chapter Title - Part 1"
-    // "Original Chapter Title - Part 2"
-    String? chapterTitle = chapter.title;
-    String? chapterHtmlContent = chapter.htmlContent;
-  });
+  // Content is loaded here
+  final htmlContent = await chapterRef.readHtmlContent();
+  print('Content loaded: ${htmlContent?.length ?? 0} characters');
+}
+```
 
-  // LAZY LOADING WITH CHAPTER SPLITTING
+### Lazy Loading with Chapter Splitting
 
-  // Open book for lazy loading with automatic chapter splitting
-  EpubBookRef lazyBookRef = await EpubReader.openBookWithSplitChapters(bytes);
-  
-  // Get chapter references that will be split as needed
-  List<EpubChapterRef> chapterRefs = await lazyBookRef.getChapterRefsWithSplitting();
-  
-  // Content is loaded on-demand when you read it
-  for (var chapterRef in chapterRefs) {
-    if (chapterRef is EpubChapterSplitRef) {
-      // This is a split chapter part
-      print('${chapterRef.title} (Part ${chapterRef.partNumber} of ${chapterRef.totalParts})');
-    }
-    // Content is only loaded when you call readHtmlContent()
-    String content = await chapterRef.readHtmlContent();
+```dart
+// Open book with lazy loading and automatic chapter splitting
+final splitBookRef = await EpubReader.openBookWithSplitChapters(bytes);
+
+// Get chapter references that will be split as needed
+final chapterRefs = await splitBookRef.getChapterRefsWithSplitting();
+
+// Content is loaded and split on-demand
+for (final chapterRef in chapterRefs) {
+  if (chapterRef is EpubChapterSplitRef) {
+    print('${chapterRef.title} (Part ${chapterRef.partNumber} of ${chapterRef.totalParts})');
   }
-
-  // For comparison: regular lazy loading with splitting
-  EpubBookRef bookRef = await EpubReader.openBook(bytes);
-  List<EpubChapter> splitChapters = await bookRef.getChaptersWithSplitting();
   
-  // Each chapter is guaranteed to have ≤5000 words
-  for (var chapter in splitChapters) {
-    print('${chapter.title}: ${chapter.htmlContent?.length} characters');
+  // Content is only loaded when you call readHtmlContent()
+  final content = await chapterRef.readHtmlContent();
+}
+
+// Alternative: Get all split chapters at once
+final splitChapters = await bookRef.getChaptersWithSplitting();
+for (final chapter in splitChapters) {
+  print('${chapter.title}: ${chapter.htmlContent?.length} characters');
+}
+```
+
+### Smart NCX/Spine Reconciliation
+
+```dart
+// The library automatically handles EPUBs with incomplete navigation
+// Example: NCX only lists main parts, but spine contains individual chapters
+
+// NCX Navigation: ["Part 1", "Part 2"]
+// Spine Reading Order: ["cover.xhtml", "part1.xhtml", "chapter01.xhtml", "chapter02.xhtml", "part2.xhtml", "chapter03.xhtml"]
+
+// The library creates a proper hierarchy:
+for (final chapter in epubBook.chapters) {
+  print('Chapter: ${chapter.title ?? chapter.contentFileName}');
+  
+  // Orphaned spine items become subchapters
+  for (final subChapter in chapter.subChapters) {
+    print('  SubChapter: ${subChapter.title ?? subChapter.contentFileName}');
   }
+}
 
-  // SMART NCX/SPINE RECONCILIATION
+// Output:
+// Chapter: cover.xhtml
+// Chapter: Part 1
+//   SubChapter: chapter01.xhtml
+//   SubChapter: chapter02.xhtml
+// Chapter: Part 2
+//   SubChapter: chapter03.xhtml
+```
+
+### Writing EPUB Files
+
+```dart
+// Write the book back to bytes
+final writtenBytes = EpubWriter.writeBook(epubBook);
+
+if (writtenBytes != null) {
+  // Save to file
+  final outputFile = File('output.epub');
+  await outputFile.writeAsBytes(writtenBytes);
   
-  // The library automatically handles EPUBs with incomplete navigation
-  // For example, if an EPUB has chapters in the spine but not in the NCX:
-  // NCX: [Part 1, Part 2]
-  // Spine: [cover.xhtml, part1.xhtml, chapter01.xhtml, chapter02.xhtml, part2.xhtml, chapter03.xhtml]
-  
-  // The library will create a proper hierarchy:
-  epubBook.chapters.forEach((chapter) {
-    print('Chapter: ${chapter.title}');
-    // Orphaned spine items become subchapters
-    chapter.subChapters.forEach((subChapter) {
-      print('  SubChapter: ${subChapter.title ?? subChapter.contentFileName}');
-    });
-  });
-  // Output:
-  // Chapter: null (cover.xhtml)
-  // Chapter: Part 1
-  //   SubChapter: chapter01.xhtml
-  //   SubChapter: chapter02.xhtml
-  // Chapter: Part 2
-  //   SubChapter: chapter03.xhtml
+  // Or read it back
+  final newBook = await EpubReader.readBook(writtenBytes);
+  print('Round-trip successful: ${newBook.title}');
+}
+```
+
+### Advanced: Accessing Raw Schema Information
+
+```dart
+// Access EPUB OPF (Open Packaging Format) data
+final package = epubBook.schema?.package;
+
+// Enumerate contributors
+package?.metadata?.contributors.forEach((contributor) {
+  print('Contributor: ${contributor.contributor} (${contributor.role})');
+});
+
+// Access EPUB NCX (Navigation Control file) data
+final navigation = epubBook.schema?.navigation;
+
+// Enumerate NCX metadata
+navigation?.head?.metadata.forEach((meta) {
+  print('${meta.name}: ${meta.content}');
+});
 ```

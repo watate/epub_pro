@@ -168,12 +168,16 @@ class ChapterSplitter {
   /// Splits a chapter into multiple parts if it exceeds the word limit.
   ///
   /// If the chapter's word count exceeds [maxWordsPerChapter], it is split
-  /// into multiple parts. Each part gets a title like "Original Title - Part N".
+  /// into multiple parts. Each part gets a title like "Original Title (1/3)".
+  ///
+  /// For orphaned subchapters (those without meaningful titles), the parent
+  /// title is used as the base for split part titles.
   ///
   /// Subchapters are preserved only in the first part and are recursively
   /// split if needed.
   ///
   /// The [chapter] parameter is the chapter to potentially split.
+  /// The [parentTitle] parameter is used for orphaned subchapters without titles.
   ///
   /// Returns a list containing either:
   /// - The original chapter (if under word limit)
@@ -188,11 +192,12 @@ class ChapterSplitter {
   ///
   /// final parts = ChapterSplitter.splitChapter(longChapter);
   /// // Returns 3 chapters:
-  /// // - "War and Peace - Part 1"
-  /// // - "War and Peace - Part 2"
-  /// // - "War and Peace - Part 3"
+  /// // - "War and Peace (1/3)"
+  /// // - "War and Peace (2/3)"
+  /// // - "War and Peace (3/3)"
   /// ```
-  static List<EpubChapter> splitChapter(EpubChapter chapter) {
+  static List<EpubChapter> splitChapter(EpubChapter chapter,
+      {String? parentTitle}) {
     final wordCount = countWords(chapter.htmlContent);
 
     if (wordCount <= maxWordsPerChapter || chapter.htmlContent == null) {
@@ -200,7 +205,8 @@ class ChapterSplitter {
       if (chapter.subChapters.isNotEmpty) {
         final processedSubChapters = <EpubChapter>[];
         for (final subChapter in chapter.subChapters) {
-          processedSubChapters.addAll(splitChapter(subChapter));
+          processedSubChapters
+              .addAll(splitChapter(subChapter, parentTitle: chapter.title));
         }
 
         return [
@@ -221,9 +227,17 @@ class ChapterSplitter {
     final splitChapters = <EpubChapter>[];
 
     for (var i = 0; i < parts.length; i++) {
-      final partTitle = chapter.title != null
-          ? '${chapter.title} - Part ${i + 1}'
-          : 'Part ${i + 1}';
+      // Determine the base title for this split part
+      String baseTitle;
+      if (chapter.title != null && chapter.title!.isNotEmpty) {
+        baseTitle = chapter.title!;
+      } else if (parentTitle != null && parentTitle.isNotEmpty) {
+        baseTitle = parentTitle;
+      } else {
+        baseTitle = chapter.contentFileName ?? 'Chapter';
+      }
+
+      final partTitle = '$baseTitle (${i + 1}/${parts.length})';
 
       // Only add sub-chapters to the first part
       final subChapters = i == 0 ? chapter.subChapters : <EpubChapter>[];
@@ -235,7 +249,10 @@ class ChapterSplitter {
           anchor: i == 0 ? chapter.anchor : null,
           htmlContent: parts[i],
           subChapters: i == 0
-              ? subChapters.expand((sub) => splitChapter(sub)).toList()
+              ? subChapters
+                  .expand(
+                      (sub) => splitChapter(sub, parentTitle: chapter.title))
+                  .toList()
               : [],
         ),
       );
@@ -254,8 +271,8 @@ class ChapterSplitter {
   }
 
   /// Creates a function to split a chapter ref when its content is loaded
-  static Future<List<EpubChapter>> splitChapterRef(
-      EpubChapterRef chapterRef) async {
+  static Future<List<EpubChapter>> splitChapterRef(EpubChapterRef chapterRef,
+      {String? parentTitle}) async {
     final htmlContent = await chapterRef.readHtmlContent();
     final wordCount = countWords(htmlContent);
 
@@ -263,7 +280,8 @@ class ChapterSplitter {
       // Process sub-chapters even if main chapter doesn't need splitting
       final processedSubChapters = <EpubChapter>[];
       for (final subChapterRef in chapterRef.subChapters) {
-        processedSubChapters.addAll(await splitChapterRef(subChapterRef));
+        processedSubChapters.addAll(await splitChapterRef(subChapterRef,
+            parentTitle: chapterRef.title));
       }
 
       return [
@@ -282,15 +300,24 @@ class ChapterSplitter {
     final splitChapters = <EpubChapter>[];
 
     for (var i = 0; i < parts.length; i++) {
-      final partTitle = chapterRef.title != null
-          ? '${chapterRef.title} - Part ${i + 1}'
-          : 'Part ${i + 1}';
+      // Determine the base title for this split part
+      String baseTitle;
+      if (chapterRef.title != null && chapterRef.title!.isNotEmpty) {
+        baseTitle = chapterRef.title!;
+      } else if (parentTitle != null && parentTitle.isNotEmpty) {
+        baseTitle = parentTitle;
+      } else {
+        baseTitle = chapterRef.contentFileName ?? 'Chapter';
+      }
+
+      final partTitle = '$baseTitle (${i + 1}/${parts.length})';
 
       // Process sub-chapters for the first part only
       final subChapters = <EpubChapter>[];
       if (i == 0) {
         for (final subChapterRef in chapterRef.subChapters) {
-          subChapters.addAll(await splitChapterRef(subChapterRef));
+          subChapters.addAll(await splitChapterRef(subChapterRef,
+              parentTitle: chapterRef.title));
         }
       }
 

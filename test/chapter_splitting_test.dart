@@ -52,8 +52,8 @@ void main() {
 
       final result = ChapterSplitter.splitChapter(longChapter);
       expect(result.length, equals(2));
-      expect(result[0].title, equals('Long Chapter - Part 1'));
-      expect(result[1].title, equals('Long Chapter - Part 2'));
+      expect(result[0].title, equals('Long Chapter (1/2)'));
+      expect(result[1].title, equals('Long Chapter (2/2)'));
     });
 
     test('splitChapter preserves sub-chapters in first part only', () {

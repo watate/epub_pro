@@ -1,3 +1,14 @@
+# 5.4.0
+- Changed chapter splitting title format from "Part X" to "(X/Y)" notation
+  - Split chapters now use format: "Chapter Title (1/2)" instead of "Chapter Title - Part 1"
+  - Prevents confusion with books that have actual "Part" titles (like Piranesi)
+  - Better suited for chapter-based reading apps
+- Added parent title inheritance for orphaned subchapters when split
+  - Orphaned spine items that become subchapters now inherit parent chapter titles when split
+  - Improves navigation clarity in chapter-based reading interfaces
+- Updated all tests to expect the new (X/Y) format
+- Enhanced documentation with cleaner, more readable examples
+
 # 5.3.0
 - Improved NCX/spine reconciliation for better handling of malformed EPUBs
   - Smart algorithm that ensures all spine items are accessible even when not in navigation

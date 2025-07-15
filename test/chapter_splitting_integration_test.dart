@@ -146,11 +146,11 @@ void main() {
       // Find where Chapter 3 starts (it should be split)
       final ch3Index = splitBook.chapters
           .indexWhere((ch) => ch.title?.startsWith('Chapter 3') ?? false);
-      expect(splitBook.chapters[ch3Index].title, contains('Part'));
+      expect(splitBook.chapters[ch3Index].title, contains('('));
 
       // Verify last chapter
       expect(splitBook.chapters.last.title,
-          anyOf(equals('Chapter 5'), contains('Chapter 5 - Part')));
+          anyOf(equals('Chapter 5'), contains('Chapter 5 (')));
     });
 
     test('preserves metadata after splitting', () async {
