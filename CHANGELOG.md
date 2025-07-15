@@ -1,3 +1,21 @@
+# 5.3.0
+- Improved NCX/spine reconciliation for better handling of malformed EPUBs
+  - Smart algorithm that ensures all spine items are accessible even when not in navigation
+  - Orphaned spine items are automatically inserted as subchapters under logical parents  
+  - Maintains correct reading order while preserving intended navigation hierarchy
+  - Matches behavior of major EPUB readers like Apple Books
+- Added comprehensive API documentation
+  - All major classes now have detailed documentation comments with examples
+  - Documentation follows Dart standards for generating API docs with `dart doc`
+  - Added clear explanations of all public methods and properties
+- Enhanced documentation
+  - Updated README.md with better explanation of NCX/spine reconciliation
+  - Added code examples for all major features
+- Improved test coverage
+  - Added tests for EPUBs with section-wrapped content (e.g., piranesi.epub)
+  - Added tests for NCX/spine reconciliation functionality
+  - Fixed test reliability issues
+
 # 5.2.0
 - Added lazy loading support for chapter splitting
   - Added `EpubReader.openBookWithSplitChapters()` - opens book with lazy loading and automatic chapter splitting
