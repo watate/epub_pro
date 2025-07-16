@@ -249,5 +249,58 @@ void main() {
         expect(wordCount, lessThanOrEqualTo(5000));
       }
     });
+
+    test(
+        'inherits parent title for orphaned subchapters that do not need splitting',
+        () {
+      // Create a parent chapter with a short orphaned subchapter
+      final shortOrphanedSubChapter = EpubChapter(
+        title: null, // No title - should inherit parent's
+        contentFileName: 'orphan.xhtml',
+        htmlContent: '<p>Short content that does not need splitting.</p>',
+      );
+
+      final parentChapter = EpubChapter(
+        title: 'Parent Chapter Title',
+        contentFileName: 'parent.xhtml',
+        htmlContent: '<p>Parent content.</p>',
+        subChapters: [shortOrphanedSubChapter],
+      );
+
+      final result = ChapterSplitter.splitChapter(parentChapter);
+
+      // Should return one chapter with the subchapter having inherited title
+      expect(result.length, equals(1));
+      expect(result[0].title, equals('Parent Chapter Title'));
+      expect(result[0].subChapters.length, equals(1));
+      expect(result[0].subChapters[0].title, equals('Parent Chapter Title'));
+      expect(result[0].subChapters[0].contentFileName, equals('orphan.xhtml'));
+    });
+
+    test('preserves existing titles for subchapters that already have them',
+        () {
+      // Create a subchapter that already has a title
+      final titledSubChapter = EpubChapter(
+        title: 'Existing SubChapter Title',
+        contentFileName: 'titled.xhtml',
+        htmlContent: '<p>Short content with existing title.</p>',
+      );
+
+      final parentChapter = EpubChapter(
+        title: 'Parent Chapter Title',
+        contentFileName: 'parent.xhtml',
+        htmlContent: '<p>Parent content.</p>',
+        subChapters: [titledSubChapter],
+      );
+
+      final result = ChapterSplitter.splitChapter(parentChapter);
+
+      // Should preserve the existing subchapter title
+      expect(result.length, equals(1));
+      expect(result[0].title, equals('Parent Chapter Title'));
+      expect(result[0].subChapters.length, equals(1));
+      expect(
+          result[0].subChapters[0].title, equals('Existing SubChapter Title'));
+    });
   });
 }

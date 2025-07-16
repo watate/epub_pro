@@ -201,17 +201,25 @@ class ChapterSplitter {
     final wordCount = countWords(chapter.htmlContent);
 
     if (wordCount <= maxWordsPerChapter || chapter.htmlContent == null) {
+      // Determine the title for this chapter, applying parent title inheritance if needed
+      String? chapterTitle = chapter.title;
+      if ((chapterTitle == null || chapterTitle.isEmpty) &&
+          parentTitle != null &&
+          parentTitle.isNotEmpty) {
+        chapterTitle = parentTitle;
+      }
+
       // Process sub-chapters even if main chapter doesn't need splitting
       if (chapter.subChapters.isNotEmpty) {
         final processedSubChapters = <EpubChapter>[];
         for (final subChapter in chapter.subChapters) {
           processedSubChapters
-              .addAll(splitChapter(subChapter, parentTitle: chapter.title));
+              .addAll(splitChapter(subChapter, parentTitle: chapterTitle));
         }
 
         return [
           EpubChapter(
-            title: chapter.title,
+            title: chapterTitle,
             contentFileName: chapter.contentFileName,
             anchor: chapter.anchor,
             htmlContent: chapter.htmlContent,
@@ -219,6 +227,20 @@ class ChapterSplitter {
           )
         ];
       }
+
+      // Return chapter with inherited title if applicable
+      if (chapterTitle != chapter.title) {
+        return [
+          EpubChapter(
+            title: chapterTitle,
+            contentFileName: chapter.contentFileName,
+            anchor: chapter.anchor,
+            htmlContent: chapter.htmlContent,
+            subChapters: chapter.subChapters,
+          )
+        ];
+      }
+
       return [chapter];
     }
 
@@ -277,16 +299,24 @@ class ChapterSplitter {
     final wordCount = countWords(htmlContent);
 
     if (wordCount <= maxWordsPerChapter) {
+      // Determine the title for this chapter, applying parent title inheritance if needed
+      String? chapterTitle = chapterRef.title;
+      if ((chapterTitle == null || chapterTitle.isEmpty) &&
+          parentTitle != null &&
+          parentTitle.isNotEmpty) {
+        chapterTitle = parentTitle;
+      }
+
       // Process sub-chapters even if main chapter doesn't need splitting
       final processedSubChapters = <EpubChapter>[];
       for (final subChapterRef in chapterRef.subChapters) {
-        processedSubChapters.addAll(await splitChapterRef(subChapterRef,
-            parentTitle: chapterRef.title));
+        processedSubChapters.addAll(
+            await splitChapterRef(subChapterRef, parentTitle: chapterTitle));
       }
 
       return [
         EpubChapter(
-          title: chapterRef.title,
+          title: chapterTitle,
           contentFileName: chapterRef.contentFileName,
           anchor: chapterRef.anchor,
           htmlContent: htmlContent,

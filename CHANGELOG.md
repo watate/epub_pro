@@ -1,11 +1,18 @@
+# 5.4.1
+- Fixed title inheritance in lazy loading chapter splitting
+  - The `splitChapterRef` method now properly applies parent title inheritance for orphaned subchapters
+  - Ensures consistent behavior between `splitChapter` and `splitChapterRef` methods
+  - Orphaned subchapters now show inherited parent titles instead of "Untitled" in all loading scenarios
+
 # 5.4.0
 - Changed chapter splitting title format from "Part X" to "(X/Y)" notation
   - Split chapters now use format: "Chapter Title (1/2)" instead of "Chapter Title - Part 1"
   - Prevents confusion with books that have actual "Part" titles (like Piranesi)
   - Better suited for chapter-based reading apps
-- Added parent title inheritance for orphaned subchapters when split
-  - Orphaned spine items that become subchapters now inherit parent chapter titles when split
-  - Improves navigation clarity in chapter-based reading interfaces
+- Fixed orphaned subchapters showing as "Untitled"
+  - Orphaned spine items that become subchapters now inherit parent chapter titles
+  - Applies to both split and non-split chapters for consistency
+  - Example: chapter01.xhtml under "PART 1: PIRANESI" now shows as "PART 1: PIRANESI" instead of "Untitled"
 - Updated all tests to expect the new (X/Y) format
 - Enhanced documentation with cleaner, more readable examples
 
