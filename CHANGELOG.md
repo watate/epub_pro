@@ -1,3 +1,6 @@
+# 5.4.2
+- Fix: safely handle files if they're in the root directory instead of a subdirectory
+
 # 5.4.1
 - Fixed title inheritance in lazy loading chapter splitting
   - The `splitChapterRef` method now properly applies parent title inheritance for orphaned subchapters
