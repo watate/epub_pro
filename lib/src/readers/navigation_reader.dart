@@ -155,8 +155,14 @@ class NavigationReader {
         );
       }
       //Get relative toc file path
-      _tocFileEntryPath =
-          '${((_tocFileEntryPath!.split('/')..removeLast())..removeAt(0)).join('/')}/';
+      var pathParts = _tocFileEntryPath!.split('/');
+      if (pathParts.isNotEmpty) {
+        pathParts.removeLast();
+      }
+      if (pathParts.isNotEmpty) {
+        pathParts.removeAt(0);
+      }
+      _tocFileEntryPath = pathParts.isEmpty ? '' : '${pathParts.join('/')}/';
 
       var containerDocument =
           xml.XmlDocument.parse(convert.utf8.decode(tocFileEntry.content));

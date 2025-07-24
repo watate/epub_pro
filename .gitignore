@@ -58,3 +58,7 @@ assets/piranesi.epub
 assets/piranesi/
 test/piranesi_section_test.dart
 .DS_Store
+assets/sao.epub
+assets/sao
+JP_EPUB.md
+forge.yaml

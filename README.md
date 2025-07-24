@@ -1,8 +1,8 @@
 # epub_pro
 
-This is a fork of a [fork](https://github.com/4akloon/epub_plus), of a [fork](https://github.com/ScerIO/epubx.dart), of [dart-epub](https://github.com/orthros/dart-epub). All of which seem unmaintained.
+To my knowledge, this is the *only* working and actively maintained EPUB library for Dart.
 
-I'm maintaining this so that I can read EPUBs on my app.
+This is a fork of a [fork](https://github.com/4akloon/epub_plus), of a [fork](https://github.com/ScerIO/epubx.dart), of [dart-epub](https://github.com/orthros/dart-epub). The other forks seem unmaintained, and I'm maintaining this so that I can read EPUBs on my app.
 
 ## What's different?
 1. Updated dependencies (so your installs will work)
@@ -12,8 +12,66 @@ I'm maintaining this so that I can read EPUBs on my app.
    - Including orphaned spine items as subchapters under their logical parents
    - Maintaining the correct reading order from the spine
    - This matches how Apple Books and other readers handle malformed EPUBs
-4. Added chapter splitting functionality - automatically split long chapters (>5000 words) into smaller, more manageable parts
+4. Added chapter splitting functionality (optional) - automatically split long chapters (>5000 words) into smaller, more manageable parts
 5. Added lazy loading support for chapter splitting - read and split chapters on-demand for better memory efficiency
+
+## Some useful info
+### Mimetype
+This file explains to your device that the archive is an ePUB, and needs to be read using an engine that can handle ePUBs. It must be the first file added to your ePUB folder when you are creating a new ePUB.
+
+### META-INF Folder
+Inside the META-INF folder is an XML file called container.xml that points the ebook to the OPF file.
+
+This is the XML file that describes the ebook. This doesn't really change from ebook to ebook, can be the same for every ebook. Sometimes, the directory is called an OPS rather than OEBPS.  If that’s the case, then you need change it to OPS in the <rootfile> element too.
+
+### OPS Folder
+The OPS or OEBPS folder is where all of the content of your ebook lives. Typically, each chapter in the book will have its own HTML or XHTML page, as will any ancillary materials like the copyright page, title page, preface, epigraph, etc.
+
+Different types of media need their own folders, so you should create a folder to house all of the images contained within the book, and another for fonts, and one for the CSS. If your book has any audio/video materials, those would need their own folders, too.
+
+### content.opf
+‘OPF’ stands for Open Package Format. It’s essentially an XML file, although it has the file extension .opf instead of .xml. It lists all of the contents of your ePUB, and tells the reading system what order to display the files in.
+
+This includes:
+1. OPF head
+2. Metadata
+3. OPF Manifest
+4. Spine
+5. Guide (not common in EPUB 3)
+
+### OPF Manifest
+The manifest is an unordered list of all of the files within the OEBPS/OPS directory.  Each item in the manifest has three components:
+1. An item ID, which you can make up, and should describe the file.
+```
+<item id="cover"
+```
+2. A reference to the actual file.
+```
+href="cover.xhtml"
+```
+3. The media-type, which tells the parser what type of file it is.
+```
+media-type="application/xhtml+xml"/>
+```
+
+Things included in the manifest:
+- Fonts
+- All of the XHTML pages in the book (introduction, copyright, chapters, epigraph, etc.)
+- Images
+- Audio or Video files, if applicable
+- The CSS stylesheet
+- The NCX file, if you’re working with the ePUB 2.0 format
+
+### Spine
+The spine is an ordered list of all of the contents of the book. It uses the item IDs you’ve created in the manifest. Each item gets an item ref, and you use the item id that you created in the manifest for the id ref.
+
+### NCX file
+The NCX file abbreviated as a Navigation Control file for XML, usually named toc.ncx. This file consists of the hierarchical table of contents for an EPUB file. The specification for NCX was developed for Digital Talking Book (DTB) and this file format is maintained by the DAISY Consortium and is not a part of the EPUB specification. The NCX file includes a mime-type of application/x-dtbncx+xml into it.
+
+### Sources
+- https://www.eboundcanada.org/resources/whats-in-an-epub-the-root-directory/
+- https://www.eboundcanada.org/resources/whats-in-an-epub-the-opf-file/
+- https://apln.ca/introduction-to-the-opf-file/
 
 ## Internal
 dart pub publish --dry-run
@@ -97,7 +155,14 @@ content?.html?.forEach((fileName, htmlFile) {
 // Access CSS files
 content?.css?.forEach((fileName, cssFile) {
   print('CSS: $fileName');
+  print('Content: ${cssFile.content}');
 });
+
+// Access a specific CSS file by path
+final mainStylesheet = content?.css?['styles/main.css'];
+if (mainStylesheet != null) {
+  print('Main CSS content: ${mainStylesheet.content}');
+}
 ```
 
 ### Chapter Splitting for Long Chapters
@@ -138,6 +203,13 @@ for (final chapterRef in chapterRefs) {
   // Content is loaded here
   final htmlContent = await chapterRef.readHtmlContent();
   print('Content loaded: ${htmlContent?.length ?? 0} characters');
+}
+
+// Lazy load CSS files
+final cssRefs = bookRef.content?.css;
+for (final entry in cssRefs?.entries ?? []) {
+  final cssContent = await entry.value.readContentAsync();
+  print('CSS ${entry.key}: ${cssContent.length} characters');
 }
 ```
 
