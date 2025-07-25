@@ -4,6 +4,27 @@ import '../entities/epub_chapter.dart';
 import '../ref_entities/epub_chapter_ref.dart';
 import '../ref_entities/epub_chapter_split_ref.dart';
 
+/// Holds the structure of an HTML document for preservation during splitting
+class _HtmlStructure {
+  final String? doctype;
+  final String? htmlOpenTag;
+  final String? head;
+  final String? bodyOpenTag;
+  final String bodyContent;
+  final String? trailingContent;
+  final bool isCompleteDocument;
+
+  const _HtmlStructure({
+    this.doctype,
+    this.htmlOpenTag,
+    this.head,
+    this.bodyOpenTag,
+    required this.bodyContent,
+    this.trailingContent,
+    required this.isCompleteDocument,
+  });
+}
+
 /// Utility class for splitting long chapters into smaller, more readable parts.
 ///
 /// The [ChapterSplitter] provides functionality to automatically split chapters
@@ -74,6 +95,7 @@ class ChapterSplitter {
 
   /// Splits HTML content into parts based on word count.
   ///
+  /// Preserves HTML document structure (DOCTYPE, head, body tags) when splitting.
   /// Attempts to split at paragraph boundaries for clean breaks.
   /// If no paragraphs are found, falls back to character-based splitting.
   ///
@@ -87,17 +109,33 @@ class ChapterSplitter {
     final wordCount = countWords(htmlContent);
     if (wordCount <= maxWords) return [htmlContent];
 
+    // Extract HTML document structure
+    final structure = _extractHtmlStructure(htmlContent);
+
     // Calculate number of parts needed
     final numParts = (wordCount / maxWords).ceil();
 
-    // Parse the HTML to find paragraph boundaries
+    // Split the body content (not the full document)
+    final bodyParts =
+        _splitBodyContent(structure.bodyContent, maxWords, numParts);
+
+    // Reconstruct complete HTML documents for each part
+    return bodyParts
+        .map((bodyPart) => _reconstructHtmlDocument(structure, bodyPart))
+        .toList();
+  }
+
+  /// Splits body content into parts, preserving paragraph boundaries
+  static List<String> _splitBodyContent(
+      String bodyContent, int maxWords, int numParts) {
+    // Parse the body content to find paragraph boundaries
     final paragraphs = <String>[];
     final paragraphPattern = RegExp(r'<p[^>]*>.*?</p>', dotAll: true);
-    final matches = paragraphPattern.allMatches(htmlContent);
+    final matches = paragraphPattern.allMatches(bodyContent);
 
     if (matches.isEmpty) {
       // If no paragraphs found, split by approximate character count
-      return _splitByCharacterCount(htmlContent, numParts);
+      return _splitByCharacterCount(bodyContent, numParts);
     }
 
     // Extract all content before first paragraph
@@ -106,7 +144,7 @@ class ChapterSplitter {
 
     for (final match in matches) {
       if (match.start > lastEnd) {
-        beforeContent.write(htmlContent.substring(lastEnd, match.start));
+        beforeContent.write(bodyContent.substring(lastEnd, match.start));
       }
       paragraphs.add(match.group(0)!);
       lastEnd = match.end;
@@ -114,11 +152,11 @@ class ChapterSplitter {
 
     // Extract content after last paragraph
     final afterContent =
-        lastEnd < htmlContent.length ? htmlContent.substring(lastEnd) : '';
+        lastEnd < bodyContent.length ? bodyContent.substring(lastEnd) : '';
 
     // Split paragraphs into parts
     final parts = <String>[];
-    final wordsPerPart = (wordCount / numParts).ceil();
+    final wordsPerPart = (countWords(bodyContent) / numParts).ceil();
     var currentPart = StringBuffer(beforeContent.toString());
     var currentWordCount = 0;
 
@@ -200,12 +238,16 @@ class ChapterSplitter {
     final wordCount = countWords(chapter.htmlContent);
 
     if (wordCount <= maxWordsPerChapter || chapter.htmlContent == null) {
-      // Determine the title for this chapter, applying parent title inheritance if needed
+      // Determine the title for this chapter, applying parent title inheritance and filename fallback
       String? chapterTitle = chapter.title;
       if ((chapterTitle == null || chapterTitle.isEmpty) &&
           parentTitle != null &&
           parentTitle.isNotEmpty) {
         chapterTitle = parentTitle;
+      }
+      // Use filename as fallback if still no title
+      if (chapterTitle == null || chapterTitle.isEmpty) {
+        chapterTitle = _stripFileExtension(chapter.contentFileName) ?? 'Chapter';
       }
 
       // Process sub-chapters even if main chapter doesn't need splitting
@@ -255,7 +297,7 @@ class ChapterSplitter {
       } else if (parentTitle != null && parentTitle.isNotEmpty) {
         baseTitle = parentTitle;
       } else {
-        baseTitle = chapter.contentFileName ?? 'Chapter';
+        baseTitle = _stripFileExtension(chapter.contentFileName) ?? 'Chapter';
       }
 
       final partTitle = '$baseTitle (${i + 1}/${parts.length})';
@@ -298,12 +340,16 @@ class ChapterSplitter {
     final wordCount = countWords(htmlContent);
 
     if (wordCount <= maxWordsPerChapter) {
-      // Determine the title for this chapter, applying parent title inheritance if needed
+      // Determine the title for this chapter, applying parent title inheritance and filename fallback
       String? chapterTitle = chapterRef.title;
       if ((chapterTitle == null || chapterTitle.isEmpty) &&
           parentTitle != null &&
           parentTitle.isNotEmpty) {
         chapterTitle = parentTitle;
+      }
+      // Use filename as fallback if still no title
+      if (chapterTitle == null || chapterTitle.isEmpty) {
+        chapterTitle = _stripFileExtension(chapterRef.contentFileName) ?? 'Chapter';
       }
 
       // Process sub-chapters even if main chapter doesn't need splitting
@@ -336,7 +382,7 @@ class ChapterSplitter {
       } else if (parentTitle != null && parentTitle.isNotEmpty) {
         baseTitle = parentTitle;
       } else {
-        baseTitle = chapterRef.contentFileName ?? 'Chapter';
+        baseTitle = _stripFileExtension(chapterRef.contentFileName) ?? 'Chapter';
       }
 
       final partTitle = '$baseTitle (${i + 1}/${parts.length})';
@@ -443,5 +489,128 @@ class ChapterSplitter {
     }
 
     return splitRefs;
+  }
+
+  /// Extracts the HTML document structure, separating head from body content
+  static _HtmlStructure _extractHtmlStructure(String htmlContent) {
+    // Check if this is a complete HTML document
+    final hasHtml =
+        htmlContent.contains(RegExp(r'<html[^>]*>', caseSensitive: false));
+    final hasHead =
+        htmlContent.contains(RegExp(r'<head[^>]*>', caseSensitive: false));
+    final hasBody =
+        htmlContent.contains(RegExp(r'<body[^>]*>', caseSensitive: false));
+
+    if (!hasHtml || !hasHead || !hasBody) {
+      // Not a complete document, return as-is for body content
+      return _HtmlStructure(
+        bodyContent: htmlContent,
+        isCompleteDocument: false,
+      );
+    }
+
+    // Extract DOCTYPE
+    final doctypeMatch = RegExp(r'<!DOCTYPE[^>]*>', caseSensitive: false)
+        .firstMatch(htmlContent);
+    final doctype = doctypeMatch?.group(0);
+
+    // Extract HTML opening tag
+    final htmlOpenMatch =
+        RegExp(r'<html[^>]*>', caseSensitive: false).firstMatch(htmlContent);
+    final htmlOpenTag = htmlOpenMatch?.group(0);
+
+    // Extract HEAD section (including the head tags)
+    final headMatch =
+        RegExp(r'<head[^>]*>.*?</head>', dotAll: true, caseSensitive: false)
+            .firstMatch(htmlContent);
+    final head = headMatch?.group(0);
+
+    // Extract BODY opening tag
+    final bodyOpenMatch =
+        RegExp(r'<body[^>]*>', caseSensitive: false).firstMatch(htmlContent);
+    final bodyOpenTag = bodyOpenMatch?.group(0);
+
+    // Extract content between <body> and </body>
+    final bodyContentMatch =
+        RegExp(r'<body[^>]*>(.*?)</body>', dotAll: true, caseSensitive: false)
+            .firstMatch(htmlContent);
+    final bodyContent = bodyContentMatch?.group(1) ?? htmlContent;
+
+    // Extract any content after </body>
+    final bodyEndMatch =
+        RegExp(r'</body>.*', dotAll: true, caseSensitive: false)
+            .firstMatch(htmlContent);
+    final trailingContent = bodyEndMatch?.group(0);
+
+    return _HtmlStructure(
+      doctype: doctype,
+      htmlOpenTag: htmlOpenTag,
+      head: head,
+      bodyOpenTag: bodyOpenTag,
+      bodyContent: bodyContent,
+      trailingContent: trailingContent,
+      isCompleteDocument: true,
+    );
+  }
+
+  /// Reconstructs a complete HTML document with preserved structure and new body content
+  static String _reconstructHtmlDocument(
+      _HtmlStructure structure, String newBodyContent) {
+    if (!structure.isCompleteDocument) {
+      // Not a complete document, just return the new content
+      return newBodyContent;
+    }
+
+    final buffer = StringBuffer();
+
+    // Add DOCTYPE if present
+    if (structure.doctype != null) {
+      buffer.writeln(structure.doctype);
+    }
+
+    // Add HTML opening tag if present
+    if (structure.htmlOpenTag != null) {
+      buffer.writeln(structure.htmlOpenTag);
+    }
+
+    // Add HEAD section if present
+    if (structure.head != null) {
+      buffer.writeln(structure.head);
+    }
+
+    // Add BODY opening tag if present
+    if (structure.bodyOpenTag != null) {
+      buffer.writeln(structure.bodyOpenTag);
+    }
+
+    // Add the new body content
+    buffer.write(newBodyContent);
+
+    // Close body tag if we had one
+    if (structure.bodyOpenTag != null) {
+      buffer.writeln('</body>');
+    }
+
+    // Add any trailing content (like closing </html>)
+    if (structure.trailingContent != null) {
+      buffer.write(structure.trailingContent);
+    } else if (structure.htmlOpenTag != null) {
+      // Add closing HTML tag if we had an opening one but no trailing content
+      buffer.writeln('</html>');
+    }
+
+    return buffer.toString();
+  }
+
+  /// Strips file extension from filename for cleaner titles
+  static String? _stripFileExtension(String? fileName) {
+    if (fileName == null || fileName.isEmpty) {
+      return fileName;
+    }
+    final lastDotIndex = fileName.lastIndexOf('.');
+    if (lastDotIndex > 0) {
+      return fileName.substring(0, lastDotIndex);
+    }
+    return fileName;
   }
 }
