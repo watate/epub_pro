@@ -1,3 +1,5 @@
+import 'package:word_count/word_count.dart';
+
 import '../entities/epub_chapter.dart';
 import '../ref_entities/epub_chapter_ref.dart';
 import '../ref_entities/epub_chapter_split_ref.dart';
@@ -65,12 +67,9 @@ class ChapterSplitter {
 
     if (textOnly.isEmpty) return 0;
 
-    // Split by whitespace and count non-empty tokens
-    // This will count punctuation attached to words as part of the word
-    return textOnly
-        .split(RegExp(r'\s+'))
-        .where((word) => word.isNotEmpty)
-        .length;
+    // Use word_count library for proper word counting across all languages
+    // This handles CJK languages (Chinese, Japanese, Korean) correctly
+    return wordsCount(textOnly);
   }
 
   /// Splits HTML content into parts based on word count.

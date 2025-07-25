@@ -10,7 +10,7 @@ void main() {
       expect(ChapterSplitter.countWords('<p>Hello world</p>'), equals(2));
       expect(
         ChapterSplitter.countWords('<p>This is a <strong>test</strong>.</p>'),
-        equals(5), // "This", "is", "a", "test", "."
+        equals(4), // "This", "is", "a", "test" (period not counted as separate word)
       );
       expect(
         ChapterSplitter.countWords('<p>One</p><p>Two</p><p>Three</p>'),

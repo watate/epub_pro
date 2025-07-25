@@ -2,6 +2,7 @@ import 'dart:io' as io;
 
 import 'package:epub_pro/epub_pro.dart';
 import 'package:epub_pro/src/schema/opf/epub_metadata_meta.dart';
+import 'package:epub_pro/src/utils/chapter_splitter.dart';
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 
@@ -271,6 +272,269 @@ void main() {
         print('Chapters: ${chapters.length}');
         print('✓ All spine items correctly mapped to chapters in order');
       }
+    });
+
+    test('word counting should work correctly for Japanese text', () async {
+      final saoPath = path.join(
+        io.Directory.current.path,
+        'assets',
+        'sao.epub',
+      );
+      final saoFile = io.File(saoPath);
+      if (!(await saoFile.exists())) {
+        return;
+      }
+
+      // Get a chapter with substantial Japanese content
+      final japaneseChapter = saoBook.chapters.firstWhere(
+        (ch) => ch.contentFileName?.contains('part0009.html') ?? false,
+        orElse: () => saoBook.chapters[2], // fallback to any content chapter
+      );
+
+      final htmlContent = japaneseChapter.htmlContent ?? '';
+      expect(htmlContent.isNotEmpty, isTrue);
+
+      // Count "words" using current method (splits on whitespace)
+      final wordCount = ChapterSplitter.countWords(htmlContent);
+      
+      // Count characters (more appropriate for Japanese)
+      final textOnly = htmlContent
+          .replaceAll(RegExp(r'<[^>]*>'), '') // Remove HTML tags
+          .replaceAll(RegExp(r'&[^;]+;'), '') // Remove HTML entities
+          .replaceAll(RegExp(r'\s+'), ' ') // Normalize whitespace
+          .trim();
+      final charCount = textOnly.length;
+
+      if (verbose) {
+        print('\n=== Japanese Word Counting Analysis ===');
+        print('Chapter: ${japaneseChapter.contentFileName}');
+        print('Raw HTML length: ${htmlContent.length} characters');
+        print('Text-only length: $charCount characters');
+        print('Current "word" count: $wordCount');
+        print('Expected words (chars/3): ${(charCount / 3).round()}');
+        print('\nSample text (first 200 chars):');
+        print(textOnly.length > 200 ? '${textOnly.substring(0, 200)}...' : textOnly);
+        print('\n✓ Japanese text properly counted as $wordCount words (estimated ~${(charCount / 3).round()} words from chars/3)');
+      }
+
+      // Japanese text should be counted properly
+      expect(charCount, greaterThan(1000)); // Should have substantial content
+      
+      // For Japanese text, we expect significantly more words than whitespace-based counting
+      // The word_count library should properly tokenize Japanese text
+      expect(
+        wordCount,
+        greaterThan(charCount / 10), // Should be much more than whitespace counting
+        reason: 'Japanese text with $charCount characters was counted as $wordCount words. '
+                'This should be significantly higher than whitespace-based counting.',
+      );
+      
+      // Also verify it's a reasonable count (not too high)
+      expect(
+        wordCount,
+        lessThan(charCount), // Shouldn't count every character as a word
+        reason: 'Word count should be less than character count',
+      );
+    });
+
+    test('chapter splitting should work for long Japanese chapters', () async {
+      final saoPath = path.join(
+        io.Directory.current.path,
+        'assets',
+        'sao.epub',
+      );
+      final saoFile = io.File(saoPath);
+      if (!(await saoFile.exists())) {
+        return;
+      }
+
+      // Test with multiple Japanese chapters to see if any would split
+      var testedChapters = 0;
+      var splitOccurred = false;
+      
+      if (verbose) {
+        print('\n=== Chapter Length Analysis ===');
+      }
+      
+      for (final chapter in saoBook.chapters.take(15)) {
+        if (chapter.htmlContent == null || chapter.htmlContent!.isEmpty) continue;
+        
+        final originalWordCount = ChapterSplitter.countWords(chapter.htmlContent);
+        final charCount = chapter.htmlContent!
+            .replaceAll(RegExp(r'<[^>]*>'), '')
+            .replaceAll(RegExp(r'&[^;]+;'), '')
+            .length;
+            
+        if (verbose && testedChapters < 5) {
+          print('${chapter.contentFileName}: $charCount chars, $originalWordCount words');
+        }
+            
+        if (charCount < 1000) continue; // Skip very short chapters
+        
+        testedChapters++;
+        
+        // Try to split the chapter
+        final splitParts = ChapterSplitter.splitChapter(chapter);
+        
+        if (verbose && testedChapters <= 3) {
+          print('\n=== Chapter Splitting Test ${testedChapters} ===');
+          print('Chapter: ${chapter.contentFileName}');
+          print('Character count: $charCount');
+          print('Current word count: $originalWordCount');
+          print('Parts after splitting: ${splitParts.length}');
+          
+          if (splitParts.length > 1) {
+            print('✓ Chapter was split (unexpected for Japanese!)');
+            splitOccurred = true;
+          } else {
+            print('✗ Chapter was not split (expected due to word counting issue)');
+          }
+        }
+        
+        if (splitParts.length > 1) {
+          splitOccurred = true;
+        }
+      }
+      
+      if (verbose) {
+        print('\n=== Splitting Summary ===');
+        print('Chapters tested: $testedChapters');
+        print('Any chapters split: $splitOccurred');
+        print('⚠️  Japanese chapters likely won\'t split due to word counting method');
+      }
+      
+      expect(testedChapters, greaterThan(0), reason: 'Should have found chapters to test');
+      
+      // At least some chapters should have been split
+      expect(
+        splitOccurred,
+        isTrue,
+        reason: 'Long Japanese chapters (>15,000 characters) should be split into multiple parts. '
+                'Found $testedChapters chapters with substantial content, but none were split. '
+                'The current word counting method doesn\'t work for Japanese text.',
+      );
+    });
+
+    test('demonstrates character-based splitting for Japanese', () async {
+      final saoPath = path.join(
+        io.Directory.current.path,
+        'assets',
+        'sao.epub',
+      );
+      final saoFile = io.File(saoPath);
+      if (!(await saoFile.exists())) {
+        return;
+      }
+
+      // Test character-based counting as an alternative
+      var longChapterFound = false;
+      
+      if (verbose) {
+        print('\n=== Scanning for Long Chapters ===');
+      }
+      
+      for (final chapter in saoBook.chapters.take(15)) {
+        if (chapter.htmlContent == null || chapter.htmlContent!.isEmpty) continue;
+        
+        final textOnly = chapter.htmlContent!
+            .replaceAll(RegExp(r'<[^>]*>'), '')
+            .replaceAll(RegExp(r'&[^;]+;'), '')
+            .replaceAll(RegExp(r'\s+'), ' ')
+            .trim();
+            
+        final charCount = textOnly.length;
+        final currentWordCount = ChapterSplitter.countWords(chapter.htmlContent);
+        
+        // For Japanese, roughly 3 characters = 1 word equivalent
+        final estimatedWords = (charCount / 3).round();
+        
+        if (verbose && charCount > 500) {
+          print('${chapter.contentFileName}: $charCount chars, estimated $estimatedWords words');
+        }
+        
+        if (charCount > 1000) { // Find a substantial chapter
+          longChapterFound = true;
+          
+          if (verbose) {
+            print('\n=== Character-based Splitting Analysis ===');
+            print('Chapter: ${chapter.contentFileName}');
+            print('Character count: $charCount');
+            print('Current word count: $currentWordCount');
+            print('Estimated words (chars/3): $estimatedWords');
+            print('Should split if >5000 estimated words: ${estimatedWords > 5000}');
+            print('Would need ${(estimatedWords / 5000).ceil()} parts');
+            
+            // Show how character-based thresholds would work
+            final charThreshold = 15000; // ~5000 words worth
+            print('\nCharacter-based approach:');
+            print('Character threshold (15000): ${charCount > charThreshold}');
+            print('Parts needed: ${(charCount / charThreshold).ceil()}');
+          }
+          
+          // The word_count library now properly counts Japanese text
+          // So the actual word count should be reasonable for the character count
+          expect(currentWordCount, greaterThan(charCount / 10), 
+                 reason: 'Word count should be substantial for the character count');
+          break;
+        }
+      }
+      
+      expect(longChapterFound, isTrue, reason: 'Should find at least one substantial chapter');
+      
+      if (verbose) {
+        print('\n💡 Proposed solution: Use character-based counting for CJK languages');
+        print('   - Detect Japanese/Chinese/Korean text');
+        print('   - Use character count / 3 as word estimate');
+        print('   - Or use character threshold directly (e.g., 15,000 chars = split point)');
+      }
+    });
+
+    test('eager splitting should work for Japanese chapters', () async {
+      final saoPath = path.join(
+        io.Directory.current.path,
+        'assets',
+        'sao.epub',
+      );
+      final saoFile = io.File(saoPath);
+      if (!(await saoFile.exists())) {
+        return;
+      }
+
+      // Test the readBookWithSplitChapters method
+      final saoBytes = await saoFile.readAsBytes();
+      final splitBook = await EpubReader.readBookWithSplitChapters(saoBytes);
+      
+      if (verbose) {
+        print('\n=== Eager Splitting Test ===');  
+        print('Original chapters: ${saoBook.chapters.length}');
+        print('Split book chapters: ${splitBook.chapters.length}');
+        
+        if (splitBook.chapters.length > saoBook.chapters.length) {
+          print('✓ Some chapters were split!');
+          
+          // Find split chapters (those with (1/2), (2/2) etc in title)
+          var splitCount = 0;
+          for (final chapter in splitBook.chapters) {
+            if (chapter.title?.contains(RegExp(r'\(\d+/\d+\)')) ?? false) {
+              splitCount++;
+              print('  Split chapter: ${chapter.title}');
+            }
+          }
+          print('Total split parts: $splitCount');
+        } else {
+          print('✗ No chapters were split (expected for Japanese content)');
+        }
+      }
+      
+      // The split book should have more chapters than the original
+      expect(
+        splitBook.chapters.length,
+        greaterThan(saoBook.chapters.length),
+        reason: 'readBookWithSplitChapters should split long Japanese chapters. '
+                'Original had ${saoBook.chapters.length} chapters, '
+                'but split version also has ${splitBook.chapters.length} chapters. '
+                'Japanese chapters with >15,000 characters should be split.',
+      );
     });
   });
 }
