@@ -1,3 +1,6 @@
+# 5.4.3
+- Fix: chapter splitting not working on Japanese EPUBs. Fixed by using word count library
+
 # 5.4.2
 - Fix: safely handle files if they're in the root directory instead of a subdirectory
 
