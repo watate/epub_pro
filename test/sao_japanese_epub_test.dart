@@ -84,9 +84,18 @@ void main() {
       expect(chapters.last.contentFileName, equals('text/part0038.html'));
       expect(chapters.last.title, equals('奥付'));
       
-      // All others should be untitled
+      // All others should use filename fallback (orphaned chapters from spine reconciliation)
       for (var i = 1; i < chapters.length - 1; i++) {
-        expect(chapters[i].title, isNull);
+        final chapter = chapters[i];
+        expect(chapter.title, isNotNull, reason: 'Orphaned chapters should use filename fallback');
+        expect(chapter.title, isNotEmpty, reason: 'Filename fallback should provide non-empty titles');
+        
+        // Verify the title matches the filename without extension
+        if (chapter.contentFileName != null) {
+          final expectedTitle = _stripFileExtension(chapter.contentFileName!);
+          expect(chapter.title, equals(expectedTitle), 
+              reason: 'Orphaned chapter should use filename without extension as title');
+        }
       }
       
       if (verbose) {
@@ -537,4 +546,14 @@ void main() {
       );
     });
   });
+}
+
+/// Strips file extension from filename for cleaner titles
+String _stripFileExtension(String fileName) {
+  if (fileName.isEmpty) return fileName;
+  final lastDotIndex = fileName.lastIndexOf('.');
+  if (lastDotIndex > 0) {
+    return fileName.substring(0, lastDotIndex);
+  }
+  return fileName;
 }

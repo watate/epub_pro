@@ -67,8 +67,18 @@ void main() {
       expect(part1Content, isNotEmpty);
       expect(part2Content, isNotEmpty);
 
-      // Verify part 2 doesn't contain the beginning of part 1
-      expect(part2Content.contains(part1Content.substring(0, 100)), isFalse);
+      // Verify part 2 doesn't contain the beginning body content of part 1
+      // Extract body content to avoid comparing shared HTML structure (head, DOCTYPE, etc.)
+      final part1BodyContent = _extractBodyContent(part1Content);
+      final part2BodyContent = _extractBodyContent(part2Content);
+      
+      // Take first 100 characters of actual body content
+      final part1BodyStart = part1BodyContent.isNotEmpty && part1BodyContent.length > 100 
+          ? part1BodyContent.substring(0, 100)
+          : part1BodyContent;
+      
+      expect(part2BodyContent.contains(part1BodyStart), isFalse,
+          reason: 'Part 2 body content should not contain the beginning of part 1 body content');
     });
 
     test('Split chapters maintain correct metadata', () async {
@@ -335,4 +345,18 @@ List<int> _createTestEpubWithShortChapters() {
   // Create the EPUB
   final encoded = ZipEncoder().encode(archive);
   return encoded ?? [];
+}
+
+/// Extracts the content between <body> and </body> tags
+String _extractBodyContent(String htmlContent) {
+  final bodyMatch = RegExp(r'<body[^>]*>(.*?)</body>', dotAll: true, caseSensitive: false)
+      .firstMatch(htmlContent);
+  
+  if (bodyMatch != null) {
+    return bodyMatch.group(1) ?? '';
+  }
+  
+  // If no body tags found, return the content as-is
+  // (might be a fragment without full HTML structure)
+  return htmlContent;
 }
