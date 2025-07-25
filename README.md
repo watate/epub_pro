@@ -2,7 +2,7 @@
 
 To my knowledge, this is the *only* working and actively maintained EPUB library for Dart.
 
-This is a fork of a [fork](https://github.com/4akloon/epub_plus), of a [fork](https://github.com/ScerIO/epubx.dart), of [dart-epub](https://github.com/orthros/dart-epub). The other forks seem unmaintained, and I'm maintaining this so that I can read EPUBs on my app.
+History: This is a fork of a [fork](https://github.com/4akloon/epub_plus), of a [fork](https://github.com/ScerIO/epubx.dart), of [dart-epub](https://github.com/orthros/dart-epub). The other forks are unmaintained, and I'm maintaining this so that I can read EPUBs on my app.
 
 ## What's different?
 1. Updated dependencies (so your installs will work)
