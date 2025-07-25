@@ -47,6 +47,19 @@ class EpubChapterRef {
 
   @override
   String toString() {
-    return 'Title: $title, Subchapter count: ${subChapters.length}';
+    final effectiveTitle = title ?? _stripFileExtension(contentFileName) ?? 'Chapter';
+    return 'Title: $effectiveTitle, Subchapter count: ${subChapters.length}';
+  }
+
+  /// Strips file extension from filename for cleaner titles
+  static String? _stripFileExtension(String? fileName) {
+    if (fileName == null || fileName.isEmpty) {
+      return fileName;
+    }
+    final lastDotIndex = fileName.lastIndexOf('.');
+    if (lastDotIndex > 0) {
+      return fileName.substring(0, lastDotIndex);
+    }
+    return fileName;
   }
 }

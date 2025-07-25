@@ -258,14 +258,14 @@ class EpubReader {
     var result = <EpubChapter>[];
 
     await Future.forEach(chapterRefs, (EpubChapterRef chapterRef) async {
-      final title = chapterRef.title;
+      final effectiveTitle = _getEffectiveTitle(chapterRef.title, chapterRef.contentFileName);
       final contentFileName = chapterRef.contentFileName;
       final anchor = chapterRef.anchor;
       final htmlContent = await chapterRef.readHtmlContent();
       final subChapters = await readChapters(chapterRef.subChapters);
 
       final chapter = EpubChapter(
-        title: title,
+        title: effectiveTitle,
         contentFileName: contentFileName,
         anchor: anchor,
         htmlContent: htmlContent,
@@ -275,6 +275,26 @@ class EpubReader {
       result.add(chapter);
     });
     return result;
+  }
+
+  /// Returns an effective title using filename fallback if title is null/empty
+  static String _getEffectiveTitle(String? title, String? contentFileName) {
+    if (title != null && title.isNotEmpty) {
+      return title;
+    }
+    return _stripFileExtension(contentFileName) ?? 'Chapter';
+  }
+
+  /// Strips file extension from filename for cleaner titles
+  static String? _stripFileExtension(String? fileName) {
+    if (fileName == null || fileName.isEmpty) {
+      return fileName;
+    }
+    final lastDotIndex = fileName.lastIndexOf('.');
+    if (lastDotIndex > 0) {
+      return fileName.substring(0, lastDotIndex);
+    }
+    return fileName;
   }
 
   /// Reads an EPUB file and automatically splits long chapters.
