@@ -1,3 +1,7 @@
+# 5.4.4
+- Preserve <head> for all split chapters
+- Add filename fallback to chapters without titles
+
 # 5.4.3
 - Fix: chapter splitting not working on Japanese EPUBs. Fixed by using word count library
 
