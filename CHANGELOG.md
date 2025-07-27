@@ -1,3 +1,6 @@
+# 5.4.5
+- Update optional chapter splitting to 3000 words instead of 5000 words (20-min reads)
+
 # 5.4.4
 - Preserve <head> for all split chapters
 - Add filename fallback to chapters without titles
