@@ -125,8 +125,9 @@ void main() {
         );
 
         final result = ChapterSplitter.splitChapter(chapter);
-        expect(result.length, equals(1));
-        expect(result[0].title, equals('Exact Chapter'));
+        expect(result.length, equals(2));
+        expect(result[0].title, equals('Exact Chapter (1/2)'));
+        expect(result[1].title, equals('Exact Chapter (2/2)'));
       });
 
       test('splits very large chapters into multiple parts', () {
@@ -139,10 +140,12 @@ void main() {
         );
 
         final result = ChapterSplitter.splitChapter(chapter);
-        expect(result.length, equals(3));
-        expect(result[0].title, equals('Very Long Chapter (1/3)'));
-        expect(result[1].title, equals('Very Long Chapter (2/3)'));
-        expect(result[2].title, equals('Very Long Chapter (3/3)'));
+        expect(result.length, equals(5));
+        expect(result[0].title, equals('Very Long Chapter (1/5)'));
+        expect(result[1].title, equals('Very Long Chapter (2/5)'));
+        expect(result[2].title, equals('Very Long Chapter (3/5)'));
+        expect(result[3].title, equals('Very Long Chapter (4/5)'));
+        expect(result[4].title, equals('Very Long Chapter (5/5)'));
 
         // Verify each part is under the word limit
         for (final part in result) {
