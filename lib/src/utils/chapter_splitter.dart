@@ -53,12 +53,12 @@ class _HtmlStructure {
 ///
 /// final parts = ChapterSplitter.splitChapter(chapter);
 /// // Results in:
-/// // - "Long Chapter - Part 1" (≤5000 words)
-/// // - "Long Chapter - Part 2" (≤5000 words)
+/// // - "Long Chapter - Part 1" (≤3000 words)
+/// // - "Long Chapter - Part 2" (≤3000 words)
 /// ```
 class ChapterSplitter {
   /// Maximum number of words allowed per chapter part.
-  static const int maxWordsPerChapter = 5000;
+  static const int maxWordsPerChapter = 3000;
 
   /// Counts the number of words in HTML content.
   ///

@@ -42,7 +42,7 @@ void main() {
     });
 
     test('splitChapter splits long chapters', () {
-      // Create content with more than 5000 words using multiple paragraphs
+      // Create content with more than 3000 words using multiple paragraphs
       final longContent =
           List.generate(30, (i) => '<p>${'word ' * 200}</p>').join();
       final longChapter = EpubChapter(
@@ -76,18 +76,18 @@ void main() {
       expect(result[1].subChapters.length, equals(0));
     });
 
-    test('handles chapters with exactly 5000 words', () {
-      // Create content with exactly 5000 words
+    test('handles chapters with exactly 3000 words', () {
+      // Create content with exactly 3000 words
       final exactContent =
           List.generate(50, (i) => '<p>${'word ' * 100}</p>').join();
       final chapter = EpubChapter(
-        title: 'Exact 5000',
+        title: 'Exact 3000',
         htmlContent: exactContent,
       );
 
       final result = ChapterSplitter.splitChapter(chapter);
       expect(result.length, equals(1));
-      expect(ChapterSplitter.countWords(result[0].htmlContent), equals(5000));
+      expect(ChapterSplitter.countWords(result[0].htmlContent), equals(3000));
     });
 
     test('handles empty and null content', () {
@@ -186,7 +186,7 @@ void main() {
         // Each part should be under limit
         for (final part in result) {
           expect(ChapterSplitter.countWords(part.htmlContent),
-              lessThanOrEqualTo(5000));
+              lessThanOrEqualTo(3000));
         }
       }
     });
@@ -216,7 +216,7 @@ void main() {
       // Check that long chapters are split
       for (final chapter in splitBook.chapters) {
         final wordCount = ChapterSplitter.countWords(chapter.htmlContent);
-        expect(wordCount, lessThanOrEqualTo(5000),
+        expect(wordCount, lessThanOrEqualTo(3000),
             reason: 'Chapter "${chapter.title}" has $wordCount words');
       }
     });
@@ -246,7 +246,7 @@ void main() {
       // All chapters should be within word limit
       for (final chapter in splitChapters) {
         final wordCount = ChapterSplitter.countWords(chapter.htmlContent);
-        expect(wordCount, lessThanOrEqualTo(5000));
+        expect(wordCount, lessThanOrEqualTo(3000));
       }
     });
 

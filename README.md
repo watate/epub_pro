@@ -12,7 +12,7 @@ History: This is a fork of a [fork](https://github.com/4akloon/epub_plus), of a 
    - Including orphaned spine items as subchapters under their logical parents
    - Maintaining the correct reading order from the spine
    - This matches how Apple Books and other readers handle malformed EPUBs
-4. Added chapter splitting functionality (optional) - automatically split long chapters (>5000 words) into smaller, more manageable parts
+4. Added chapter splitting functionality (optional) - automatically split long chapters (>3000 words) into smaller, more manageable parts
 5. Added lazy loading support for chapter splitting - read and split chapters on-demand for better memory efficiency
 
 ## Some useful info
@@ -168,7 +168,7 @@ if (mainStylesheet != null) {
 ### Chapter Splitting for Long Chapters
 
 ```dart
-// Automatically split chapters longer than 5000 words
+// Automatically split chapters longer than 3000 words
 final splitBook = await EpubReader.readBookWithSplitChapters(bytes);
 
 print('Original chapters: ${epubBook.chapters.length}');

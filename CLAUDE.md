@@ -31,7 +31,7 @@ The library follows a clear separation between:
 **Main Entry Points**:
 - `EpubReader`: Read EPUB files (supports both byte arrays and lazy loading)
   - `readBook()`: Standard reading method
-  - `readBookWithSplitChapters()`: Automatically splits chapters >5000 words (eager loading)
+  - `readBookWithSplitChapters()`: Automatically splits chapters >3000 words (eager loading)
   - `openBook()`: Opens book for lazy loading
   - `openBookWithSplitChapters()`: Opens book with lazy loading and automatic chapter splitting
 - `EpubWriter`: Write EPUB files back to disk
@@ -62,7 +62,7 @@ Each writer handles a specific OPF component:
 **Utility Classes**:
 - `ChapterSplitter`: Handles splitting of long chapters
   - Counts words in HTML content (strips tags)
-  - Splits chapters exceeding 5000 words
+  - Splits chapters exceeding 3000 words
   - Maintains paragraph boundaries when splitting
   - Preserves sub-chapters in the first part only
   - Supports both eager and lazy splitting:
@@ -97,7 +97,7 @@ Each writer handles a specific OPF component:
 4. **Content References**: All content references are normalized relative to the OPF file location.
 
 5. **Chapter Splitting**: For books with very long chapters (like Fahrenheit 451):
-   - Chapters exceeding 5000 words are automatically split into parts
+   - Chapters exceeding 3000 words are automatically split into parts
    - Split titles follow the pattern: "Original Title (1/2)", "Original Title (2/2)", etc.
    - Orphaned subchapters inherit parent titles when split: "Parent Title (1/3)" instead of generic "Chapter (1/3)"
    - Splitting attempts to break at paragraph boundaries for better readability

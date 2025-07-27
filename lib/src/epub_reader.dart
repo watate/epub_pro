@@ -52,7 +52,7 @@ import 'utils/chapter_splitter.dart';
 ///
 /// ## Example - With Chapter Splitting
 /// ```dart
-/// // Automatically split chapters exceeding 5000 words
+/// // Automatically split chapters exceeding 3000 words
 /// EpubBook book = await EpubReader.readBookWithSplitChapters(bytes);
 /// // Long chapters are now split: "Chapter 1 - Part 1", "Chapter 1 - Part 2", etc.
 /// ```
@@ -300,7 +300,7 @@ class EpubReader {
   /// Reads an EPUB file and automatically splits long chapters.
   ///
   /// This method combines full content loading with automatic chapter splitting.
-  /// Any chapter exceeding 5000 words is split into smaller parts at paragraph
+  /// Any chapter exceeding 3000 words is split into smaller parts at paragraph
   /// boundaries for better readability.
   ///
   /// The [bytes] parameter should contain the complete EPUB file data as [List<int>].
@@ -351,7 +351,7 @@ class EpubReader {
     );
   }
 
-  /// Reads chapters and splits any that exceed 5000 words.
+  /// Reads chapters and splits any that exceed 3000 words.
   static Future<List<EpubChapter>> readChaptersWithSplitting(
     List<EpubChapterRef> chapterRefs,
   ) async {
@@ -376,7 +376,7 @@ class EpubReader {
   /// Returns an [EpubBookRef] that automatically splits chapters when accessed:
   /// - Metadata loaded immediately
   /// - Chapter content loaded on-demand
-  /// - Chapters >5000 words split when retrieved
+  /// - Chapters >3000 words split when retrieved
   ///
   /// ## Example
   /// ```dart

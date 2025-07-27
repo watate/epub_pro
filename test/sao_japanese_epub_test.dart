@@ -470,11 +470,11 @@ void main() {
             print('Character count: $charCount');
             print('Current word count: $currentWordCount');
             print('Estimated words (chars/3): $estimatedWords');
-            print('Should split if >5000 estimated words: ${estimatedWords > 5000}');
-            print('Would need ${(estimatedWords / 5000).ceil()} parts');
+            print('Should split if >3000 estimated words: ${estimatedWords > 3000}');
+            print('Would need ${(estimatedWords / 3000).ceil()} parts');
             
             // Show how character-based thresholds would work
-            final charThreshold = 15000; // ~5000 words worth
+            final charThreshold = 15000; // ~3000 words worth
             print('\nCharacter-based approach:');
             print('Character threshold (15000): ${charCount > charThreshold}');
             print('Parts needed: ${(charCount / charThreshold).ceil()}');

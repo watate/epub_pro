@@ -117,7 +117,7 @@ void main() {
       final epubBytes = createTestEpub(
         chapterWordCounts: [
           1000, // Short chapter
-          5000, // Exactly at limit
+          3000, // Exactly at limit
           7500, // Should split into 2 parts
           15000, // Should split into 3 parts
           500, // Very short chapter
@@ -227,7 +227,7 @@ void main() {
             .split(RegExp(r'\s+'))
             .where((w) => w.isNotEmpty)
             .length;
-        expect(wordCount, lessThanOrEqualTo(5000));
+        expect(wordCount, lessThanOrEqualTo(3000));
       }
     });
 
@@ -244,7 +244,7 @@ void main() {
       stopwatch.stop();
 
       // Should complete in reasonable time (less than 5 seconds)
-      expect(stopwatch.elapsedMilliseconds, lessThan(5000));
+      expect(stopwatch.elapsedMilliseconds, lessThan(3000));
 
       // Should have 100+ chapters (each 10,000 word chapter splits into 2-3 parts)
       expect(splitBook.chapters.length, greaterThanOrEqualTo(100));

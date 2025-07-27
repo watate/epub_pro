@@ -4,7 +4,7 @@ import 'epub_chapter_ref.dart';
 /// A reference to an EPUB book that automatically splits long chapters.
 ///
 /// This class extends [EpubBookRef] and overrides the [getChapters] method
-/// to return split chapter references for chapters that exceed 5000 words.
+/// to return split chapter references for chapters that exceed 3000 words.
 class EpubBookSplitRef extends EpubBookRef {
   EpubBookSplitRef({
     required super.epubArchive,

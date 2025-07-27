@@ -105,10 +105,10 @@ class EpubBookRef {
     return ChapterReader.getChapters(this);
   }
 
-  /// Gets chapters and automatically splits any that exceed 5000 words.
+  /// Gets chapters and automatically splits any that exceed 3000 words.
   ///
   /// This method loads chapter content on-demand and splits long chapters
-  /// into smaller parts of approximately 5000 words each.
+  /// into smaller parts of approximately 3000 words each.
   ///
   /// Returns a `Future<List<EpubChapter>>` instead of `List<EpubChapterRef>`
   /// because splitting requires reading the actual content.

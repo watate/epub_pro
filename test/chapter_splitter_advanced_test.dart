@@ -115,8 +115,8 @@ void main() {
     });
 
     group('Chapter Splitting Edge Cases', () {
-      test('handles chapters with exactly 5000 words', () {
-        // Create content with exactly 5000 words
+      test('handles chapters with exactly 3000 words', () {
+        // Create content with exactly 3000 words
         final exactContent =
             List.generate(50, (i) => '<p>${'word ' * 100}</p>').join();
         final chapter = EpubChapter(
@@ -147,7 +147,7 @@ void main() {
         // Verify each part is under the word limit
         for (final part in result) {
           final wordCount = ChapterSplitter.countWords(part.htmlContent);
-          expect(wordCount, lessThanOrEqualTo(5000));
+          expect(wordCount, lessThanOrEqualTo(3000));
         }
       });
 
@@ -243,7 +243,7 @@ void main() {
 
         // Should complete in reasonable time
         expect(stopwatch.elapsedMilliseconds, lessThan(1000));
-        expect(result.length, equals(1)); // 1000 words is less than 5000
+        expect(result.length, equals(1)); // 1000 words is less than 3000
       });
 
       test('handles malformed HTML gracefully', () {
