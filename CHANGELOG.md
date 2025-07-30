@@ -1,3 +1,7 @@
+# 5.4.6
+- Fixed chapter splitting to handle nested divs and more element types including blockquote, h1, h2, section, article, tr, etc.
+- Added more test cases for chapter splitting and japanese EPUBs
+
 # 5.4.5
 - Update optional chapter splitting to 3000 words instead of 5000 words (20-min reads)
 

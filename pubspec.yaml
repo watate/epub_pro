@@ -2,7 +2,7 @@ name: epub_pro
 description: EPUB Parser for Dart. Suitable for use on the Server, the Web, or in Flutter
 homepage: https://github.com/watate/epub_pro
 issue_tracker: https://github.com/watate/epub_pro/issues
-version: 5.4.5
+version: 5.4.6
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
