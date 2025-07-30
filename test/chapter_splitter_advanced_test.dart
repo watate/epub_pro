@@ -117,19 +117,20 @@ void main() {
       test('handles nested paragraphs inside div', () {
         // The regex matches overlapping patterns - both the div AND the p tags inside
         // This causes the content to be split at p tag boundaries, not div boundaries
-        final nestedContent = '<div class="chapter-content"><p>${'word ' * 500}</p><p>${'word ' * 500}</p></div>';
-        
+        final nestedContent =
+            '<div class="chapter-content"><p>${'word ' * 500}</p><p>${'word ' * 500}</p></div>';
+
         final parts = ChapterSplitter.splitHtmlContent(nestedContent, 600);
-        
+
         // With the current implementation, nested p tags are matched separately,
         // so the content gets split even though it's inside a div
         expect(parts.length, equals(2));
-        
+
         // First part contains the opening div and first p
         expect(parts[0], contains('<div class="chapter-content">'));
         expect(parts[0], contains('<p>'));
         expect(ChapterSplitter.countWords(parts[0]), equals(500));
-        
+
         // Second part contains the second p and closing div
         expect(parts[1], contains('<p>'));
         expect(parts[1], contains('</div>'));
@@ -143,9 +144,9 @@ void main() {
           <p>${'word ' * 500}</p>
           <p>${'word ' * 500}</p>
         ''';
-        
+
         final parts = ChapterSplitter.splitHtmlContent(separateParagraphs, 600);
-        
+
         // Separate paragraphs can be split into different parts
         expect(parts.length, equals(2));
         expect(parts[0], contains('<p>'));
@@ -154,15 +155,16 @@ void main() {
 
       test('handles deeply nested structures', () {
         // Complex nested structure with a single p tag
-        final deeplyNested = '<section><div><article><p>${'word ' * 1000}</p></article></div></section>';
-        
+        final deeplyNested =
+            '<section><div><article><p>${'word ' * 1000}</p></article></div></section>';
+
         final parts = ChapterSplitter.splitHtmlContent(deeplyNested, 500);
-        
+
         // A single p tag is treated as one indivisible block,
         // even if it contains more words than the limit
         expect(parts.length, equals(1));
         expect(ChapterSplitter.countWords(parts[0]), equals(1000));
-        
+
         // All container tags are preserved
         expect(parts[0], equals(deeplyNested));
       });
@@ -171,7 +173,7 @@ void main() {
         // Content with no recognized block elements
         final plainText = 'word ' * 1000; // No HTML tags
         final parts = ChapterSplitter.splitHtmlContent(plainText, 500);
-        
+
         // Should use character-based splitting as fallback
         expect(parts.length, equals(2));
         expect(parts[0].length, closeTo(parts[1].length, 100));
@@ -188,31 +190,34 @@ void main() {
           <div><p>${'word ' * 1000}</p></div>
           <p>${'word ' * 1000}</p>
         ''';
-        
+
         final parts = ChapterSplitter.splitHtmlContent(mixedContent, 1500);
-        
+
         // With 4000 total words and 1500 max per part, we need 3 parts
         // But since splitting happens at paragraph boundaries (each 1000 words),
         // actual distribution is: 1000, 1000, 2000 words
         expect(parts.length, equals(3));
-        
+
         var totalWords = 0;
         for (final part in parts) {
           totalWords += ChapterSplitter.countWords(part);
         }
         expect(totalWords, equals(4000)); // Total words preserved
-        
+
         // Verify the actual word distribution
-        expect(ChapterSplitter.countWords(parts[0]), equals(1000)); // First paragraph
-        expect(ChapterSplitter.countWords(parts[1]), equals(1000)); // Second paragraph  
-        expect(ChapterSplitter.countWords(parts[2]), equals(2000)); // Last two paragraphs
-        
+        expect(ChapterSplitter.countWords(parts[0]),
+            equals(1000)); // First paragraph
+        expect(ChapterSplitter.countWords(parts[1]),
+            equals(1000)); // Second paragraph
+        expect(ChapterSplitter.countWords(parts[2]),
+            equals(2000)); // Last two paragraphs
+
         // Verify structure preservation
         // Each part should contain paragraph content (nested or standalone)
         for (final part in parts) {
           expect(part, contains('<p>'));
         }
-        
+
         // The regex treats both nested and standalone p tags equally,
         // so all 4 paragraphs are identified as splittable blocks
         print('Successfully split mixed nested/standalone paragraphs:');

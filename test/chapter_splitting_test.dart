@@ -10,7 +10,8 @@ void main() {
       expect(ChapterSplitter.countWords('<p>Hello world</p>'), equals(2));
       expect(
         ChapterSplitter.countWords('<p>This is a <strong>test</strong>.</p>'),
-        equals(4), // "This", "is", "a", "test" (period not counted as separate word)
+        equals(
+            4), // "This", "is", "a", "test" (period not counted as separate word)
       );
       expect(
         ChapterSplitter.countWords('<p>One</p><p>Two</p><p>Three</p>'),
@@ -218,7 +219,8 @@ void main() {
       for (final chapter in splitBook.chapters) {
         final wordCount = ChapterSplitter.countWords(chapter.htmlContent);
         expect(wordCount, lessThanOrEqualTo(3200),
-            reason: 'Chapter "${chapter.title}" has $wordCount words (allowing some tolerance for paragraph boundaries)');
+            reason:
+                'Chapter "${chapter.title}" has $wordCount words (allowing some tolerance for paragraph boundaries)');
       }
     });
   });
@@ -247,7 +249,10 @@ void main() {
       // All chapters should be within word limit
       for (final chapter in splitChapters) {
         final wordCount = ChapterSplitter.countWords(chapter.htmlContent);
-        expect(wordCount, lessThanOrEqualTo(3200)); // Allow some tolerance for paragraph boundaries
+        expect(
+            wordCount,
+            lessThanOrEqualTo(
+                3200)); // Allow some tolerance for paragraph boundaries
       }
     });
 

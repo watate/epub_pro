@@ -21,7 +21,9 @@ void main() {
       }
     });
 
-    test('EpubReader.readBook() uses filename fallback for chapters without titles', () async {
+    test(
+        'EpubReader.readBook() uses filename fallback for chapters without titles',
+        () async {
       var foundChaptersWithFilenameTitle = 0;
       var foundChaptersWithNullTitle = 0;
 
@@ -32,12 +34,12 @@ void main() {
 
           for (final chapter in book.chapters) {
             // Check if this chapter originally had no title (filename without extension as title indicates fallback)
-            if (chapter.title != null && 
+            if (chapter.title != null &&
                 chapter.contentFileName != null &&
                 chapter.title == _stripFileExtension(chapter.contentFileName)) {
               foundChaptersWithFilenameTitle++;
             }
-            
+
             // Verify no chapter has null title
             if (chapter.title == null) {
               foundChaptersWithNullTitle++;
@@ -45,9 +47,10 @@ void main() {
 
             // Recursively check subchapters
             _checkSubChaptersRecursively(chapter.subChapters, (subChapter) {
-              if (subChapter.title != null && 
+              if (subChapter.title != null &&
                   subChapter.contentFileName != null &&
-                  subChapter.title == _stripFileExtension(subChapter.contentFileName)) {
+                  subChapter.title ==
+                      _stripFileExtension(subChapter.contentFileName)) {
                 foundChaptersWithFilenameTitle++;
               }
               if (subChapter.title == null) {
@@ -60,16 +63,19 @@ void main() {
         }
       }
 
-      print('Found $foundChaptersWithFilenameTitle chapters using filename as title');
+      print(
+          'Found $foundChaptersWithFilenameTitle chapters using filename as title');
       print('Found $foundChaptersWithNullTitle chapters with null title');
-      
-      expect(foundChaptersWithNullTitle, equals(0), 
-          reason: 'No chapters should have null titles after filename fallback');
+
+      expect(foundChaptersWithNullTitle, equals(0),
+          reason:
+              'No chapters should have null titles after filename fallback');
       expect(foundChaptersWithFilenameTitle, greaterThan(0),
           reason: 'Should find some chapters using filename fallback');
     });
 
-    test('EpubReader.readBookWithSplitChapters() uses filename fallback', () async {
+    test('EpubReader.readBookWithSplitChapters() uses filename fallback',
+        () async {
       var foundSplitChaptersWithFilenameTitle = 0;
       var foundSplitChaptersWithNullTitle = 0;
 
@@ -83,11 +89,12 @@ void main() {
             if (chapter.title != null && chapter.contentFileName != null) {
               // Check if this is a split chapter using filename (without extension)
               final baseFileName = _stripFileExtension(chapter.contentFileName);
-              if (baseFileName != null && chapter.title!.startsWith('$baseFileName (')) {
+              if (baseFileName != null &&
+                  chapter.title!.startsWith('$baseFileName (')) {
                 foundSplitChaptersWithFilenameTitle++;
               }
             }
-            
+
             if (chapter.title == null) {
               foundSplitChaptersWithNullTitle++;
             }
@@ -103,14 +110,17 @@ void main() {
         }
       }
 
-      print('Found $foundSplitChaptersWithFilenameTitle split chapters using filename as title');
-      print('Found $foundSplitChaptersWithNullTitle split chapters with null title');
-      
-      expect(foundSplitChaptersWithNullTitle, equals(0), 
+      print(
+          'Found $foundSplitChaptersWithFilenameTitle split chapters using filename as title');
+      print(
+          'Found $foundSplitChaptersWithNullTitle split chapters with null title');
+
+      expect(foundSplitChaptersWithNullTitle, equals(0),
           reason: 'No split chapters should have null titles');
     });
 
-    test('EpubBookRef.getChapters() chapter refs have meaningful toString()', () async {
+    test('EpubBookRef.getChapters() chapter refs have meaningful toString()',
+        () async {
       var foundMeaningfulToString = 0;
       var foundNullInToString = 0;
 
@@ -122,7 +132,7 @@ void main() {
 
           for (final chapterRef in chapters) {
             final toStringResult = chapterRef.toString();
-            
+
             // Check if toString shows meaningful title (not "Title: null")
             if (toStringResult.contains('Title: null')) {
               foundNullInToString++;
@@ -131,7 +141,8 @@ void main() {
             }
 
             // Check subchapters recursively
-            _checkSubChapterRefsRecursively(chapterRef.subChapters, (subChapterRef) {
+            _checkSubChapterRefsRecursively(chapterRef.subChapters,
+                (subChapterRef) {
               final subToString = subChapterRef.toString();
               if (subToString.contains('Title: null')) {
                 foundNullInToString++;
@@ -145,16 +156,19 @@ void main() {
         }
       }
 
-      print('Found $foundMeaningfulToString chapter refs with meaningful toString()');
-      print('Found $foundNullInToString chapter refs with "Title: null" in toString()');
-      
-      expect(foundNullInToString, equals(0), 
+      print(
+          'Found $foundMeaningfulToString chapter refs with meaningful toString()');
+      print(
+          'Found $foundNullInToString chapter refs with "Title: null" in toString()');
+
+      expect(foundNullInToString, equals(0),
           reason: 'No chapter refs should show "Title: null" in toString()');
       expect(foundMeaningfulToString, greaterThan(0),
           reason: 'Should find meaningful titles in toString()');
     });
 
-    test('EpubBookRef.getChaptersWithSplitting() uses filename fallback', () async {
+    test('EpubBookRef.getChaptersWithSplitting() uses filename fallback',
+        () async {
       var foundChaptersWithNullTitle = 0;
       var foundChaptersWithFilenameTitle = 0;
 
@@ -168,12 +182,13 @@ void main() {
             if (chapter.title == null) {
               foundChaptersWithNullTitle++;
             }
-            
+
             // Check if using filename as title (without extension)
             if (chapter.title != null && chapter.contentFileName != null) {
               final baseFileName = _stripFileExtension(chapter.contentFileName);
-              if (baseFileName != null && 
-                  (chapter.title == baseFileName || chapter.title!.startsWith('$baseFileName ('))) {
+              if (baseFileName != null &&
+                  (chapter.title == baseFileName ||
+                      chapter.title!.startsWith('$baseFileName ('))) {
                 foundChaptersWithFilenameTitle++;
               }
             }
@@ -189,11 +204,13 @@ void main() {
         }
       }
 
-      print('Found $foundChaptersWithFilenameTitle chapters with filename-based titles');
+      print(
+          'Found $foundChaptersWithFilenameTitle chapters with filename-based titles');
       print('Found $foundChaptersWithNullTitle chapters with null title');
-      
-      expect(foundChaptersWithNullTitle, equals(0), 
-          reason: 'getChaptersWithSplitting should not return chapters with null titles');
+
+      expect(foundChaptersWithNullTitle, equals(0),
+          reason:
+              'getChaptersWithSplitting should not return chapters with null titles');
     });
 
     test('title hierarchy consistency across all methods', () async {
@@ -209,51 +226,73 @@ void main() {
 
       // Verify consistent behavior: no null titles in any method
       var allChapters = <String>[];
-      
+
       // Check regular book chapters
       for (final chapter in book.chapters) {
-        expect(chapter.title, isNotNull, reason: 'readBook() should not return null titles');
-        expect(chapter.title, isNotEmpty, reason: 'readBook() should not return empty titles');
+        expect(chapter.title, isNotNull,
+            reason: 'readBook() should not return null titles');
+        expect(chapter.title, isNotEmpty,
+            reason: 'readBook() should not return empty titles');
         allChapters.add('readBook: ${chapter.title}');
-        
+
         _checkSubChaptersRecursively(chapter.subChapters, (subChapter) {
-          expect(subChapter.title, isNotNull, reason: 'readBook() subchapters should not have null titles');
-          expect(subChapter.title, isNotEmpty, reason: 'readBook() subchapters should not have empty titles');
+          expect(subChapter.title, isNotNull,
+              reason: 'readBook() subchapters should not have null titles');
+          expect(subChapter.title, isNotEmpty,
+              reason: 'readBook() subchapters should not have empty titles');
         });
       }
 
-      // Check split book chapters  
+      // Check split book chapters
       for (final chapter in splitBook.chapters) {
-        expect(chapter.title, isNotNull, reason: 'readBookWithSplitChapters() should not return null titles');
-        expect(chapter.title, isNotEmpty, reason: 'readBookWithSplitChapters() should not return empty titles');
+        expect(chapter.title, isNotNull,
+            reason:
+                'readBookWithSplitChapters() should not return null titles');
+        expect(chapter.title, isNotEmpty,
+            reason:
+                'readBookWithSplitChapters() should not return empty titles');
         allChapters.add('splitBook: ${chapter.title}');
-        
+
         _checkSubChaptersRecursively(chapter.subChapters, (subChapter) {
-          expect(subChapter.title, isNotNull, reason: 'readBookWithSplitChapters() subchapters should not have null titles');
-          expect(subChapter.title, isNotEmpty, reason: 'readBookWithSplitChapters() subchapters should not have empty titles');
+          expect(subChapter.title, isNotNull,
+              reason:
+                  'readBookWithSplitChapters() subchapters should not have null titles');
+          expect(subChapter.title, isNotEmpty,
+              reason:
+                  'readBookWithSplitChapters() subchapters should not have empty titles');
         });
       }
 
       // Check split chapters from ref
       for (final chapter in splitChapters) {
-        expect(chapter.title, isNotNull, reason: 'getChaptersWithSplitting() should not return null titles');
-        expect(chapter.title, isNotEmpty, reason: 'getChaptersWithSplitting() should not return empty titles');
+        expect(chapter.title, isNotNull,
+            reason: 'getChaptersWithSplitting() should not return null titles');
+        expect(chapter.title, isNotEmpty,
+            reason:
+                'getChaptersWithSplitting() should not return empty titles');
         allChapters.add('splitChapters: ${chapter.title}');
-        
+
         _checkSubChaptersRecursively(chapter.subChapters, (subChapter) {
-          expect(subChapter.title, isNotNull, reason: 'getChaptersWithSplitting() subchapters should not have null titles');
-          expect(subChapter.title, isNotEmpty, reason: 'getChaptersWithSplitting() subchapters should not have empty titles');
+          expect(subChapter.title, isNotNull,
+              reason:
+                  'getChaptersWithSplitting() subchapters should not have null titles');
+          expect(subChapter.title, isNotEmpty,
+              reason:
+                  'getChaptersWithSplitting() subchapters should not have empty titles');
         });
       }
 
-      print('Verified ${allChapters.length} chapters across all methods have non-null titles');
-      expect(allChapters.length, greaterThan(0), reason: 'Should have found some chapters to test');
+      print(
+          'Verified ${allChapters.length} chapters across all methods have non-null titles');
+      expect(allChapters.length, greaterThan(0),
+          reason: 'Should have found some chapters to test');
     });
   });
 }
 
 /// Helper to recursively check all subchapters
-void _checkSubChaptersRecursively(List<EpubChapter> subChapters, Function(EpubChapter) callback) {
+void _checkSubChaptersRecursively(
+    List<EpubChapter> subChapters, Function(EpubChapter) callback) {
   for (final subChapter in subChapters) {
     callback(subChapter);
     _checkSubChaptersRecursively(subChapter.subChapters, callback);
@@ -261,7 +300,8 @@ void _checkSubChaptersRecursively(List<EpubChapter> subChapters, Function(EpubCh
 }
 
 /// Helper to recursively check all subchapter refs
-void _checkSubChapterRefsRecursively(List<EpubChapterRef> subChapters, Function(EpubChapterRef) callback) {
+void _checkSubChapterRefsRecursively(
+    List<EpubChapterRef> subChapters, Function(EpubChapterRef) callback) {
   for (final subChapterRef in subChapters) {
     callback(subChapterRef);
     _checkSubChapterRefsRecursively(subChapterRef.subChapters, callback);

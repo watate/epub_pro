@@ -126,11 +126,11 @@ class ChapterSplitter {
   }
 
   /// Splits body content into parts, preserving block element boundaries
-  /// 
+  ///
   /// Note: This implementation has limitations with nested HTML structures.
   /// When block elements (like p, div, etc.) are nested, the regex matches
   /// the innermost recognizable elements, not the outer containers.
-  /// 
+  ///
   /// For example:
   /// - `<div><p>text1</p><p>text2</p></div>` splits at the p tags
   /// - `<div>text</div>` treats the entire div as one block
@@ -258,7 +258,8 @@ class ChapterSplitter {
       }
       // Use filename as fallback if still no title
       if (chapterTitle == null || chapterTitle.isEmpty) {
-        chapterTitle = _stripFileExtension(chapter.contentFileName) ?? 'Chapter';
+        chapterTitle =
+            _stripFileExtension(chapter.contentFileName) ?? 'Chapter';
       }
 
       // Process sub-chapters even if main chapter doesn't need splitting
@@ -360,7 +361,8 @@ class ChapterSplitter {
       }
       // Use filename as fallback if still no title
       if (chapterTitle == null || chapterTitle.isEmpty) {
-        chapterTitle = _stripFileExtension(chapterRef.contentFileName) ?? 'Chapter';
+        chapterTitle =
+            _stripFileExtension(chapterRef.contentFileName) ?? 'Chapter';
       }
 
       // Process sub-chapters even if main chapter doesn't need splitting
@@ -393,7 +395,8 @@ class ChapterSplitter {
       } else if (parentTitle != null && parentTitle.isNotEmpty) {
         baseTitle = parentTitle;
       } else {
-        baseTitle = _stripFileExtension(chapterRef.contentFileName) ?? 'Chapter';
+        baseTitle =
+            _stripFileExtension(chapterRef.contentFileName) ?? 'Chapter';
       }
 
       final partTitle = '$baseTitle (${i + 1}/${parts.length})';

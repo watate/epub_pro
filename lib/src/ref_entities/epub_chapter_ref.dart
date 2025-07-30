@@ -47,7 +47,8 @@ class EpubChapterRef {
 
   @override
   String toString() {
-    final effectiveTitle = title ?? _stripFileExtension(contentFileName) ?? 'Chapter';
+    final effectiveTitle =
+        title ?? _stripFileExtension(contentFileName) ?? 'Chapter';
     return 'Title: $effectiveTitle, Subchapter count: ${subChapters.length}';
   }
 

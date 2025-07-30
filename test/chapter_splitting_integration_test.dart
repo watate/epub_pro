@@ -214,7 +214,10 @@ void main() {
 
       // Get split chapters
       final splitChapters = await bookRef.getChaptersWithSplitting();
-      expect(splitChapters.length, greaterThanOrEqualTo(8)); // Should be ~8 (3 + 1 + 4) but allow some variance
+      expect(
+          splitChapters.length,
+          greaterThanOrEqualTo(
+              8)); // Should be ~8 (3 + 1 + 4) but allow some variance
 
       // Verify all chapters are properly loaded
       for (final chapter in splitChapters) {

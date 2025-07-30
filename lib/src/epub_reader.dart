@@ -258,7 +258,8 @@ class EpubReader {
     var result = <EpubChapter>[];
 
     await Future.forEach(chapterRefs, (EpubChapterRef chapterRef) async {
-      final effectiveTitle = _getEffectiveTitle(chapterRef.title, chapterRef.contentFileName);
+      final effectiveTitle =
+          _getEffectiveTitle(chapterRef.title, chapterRef.contentFileName);
       final contentFileName = chapterRef.contentFileName;
       final anchor = chapterRef.anchor;
       final htmlContent = await chapterRef.readHtmlContent();
