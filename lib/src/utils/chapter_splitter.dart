@@ -126,6 +126,15 @@ class ChapterSplitter {
   }
 
   /// Splits body content into parts, preserving block element boundaries
+  /// 
+  /// Note: This implementation has limitations with nested HTML structures.
+  /// When block elements (like p, div, etc.) are nested, the regex matches
+  /// the innermost recognizable elements, not the outer containers.
+  /// 
+  /// For example:
+  /// - `<div><p>text1</p><p>text2</p></div>` splits at the p tags
+  /// - `<div>text</div>` treats the entire div as one block
+  /// - `<section><p>text</p></section>` splits at the p tag
   static List<String> _splitBodyContent(
       String bodyContent, int maxWords, int numParts) {
     // Parse the body content to find block element boundaries
