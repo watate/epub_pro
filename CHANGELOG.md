@@ -1,3 +1,12 @@
+# 5.4.8
+- Fixed TOC structure issues with orphaned spine items
+  - Orphaned spine items (not in NCX navigation) are now standalone chapters instead of forced sub-chapters
+  - Preserves proper NCX hierarchy while ensuring all spine content is accessible
+  - Enhanced title extraction for all chapters (both NCX and orphaned) using HTML body content
+  - Improved extraction patterns to find first non-empty text content in HTML (handles Japanese content, single characters, etc.)
+  - Added intelligent title truncation: texts >10 words are truncated with "..." instead of falling back to filenames
+  - Smart fallback logic: use extracted content if available, else NCX title, else filename as last resort
+
 # 5.4.7
 - Ran 'dart format' to fix code formatting
 
