@@ -1,3 +1,6 @@
+# 5.4.7
+- Ran 'dart format' to fix code formatting
+
 # 5.4.6
 - Fixed chapter splitting to handle nested divs and more element types including blockquote, h1, h2, section, article, tr, etc.
 - Added more test cases for chapter splitting and japanese EPUBs
