@@ -125,12 +125,14 @@ class ChapterSplitter {
         .toList();
   }
 
-  /// Splits body content into parts, preserving paragraph boundaries
+  /// Splits body content into parts, preserving block element boundaries
   static List<String> _splitBodyContent(
       String bodyContent, int maxWords, int numParts) {
-    // Parse the body content to find paragraph boundaries
+    // Parse the body content to find block element boundaries
     final paragraphs = <String>[];
-    final paragraphPattern = RegExp(r'<p[^>]*>.*?</p>', dotAll: true);
+    final paragraphPattern = RegExp(
+        r'<(p|blockquote|div|h[1-6]|section|article|aside|pre|li|tr)[^>]*>.*?</(p|blockquote|div|h[1-6]|section|article|aside|pre|li|tr)>',
+        dotAll: true);
     final matches = paragraphPattern.allMatches(bodyContent);
 
     if (matches.isEmpty) {
