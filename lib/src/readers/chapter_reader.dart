@@ -1,3 +1,4 @@
+import 'dart:convert' as convert;
 import '../ref_entities/epub_book_ref.dart';
 import '../ref_entities/epub_chapter_ref.dart';
 import '../ref_entities/epub_text_content_file_ref.dart';
@@ -81,23 +82,18 @@ class ChapterReader {
     // Track which spine items are handled by NCX
     final handledSpineItems = <String>{};
 
-    // Build initial NCX structure and collect handled items
+    // Build NCX structure without orphan handling (orphans will be standalone)
     final ncxChapters = <EpubChapterRef>[];
 
-    for (var i = 0; i < navPoints.length; i++) {
-      final navPoint = navPoints[i];
-      final nextNavPoint = i < navPoints.length - 1 ? navPoints[i + 1] : null;
-
-      final chapter = _processNavPointWithOrphans(bookRef, navPoint,
-          nextNavPoint, spinePositions, spine, manifest, handledSpineItems);
+    for (var navPoint in navPoints) {
+      final chapter = _processNavPoint(bookRef, navPoint, handledSpineItems);
       if (chapter != null) {
         ncxChapters.add(chapter);
       }
     }
 
-    // Handle any remaining spine items that come before the first NCX item
-    // or after the last NCX item
-    final remainingOrphans = <EpubChapterRef>[];
+    // Create standalone chapters for all orphaned spine items
+    final orphanedChapters = <EpubChapterRef>[];
     for (var i = 0; i < spine.length; i++) {
       final manifestItem = manifest.firstWhereOrNull(
         (item) => item.id == spine[i].idRef,
@@ -106,46 +102,57 @@ class ChapterReader {
           !handledSpineItems.contains(manifestItem!.href!) &&
           bookRef.content!.html.containsKey(manifestItem.href!)) {
         final htmlContentFileRef = bookRef.content!.html[manifestItem.href!];
+        final extractedTitle =
+            _extractTitleFromHtml(htmlContentFileRef, manifestItem.href!);
+
         final orphanChapter = EpubChapterRef(
           epubTextContentFileRef: htmlContentFileRef,
-          title: null,
+          title: extractedTitle,
           contentFileName: manifestItem.href!,
           anchor: null,
           subChapters: const <EpubChapterRef>[],
         );
-        remainingOrphans.add(orphanChapter);
+        orphanedChapters.add(orphanChapter);
       }
     }
 
-    // Insert remaining orphans at appropriate positions
-    for (var orphan in remainingOrphans) {
-      final orphanPos = spinePositions[orphan.contentFileName] ?? -1;
-      var inserted = false;
-      for (var i = 0; i < ncxChapters.length; i++) {
-        final chapterPos = spinePositions[ncxChapters[i].contentFileName] ?? -1;
-        if (chapterPos > orphanPos) {
-          ncxChapters.insert(i, orphan);
-          inserted = true;
-          break;
-        }
-      }
-      if (!inserted) {
-        ncxChapters.add(orphan);
+    // Merge NCX chapters and orphaned chapters in spine order
+    final allChapters = <EpubChapterRef>[];
+    final ncxByPosition = <int, EpubChapterRef>{};
+    final orphansByPosition = <int, EpubChapterRef>{};
+
+    // Map NCX chapters by their spine positions
+    for (var chapter in ncxChapters) {
+      final pos = spinePositions[chapter.contentFileName] ?? -1;
+      if (pos >= 0) {
+        ncxByPosition[pos] = chapter;
       }
     }
 
-    return ncxChapters;
+    // Map orphaned chapters by their spine positions
+    for (var chapter in orphanedChapters) {
+      final pos = spinePositions[chapter.contentFileName] ?? -1;
+      if (pos >= 0) {
+        orphansByPosition[pos] = chapter;
+      }
+    }
+
+    // Merge in spine order
+    for (var i = 0; i < spine.length; i++) {
+      if (ncxByPosition.containsKey(i)) {
+        allChapters.add(ncxByPosition[i]!);
+      } else if (orphansByPosition.containsKey(i)) {
+        allChapters.add(orphansByPosition[i]!);
+      }
+    }
+
+    return allChapters;
   }
 
-  static EpubChapterRef? _processNavPointWithOrphans(
-      EpubBookRef bookRef,
-      EpubNavigationPoint navPoint,
-      EpubNavigationPoint? nextNavPoint,
-      Map<String, int> spinePositions,
-      List<dynamic> spine,
-      List<dynamic> manifest,
-      Set<String> handledSpineItems) {
-    // Process the navigation point as usual
+  /// Processes a navigation point without adding orphaned spine items as sub-chapters.
+  /// Orphaned items will be handled separately as standalone chapters.
+  static EpubChapterRef? _processNavPoint(EpubBookRef bookRef,
+      EpubNavigationPoint navPoint, Set<String> handledSpineItems) {
     String? contentFileName;
     String? anchor;
     if (navPoint.content?.source == null) return null;
@@ -171,80 +178,73 @@ class ChapterReader {
     final htmlContentFileRef = bookRef.content!.html[contentFileName];
     handledSpineItems.add(contentFileName);
 
-    // Process child navigation points
+    // Process child navigation points recursively
     final subChapters = <EpubChapterRef>[];
-    for (var i = 0; i < navPoint.childNavigationPoints.length; i++) {
-      final childNavPoint = navPoint.childNavigationPoints[i];
-      final nextChildNavPoint = i < navPoint.childNavigationPoints.length - 1
-          ? navPoint.childNavigationPoints[i + 1]
-          : null;
-
-      final childChapter = _processNavPointWithOrphans(
-          bookRef,
-          childNavPoint,
-          nextChildNavPoint,
-          spinePositions,
-          spine,
-          manifest,
-          handledSpineItems);
+    for (var childNavPoint in navPoint.childNavigationPoints) {
+      final childChapter =
+          _processNavPoint(bookRef, childNavPoint, handledSpineItems);
       if (childChapter != null) {
         subChapters.add(childChapter);
       }
     }
 
-    // Find orphaned spine items that should be children of this nav point
-    final mySpinePos = spinePositions[contentFileName] ?? -1;
-    var nextNavPos = spine.length;
-
-    // Determine the next navigation point's spine position
-    if (nextNavPoint != null && nextNavPoint.content?.source != null) {
-      var nextFileName = nextNavPoint.content!.source!;
-      final anchorIndex = nextFileName.indexOf('#');
-      if (anchorIndex != -1) {
-        nextFileName = nextFileName.substring(0, anchorIndex);
-      }
-      nextFileName = Uri.decodeFull(nextFileName);
-      final nextPos = spinePositions[nextFileName] ?? -1;
-      if (nextPos > mySpinePos) {
-        nextNavPos = nextPos;
-      }
-    }
-
-    // Debug: Check what we're looking for
-    // print('NavPoint ${navPoint.navigationLabels.first.text}: spine pos $mySpinePos, next nav pos $nextNavPos');
-
-    // Collect orphaned spine items between this nav point and the next
-    for (var i = mySpinePos + 1; i < nextNavPos && i < spine.length; i++) {
-      final spineItem = spine[i];
-      final manifestItem = manifest.firstWhereOrNull(
-        (item) => item.id == spineItem.idRef,
-      );
-
-      if (manifestItem?.href != null &&
-          !handledSpineItems.contains(manifestItem!.href!) &&
-          bookRef.content!.html.containsKey(manifestItem.href!)) {
-        // print('  Found orphan: ${manifestItem.href} at spine position $i');
-
-        final orphanContentRef = bookRef.content!.html[manifestItem.href!];
-        final orphanChapter = EpubChapterRef(
-          epubTextContentFileRef: orphanContentRef,
-          title: null,
-          contentFileName: manifestItem.href!,
-          anchor: null,
-          subChapters: const <EpubChapterRef>[],
-        );
-        subChapters.add(orphanChapter);
-        handledSpineItems.add(manifestItem.href!);
-      }
+    // Get title from NCX, but use HTML extraction as fallback if title is missing/empty
+    String title = navPoint.navigationLabels.first.text ?? '';
+    if (title.trim().isEmpty) {
+      title = _extractTitleFromHtml(htmlContentFileRef, contentFileName);
     }
 
     return EpubChapterRef(
       epubTextContentFileRef: htmlContentFileRef,
-      title: navPoint.navigationLabels.first.text,
+      title: title,
       contentFileName: contentFileName,
       anchor: anchor,
       subChapters: subChapters,
     );
+  }
+
+  /// Extracts a title from HTML content for orphaned chapters.
+  /// Looks for the first text element (div, p, a, h1, h2, etc.) and uses it as title.
+  /// If the first text is ≤ 10 words, uses it as title.
+  /// Otherwise, uses the filename without extension.
+  static String _extractTitleFromHtml(
+      dynamic htmlContentFileRef, String fileName) {
+    try {
+      // Get the HTML content synchronously
+      final contentBytes = htmlContentFileRef.getContentStream();
+      final content = convert.utf8.decode(contentBytes);
+
+      // Simple regex to find first text content in body elements (skip title tags from head)
+      final patterns = [
+        RegExp(r'<h[1-6][^>]*>(.*?)</h[1-6]>', caseSensitive: false),
+        RegExp(r'<p[^>]*>(.*?)</p>', caseSensitive: false),
+        RegExp(r'<div[^>]*>(.*?)</div>', caseSensitive: false),
+        RegExp(r'<a[^>]*>(.*?)</a>', caseSensitive: false),
+      ];
+
+      for (var pattern in patterns) {
+        final matches = pattern.allMatches(content);
+        for (var match in matches) {
+          final text =
+              match.group(1)?.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+          if (text != null && text.isNotEmpty) {
+            // Accept whatever text we find, truncate if too long
+            final words = text.split(RegExp(r'\s+'));
+            if (words.length <= 10) {
+              return text;
+            } else {
+              // Truncate to first 10 words
+              return '${words.take(10).join(' ')}...';
+            }
+          }
+        }
+      }
+    } catch (e) {
+      // If we can't extract content, fall back to filename
+    }
+
+    // Fallback: use filename without extension
+    return fileName.replaceAll(RegExp(r'\.[^.]+$'), '');
   }
 
   static List<EpubChapterRef> getChaptersImpl(
@@ -275,9 +275,16 @@ class ChapterReader {
       }
 
       htmlContentFileRef = bookRef.content!.html[contentFileName];
+
+      // Get title from NCX, but use HTML extraction as fallback if title is missing/empty
+      String title = navigationPoint.navigationLabels.first.text ?? '';
+      if (title.trim().isEmpty) {
+        title = _extractTitleFromHtml(htmlContentFileRef, contentFileName);
+      }
+
       var chapterRef = EpubChapterRef(
         epubTextContentFileRef: htmlContentFileRef,
-        title: navigationPoint.navigationLabels.first.text,
+        title: title,
         contentFileName: contentFileName,
         anchor: anchor,
         subChapters:

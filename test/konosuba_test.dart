@@ -54,7 +54,10 @@ void main() {
 
       // Check that we get all chapters from spine reconciliation
       final chapters = konosubaRef.getChapters();
-      expect(chapters.length, equals(10)); // KonoSuba content chapters
+      expect(
+          chapters.length,
+          equals(
+              26)); // KonoSuba content chapters (orphaned spine items now standalone)
 
       if (verbose) {
         print('\n=== Navigation Reconciliation Results ===');
@@ -78,17 +81,34 @@ void main() {
       }
 
       final chapters = konosubaBook.chapters;
-      expect(chapters.length, equals(10));
+      expect(chapters.length,
+          equals(26)); // Orphaned spine items now standalone chapters
 
       // First should be cover
       expect(chapters.first.contentFileName, equals('xhtml/p-cover.xhtml'));
 
-      // Last should be colophon with title
-      expect(chapters.last.contentFileName, equals('xhtml/p-colophon.xhtml'));
-      expect(chapters.last.title, equals('奥付'));
+      // Last should be bookwalker with extracted title (now orphaned spine item)
+      expect(chapters.last.contentFileName, equals('xhtml/p-bookwalker.xhtml'));
+      expect(chapters.last.title,
+          equals('xhtml/p-bookwalker')); // Uses filename fallback
 
-      // KonoSuba has proper titles from navigation document
-      final expectedTitles = [
+      // Check that chapter with NCX title "奥付" still exists
+      final colophonChapter = chapters.firstWhere(
+        (ch) => ch.title == '奥付',
+        orElse: () => throw Exception('Chapter with title "奥付" not found'),
+      );
+      expect(colophonChapter.contentFileName, equals('xhtml/p-colophon.xhtml'));
+
+      // Verify all chapters have meaningful titles (extracted content or filename fallback)
+      for (var i = 0; i < chapters.length; i++) {
+        final chapter = chapters[i];
+        expect(chapter.title, isNotNull, reason: 'Chapters should have titles');
+        expect(chapter.title, isNotEmpty,
+            reason: 'Chapter titles should not be empty');
+      }
+
+      // Verify key chapters with known NCX titles still exist
+      final expectedNCXTitles = [
         '表紙', // Cover
         'ＣＯＮＴＥＮＴＳ', // Contents
         'プロローグ', // Prologue
@@ -101,15 +121,11 @@ void main() {
         '奥付' // Colophon
       ];
 
-      for (var i = 0; i < chapters.length; i++) {
-        final chapter = chapters[i];
-        expect(chapter.title, isNotNull, reason: 'Chapters should have titles');
-        expect(chapter.title, isNotEmpty,
-            reason: 'Chapter titles should not be empty');
-        if (i < expectedTitles.length) {
-          expect(chapter.title, equals(expectedTitles[i]),
-              reason: 'Chapter $i should have expected title');
-        }
+      // Check that these important titles from NCX still exist somewhere in the chapters
+      for (final expectedTitle in expectedNCXTitles) {
+        final hasTitle = chapters.any((ch) => ch.title == expectedTitle);
+        expect(hasTitle, isTrue,
+            reason: 'Should find chapter with NCX title: $expectedTitle');
       }
 
       if (verbose) {
@@ -321,9 +337,16 @@ void main() {
 
       // Get a chapter with substantial Japanese content
       final japaneseChapter = konosubaBook.chapters.firstWhere(
-        (ch) => ch.contentFileName?.contains('part0009.html') ?? false,
-        orElse: () =>
-            konosubaBook.chapters[2], // fallback to any content chapter
+        (ch) =>
+            ch.contentFileName?.contains('p-003.xhtml') ??
+            false, // Prologue with substantial content
+        orElse: () => konosubaBook.chapters.firstWhere(
+          (ch) =>
+              ch.contentFileName?.contains('p-004.xhtml') ??
+              false, // Chapter 1 with substantial content
+          orElse: () => konosubaBook.chapters[
+              13], // fallback to chapter 14 which has substantial content
+        ),
       );
 
       final htmlContent = japaneseChapter.htmlContent ?? '';
