@@ -1,3 +1,6 @@
+# 5.4.9
+- Downgrade pinned XML dependency
+
 # 5.4.8
 - Fixed TOC structure issues with orphaned spine items
   - Orphaned spine items (not in NCX navigation) are now standalone chapters instead of forced sub-chapters
