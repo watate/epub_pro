@@ -1,3 +1,6 @@
+# 5.5.1
+- Fix duplicates in table of contents due to some books using # in the toc.ncx to refer to headings in chapters
+
 # 5.5.0
 - Major performance improvements to EPUB parsing
 
