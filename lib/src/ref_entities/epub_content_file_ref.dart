@@ -6,6 +6,7 @@ import 'package:collection/collection.dart';
 
 import '../entities/epub_content_type.dart';
 import '../utils/zip_path_utils.dart';
+import '../zip/lazy_archive_file.dart';
 import 'epub_book_ref.dart';
 
 abstract class EpubContentFileRef {
@@ -54,25 +55,56 @@ abstract class EpubContentFileRef {
     return openContentStream(getContentFileEntry());
   }
 
-  List<int> openContentStream(ArchiveFile contentFileEntry) {
-    var contentStream = <int>[];
-    if (contentFileEntry.content.isEmpty) {
-      throw Exception(
-          'Incorrect EPUB file: content file "$fileName" specified in manifest is not found.');
+  Future<List<int>> openContentStreamAsync(ArchiveFile contentFileEntry) async {
+    // Handle lazy loading for LazyArchiveFile
+    if (contentFileEntry is LazyArchiveFile) {
+      final content = await contentFileEntry.readContent();
+      if (content.isEmpty) {
+        throw Exception(
+            'Incorrect EPUB file: content file "$fileName" specified in manifest is not found.');
+      }
+      return content;
+    } else {
+      // Fallback for standard ArchiveFile
+      var contentStream = <int>[];
+      if (contentFileEntry.content.isEmpty) {
+        throw Exception(
+            'Incorrect EPUB file: content file "$fileName" specified in manifest is not found.');
+      }
+      contentStream.addAll(contentFileEntry.content);
+      return contentStream;
     }
-    contentStream.addAll(contentFileEntry.content);
-    return contentStream;
+  }
+
+  List<int> openContentStream(ArchiveFile contentFileEntry) {
+    // This is the legacy synchronous method - try to use cached content for lazy files
+    if (contentFileEntry is LazyArchiveFile) {
+      if (contentFileEntry.isContentLoaded) {
+        return contentFileEntry.content;
+      } else {
+        throw Exception(
+            'Content not loaded for lazy file: $fileName. Use readContentAsBytes() for async loading.');
+      }
+    } else {
+      var contentStream = <int>[];
+      if (contentFileEntry.content.isEmpty) {
+        throw Exception(
+            'Incorrect EPUB file: content file "$fileName" specified in manifest is not found.');
+      }
+      contentStream.addAll(contentFileEntry.content);
+      return contentStream;
+    }
   }
 
   Future<List<int>> readContentAsBytes() async {
     var contentFileEntry = getContentFileEntry();
-    var content = openContentStream(contentFileEntry);
+    var content = await openContentStreamAsync(contentFileEntry);
     return content;
   }
 
   Future<String> readContentAsText() async {
-    var contentStream = getContentStream();
-    var result = convert.utf8.decode(contentStream);
+    var content = await readContentAsBytes();
+    var result = convert.utf8.decode(content);
     return result;
   }
 }

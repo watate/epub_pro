@@ -5,6 +5,8 @@ import 'dart:convert' as convert;
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:xml/xml.dart' as xml;
 
+import '../zip/lazy_archive_file.dart';
+
 class RootFilePathReader {
   static Future<String?> getRootFilePath(Archive epubArchive) async {
     const epubContainerFilePath = 'META-INF/container.xml';
@@ -16,8 +18,14 @@ class RootFilePathReader {
           'EPUB parsing error: $epubContainerFilePath file not found in archive.');
     }
 
-    var containerDocument =
-        xml.XmlDocument.parse(convert.utf8.decode(containerFileEntry.content));
+    String containerContent;
+    if (containerFileEntry is LazyArchiveFile) {
+      containerContent = await containerFileEntry.readContentAsString();
+    } else {
+      containerContent = convert.utf8.decode(containerFileEntry.content);
+    }
+    
+    var containerDocument = xml.XmlDocument.parse(containerContent);
     var packageElement = containerDocument
         .findAllElements('container',
             namespace: 'urn:oasis:names:tc:opendocument:xmlns:container')

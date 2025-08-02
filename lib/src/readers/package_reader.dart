@@ -5,6 +5,8 @@ import 'dart:convert' as convert;
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:xml/xml.dart';
 
+import '../zip/lazy_archive_file.dart';
+
 import '../schema/opf/epub_guide.dart';
 import '../schema/opf/epub_guide_reference.dart';
 import '../schema/opf/epub_manifest.dart';
@@ -347,8 +349,14 @@ class PackageReader {
     if (rootFileEntry == null) {
       throw Exception('EPUB parsing error: root file not found in archive.');
     }
-    var containerDocument =
-        XmlDocument.parse(convert.utf8.decode(rootFileEntry.content));
+    String rootFileContent;
+    if (rootFileEntry is LazyArchiveFile) {
+      rootFileContent = await rootFileEntry.readContentAsString();
+    } else {
+      rootFileContent = convert.utf8.decode(rootFileEntry.content);
+    }
+    
+    var containerDocument = XmlDocument.parse(rootFileContent);
     var opfNamespace = 'http://www.idpf.org/2007/opf';
     var packageNode = containerDocument
         .findElements('package', namespace: opfNamespace)

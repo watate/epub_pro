@@ -93,6 +93,7 @@ class EpubReader {
       loadedBytes = bytes;
     }
 
+    // Temporarily fall back to standard ZIP while debugging compression
     var epubArchive = ZipDecoder().decodeBytes(loadedBytes);
 
     final schema = await SchemaReader.readSchema(epubArchive);

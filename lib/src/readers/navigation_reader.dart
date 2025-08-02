@@ -7,6 +7,8 @@ import 'package:epub_pro/src/schema/opf/epub_version.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:path/path.dart' as path;
 
+import '../zip/lazy_archive_file.dart';
+
 import '../schema/navigation/epub_metadata.dart';
 import '../schema/navigation/epub_navigation.dart';
 import '../schema/navigation/epub_navigation_doc_author.dart';
@@ -59,9 +61,14 @@ class NavigationReader {
         );
       }
 
-      var containerDocument = xml.XmlDocument.parse(
-        convert.utf8.decode(tocFileEntry.content),
-      );
+      String tocContent;
+      if (tocFileEntry is LazyArchiveFile) {
+        tocContent = await tocFileEntry.readContentAsString();
+      } else {
+        tocContent = convert.utf8.decode(tocFileEntry.content);
+      }
+      
+      var containerDocument = xml.XmlDocument.parse(tocContent);
 
       const ncxNamespace = 'http://www.daisy.org/z3986/2005/ncx/';
       final ncxNode = containerDocument
@@ -164,8 +171,14 @@ class NavigationReader {
       }
       _tocFileEntryPath = pathParts.isEmpty ? '' : '${pathParts.join('/')}/';
 
-      var containerDocument =
-          xml.XmlDocument.parse(convert.utf8.decode(tocFileEntry.content));
+      String tocContent2;
+      if (tocFileEntry is LazyArchiveFile) {
+        tocContent2 = await tocFileEntry.readContentAsString();
+      } else {
+        tocContent2 = convert.utf8.decode(tocFileEntry.content);
+      }
+      
+      var containerDocument = xml.XmlDocument.parse(tocContent2);
 
       final headNode = containerDocument.findAllElements('head').firstOrNull;
       if (headNode == null) {
