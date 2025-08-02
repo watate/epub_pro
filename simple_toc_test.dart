@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:epub_pro/epub_pro.dart';
 
 void main() async {
-  final epubFile = File('assets/sao.epub');
+  final epubFile = File('assets/blackSwan.epub');
   final fileName = epubFile.path.split('/').last;
 
   if (!await epubFile.exists()) {

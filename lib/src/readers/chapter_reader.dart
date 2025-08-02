@@ -81,12 +81,14 @@ class ChapterReader {
 
     // Track which spine items are handled by NCX
     final handledSpineItems = <String>{};
+    // Track content files to prevent duplicates (ignoring anchors)
+    final seenContentFiles = <String>{};
 
     // Build NCX structure without orphan handling (orphans will be standalone)
     final ncxChapters = <EpubChapterRef>[];
 
     for (var navPoint in navPoints) {
-      final chapter = _processNavPoint(bookRef, navPoint, handledSpineItems);
+      final chapter = _processNavPoint(bookRef, navPoint, handledSpineItems, seenContentFiles);
       if (chapter != null) {
         ncxChapters.add(chapter);
       }
@@ -152,7 +154,8 @@ class ChapterReader {
   /// Processes a navigation point without adding orphaned spine items as sub-chapters.
   /// Orphaned items will be handled separately as standalone chapters.
   static EpubChapterRef? _processNavPoint(EpubBookRef bookRef,
-      EpubNavigationPoint navPoint, Set<String> handledSpineItems) {
+      EpubNavigationPoint navPoint, Set<String> handledSpineItems, [Set<String>? seenContentFiles]) {
+    seenContentFiles ??= <String>{};
     String? contentFileName;
     String? anchor;
     if (navPoint.content?.source == null) return null;
@@ -169,6 +172,12 @@ class ChapterReader {
     }
     contentFileName = Uri.decodeFull(contentFileName!);
 
+    // Check if we've already processed this base file (ignore anchors for duplicate detection)
+    if (seenContentFiles.contains(contentFileName)) {
+      return null;
+    }
+    seenContentFiles.add(contentFileName);
+
     if (!bookRef.content!.html.containsKey(contentFileName)) {
       throw Exception(
         'Incorrect EPUB manifest: item with href = "$contentFileName" is missing.',
@@ -182,7 +191,7 @@ class ChapterReader {
     final subChapters = <EpubChapterRef>[];
     for (var childNavPoint in navPoint.childNavigationPoints) {
       final childChapter =
-          _processNavPoint(bookRef, childNavPoint, handledSpineItems);
+          _processNavPoint(bookRef, childNavPoint, handledSpineItems, seenContentFiles);
       if (childChapter != null) {
         subChapters.add(childChapter);
       }
