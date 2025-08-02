@@ -1,3 +1,6 @@
+# 5.5.0
+- Major performance improvements to EPUB parsing
+
 # 5.4.9
 - Downgrade pinned XML dependency
 
