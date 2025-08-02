@@ -13,7 +13,7 @@ dependencies:
   xml: ^6.5.0
   image: ^4.1.7
   collection: ^1.18.0
-  word_count: ^1.0.1
+  word_count: ^1.0.4
 
 dev_dependencies:
   test: ^1.25.2
