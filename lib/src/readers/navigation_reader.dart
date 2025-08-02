@@ -67,7 +67,7 @@ class NavigationReader {
       } else {
         tocContent = convert.utf8.decode(tocFileEntry.content);
       }
-      
+
       var containerDocument = xml.XmlDocument.parse(tocContent);
 
       const ncxNamespace = 'http://www.daisy.org/z3986/2005/ncx/';
@@ -177,7 +177,7 @@ class NavigationReader {
       } else {
         tocContent2 = convert.utf8.decode(tocFileEntry.content);
       }
-      
+
       var containerDocument = xml.XmlDocument.parse(tocContent2);
 
       final headNode = containerDocument.findAllElements('head').firstOrNull;

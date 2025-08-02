@@ -29,7 +29,8 @@ void main() {
       print('Lazy load (openBook) time: ${lazyLoadTime}ms');
       print('Eager load (readBook) time: ${eagerLoadTime}ms');
       print('Performance difference: ${eagerLoadTime - lazyLoadTime}ms');
-      print('Improvement ratio: ${(eagerLoadTime / lazyLoadTime).toStringAsFixed(2)}x');
+      print(
+          'Improvement ratio: ${(eagerLoadTime / lazyLoadTime).toStringAsFixed(2)}x');
 
       // Verify functionality
       expect(bookRef.title, isNotEmpty);
@@ -47,7 +48,8 @@ void main() {
         final content = await chapters[0].readHtmlContent();
         stopwatch3.stop();
 
-        print('First chapter content load time: ${stopwatch3.elapsedMilliseconds}ms');
+        print(
+            'First chapter content load time: ${stopwatch3.elapsedMilliseconds}ms');
         expect(content, isNotEmpty);
         expect(content, equals(book.chapters[0].htmlContent));
       }
@@ -77,10 +79,12 @@ void main() {
       }
 
       stopwatch.stop();
-      print('Loaded ${accessedChapters.length} chapters in: ${stopwatch.elapsedMilliseconds}ms');
+      print(
+          'Loaded ${accessedChapters.length} chapters in: ${stopwatch.elapsedMilliseconds}ms');
 
       // With lazy loading, unaccessed chapters don't consume memory
-      print('Memory efficient: Only ${accessedChapters.length}/${chapters.length} chapters loaded');
+      print(
+          'Memory efficient: Only ${accessedChapters.length}/${chapters.length} chapters loaded');
     });
 
     test('chapter splitting performance', () async {
@@ -103,12 +107,14 @@ void main() {
 
       print('Normal read time: ${stopwatch1.elapsedMilliseconds}ms');
       print('Split chapters read time: ${stopwatch2.elapsedMilliseconds}ms');
-      print('Split overhead: ${stopwatch2.elapsedMilliseconds - stopwatch1.elapsedMilliseconds}ms');
+      print(
+          'Split overhead: ${stopwatch2.elapsedMilliseconds - stopwatch1.elapsedMilliseconds}ms');
 
       print('Original chapters: ${book.chapters.length}');
       print('Split chapters: ${splitBook.chapters.length}');
 
-      expect(splitBook.chapters.length, greaterThanOrEqualTo(book.chapters.length));
+      expect(splitBook.chapters.length,
+          greaterThanOrEqualTo(book.chapters.length));
     });
 
     test('concurrent access performance', () async {
@@ -138,7 +144,8 @@ void main() {
       final results = await Future.wait(futures);
       stopwatch.stop();
 
-      print('Concurrent load of 3 chapters: ${stopwatch.elapsedMilliseconds}ms');
+      print(
+          'Concurrent load of 3 chapters: ${stopwatch.elapsedMilliseconds}ms');
       expect(results.every((content) => content.isNotEmpty), isTrue);
     });
   });

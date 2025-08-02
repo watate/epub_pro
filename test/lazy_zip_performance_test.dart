@@ -4,7 +4,8 @@ import 'dart:io';
 
 void main() {
   group('Lazy ZIP Performance Tests', () {
-    test('lazy loading is significantly faster than standard loading', () async {
+    test('lazy loading is significantly faster than standard loading',
+        () async {
       // Use a real EPUB file for testing
       final epubFile = File('assets/alicesAdventuresUnderGround.epub');
       if (!epubFile.existsSync()) {
@@ -27,7 +28,8 @@ void main() {
 
       print('Lazy load time: ${lazyLoadTime}ms');
       print('Eager load time: ${eagerLoadTime}ms');
-      print('Performance improvement: ${((eagerLoadTime - lazyLoadTime) / eagerLoadTime * 100).toStringAsFixed(1)}%');
+      print(
+          'Performance improvement: ${((eagerLoadTime - lazyLoadTime) / eagerLoadTime * 100).toStringAsFixed(1)}%');
 
       // Lazy loading should be faster
       expect(lazyLoadTime, lessThan(eagerLoadTime));
@@ -61,7 +63,7 @@ void main() {
 
         expect(content1, equals(content2));
         expect(content1, isNotEmpty);
-        
+
         print('First access: ${stopwatch1.elapsedMilliseconds}ms');
         print('Second access: ${stopwatch2.elapsedMilliseconds}ms');
       }
@@ -76,15 +78,15 @@ void main() {
       final epubBytes = await epubFile.readAsBytes();
 
       final bookRef = await EpubReader.openBook(epubBytes);
-      
+
       // Basic metadata should be available immediately
       expect(bookRef.title, isNotEmpty);
       expect(bookRef.authors, isNotEmpty);
-      
+
       // Chapters should be accessible
       final chapters = bookRef.getChapters();
       expect(chapters, isNotEmpty);
-      
+
       // Content should load on demand
       if (chapters.isNotEmpty) {
         final content = await chapters[0].readHtmlContent();
@@ -135,11 +137,12 @@ void main() {
       final bookRef = await EpubReader.openBook(epubBytes);
       stopwatch.stop();
 
-      print('Lazy load time for ${epubBytes.length} byte file: ${stopwatch.elapsedMilliseconds}ms');
-      
+      print(
+          'Lazy load time for ${epubBytes.length} byte file: ${stopwatch.elapsedMilliseconds}ms');
+
       // Verify it works
       expect(bookRef.title, isNotEmpty);
-      
+
       final chapters = bookRef.getChapters();
       expect(chapters, isNotEmpty);
     });

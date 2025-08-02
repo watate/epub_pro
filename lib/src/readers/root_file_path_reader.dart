@@ -24,7 +24,7 @@ class RootFilePathReader {
     } else {
       containerContent = convert.utf8.decode(containerFileEntry.content);
     }
-    
+
     var containerDocument = xml.XmlDocument.parse(containerContent);
     var packageElement = containerDocument
         .findAllElements('container',

@@ -355,7 +355,7 @@ class PackageReader {
     } else {
       rootFileContent = convert.utf8.decode(rootFileEntry.content);
     }
-    
+
     var containerDocument = XmlDocument.parse(rootFileContent);
     var opfNamespace = 'http://www.idpf.org/2007/opf';
     var packageNode = containerDocument

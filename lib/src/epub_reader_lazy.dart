@@ -20,38 +20,38 @@ import 'utils/chapter_splitter.dart';
 import 'zip/lazy_archive_adapter.dart';
 
 /// Enhanced EPUB reader with true lazy loading inspired by Readium's architecture.
-/// 
+///
 /// This reader provides significant performance improvements over the standard
 /// EpubReader by implementing true lazy decompression - only the central directory
 /// is read initially, and individual files are decompressed on-demand.
-/// 
+///
 /// ## Performance Benefits
 /// - **70-90% faster initial load** - Only reads ZIP directory, not file contents
 /// - **Memory efficient** - Only decompressed content is kept in memory
 /// - **Scalable** - Can handle EPUBs of any size without memory constraints
 /// - **On-demand processing** - Files are decompressed only when accessed
-/// 
+///
 /// ## Usage Examples
-/// 
+///
 /// ### Basic Lazy Loading
 /// ```dart
 /// final bytes = await File('large_book.epub').readAsBytes();
 /// final bookRef = await EpubReaderLazy.openBook(bytes);
-/// 
+///
 /// // Instant - only metadata loaded
 /// print('Title: ${bookRef.title}');
-/// 
+///
 /// // Content loaded on-demand
 /// final chapters = bookRef.getChapters();
 /// final content = await chapters[0].readHtmlContent(); // Decompressed here
 /// ```
-/// 
+///
 /// ### With Chapter Splitting
 /// ```dart
 /// final bookRef = await EpubReaderLazy.openBookWithSplitChapters(bytes);
 /// final splitChapters = await bookRef.getChapterRefsWithSplitting();
 /// ```
-/// 
+///
 /// ### Performance Optimization
 /// ```dart
 /// final adapter = await EpubReaderLazy.createLazyArchive(bytes);
@@ -64,12 +64,12 @@ class EpubReaderLazy {
   static Future<LazyArchiveAdapter> createLazyArchive(List<int> bytes) async {
     return await LazyArchiveAdapter.fromBytes(bytes);
   }
-  
+
   /// Opens an EPUB with true lazy loading - only reads the ZIP central directory.
-  /// 
+  ///
   /// This method provides the maximum performance benefit by avoiding
   /// decompression of any file content until explicitly requested.
-  /// 
+  ///
   /// **Performance**: 70-90% faster than standard openBook() for large EPUBs.
   static Future<EpubBookRef> openBook(FutureOr<List<int>> bytes) async {
     List<int> loadedBytes;
@@ -81,16 +81,17 @@ class EpubReaderLazy {
 
     // Create lazy archive - only reads central directory
     final lazyArchive = await createLazyArchive(loadedBytes);
-    
+
     // Preload critical files for better performance
     await lazyArchive.preloadCriticalFiles();
-    
+
     return await openBookFromArchive(lazyArchive);
   }
-  
+
   /// Opens an EPUB from an existing lazy archive adapter.
   /// Useful when you want to control the preloading strategy.
-  static Future<EpubBookRef> openBookFromArchive(LazyArchiveAdapter archive) async {
+  static Future<EpubBookRef> openBookFromArchive(
+      LazyArchiveAdapter archive) async {
     final schema = await SchemaReader.readSchema(archive);
     final title = schema.package!.metadata!.titles
         .firstWhere((String name) => true, orElse: () => '');
@@ -119,14 +120,14 @@ class EpubReaderLazy {
       content: content,
     );
   }
-  
+
   /// Reads an EPUB with lazy loading but loads all content into memory.
-  /// 
+  ///
   /// This provides a hybrid approach - fast initial loading with lazy decompression,
   /// but eager content loading for full compatibility with existing EpubBook API.
   static Future<EpubBook> readBook(FutureOr<List<int>> bytes) async {
     List<int> loadedBytes = await bytes;
-    
+
     var epubBookRef = await openBook(loadedBytes);
     final schema = epubBookRef.schema;
     final title = epubBookRef.title;
@@ -147,18 +148,18 @@ class EpubReaderLazy {
       chapters: chapters,
     );
   }
-  
+
   /// Opens an EPUB with lazy loading and automatic chapter splitting.
-  /// 
+  ///
   /// Combines the performance benefits of lazy loading with automatic
   /// chapter splitting for improved readability.
   static Future<EpubBookRef> openBookWithSplitChapters(List<int> bytes) async {
     final bookRef = await openBook(bytes);
     return EpubBookSplitRef.fromBookRef(bookRef);
   }
-  
+
   /// Reads an EPUB with lazy decompression and automatic chapter splitting.
-  /// 
+  ///
   /// This method provides both performance and readability benefits by
   /// using lazy decompression for faster loading and splitting long chapters.
   static Future<EpubBook> readBookWithSplitChapters(List<int> bytes) async {
@@ -183,9 +184,9 @@ class EpubReaderLazy {
       chapters: chapters,
     );
   }
-  
+
   // The following methods are identical to EpubReader but work with lazy loading
-  
+
   static Future<EpubContent> readContent(EpubContentRef contentRef) async {
     final html = await readTextContentFiles(contentRef.html);
     final css = await readTextContentFiles(contentRef.css);

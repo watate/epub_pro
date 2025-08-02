@@ -171,11 +171,12 @@ void main() {
     test('openBookWithSplitChapters accepts Future<List<int>>', () async {
       // Create a Future<List<int>> to test the FutureOr parameter
       final futureBytes = Future.value(epubBytes);
-      
+
       // Note: openBookWithSplitChapters only accepts List<int>, not FutureOr
       // but openBook accepts FutureOr. This test verifies the current API.
-      final bookRef = await EpubReader.openBookWithSplitChapters(await futureBytes);
-      
+      final bookRef =
+          await EpubReader.openBookWithSplitChapters(await futureBytes);
+
       expect(bookRef, isA<EpubBookSplitRef>());
       expect(bookRef.title, equals('Test Book with Long Chapters'));
     });
@@ -197,27 +198,33 @@ void main() {
 
     test('handles EPUB with no chapters', () async {
       final emptyEpubBytes = _createTestEpubWithNoChapters();
-      final bookRef = await EpubReader.openBookWithSplitChapters(emptyEpubBytes);
+      final bookRef =
+          await EpubReader.openBookWithSplitChapters(emptyEpubBytes);
       final chapterRefs = await bookRef.getChapterRefsWithSplitting();
-      
+
       expect(chapterRefs, isEmpty);
     });
 
     test('handles chapters at exactly 3000 word boundary', () async {
       final boundaryEpubBytes = _createTestEpubWithBoundaryChapters();
-      final bookRef = await EpubReader.openBookWithSplitChapters(boundaryEpubBytes);
+      final bookRef =
+          await EpubReader.openBookWithSplitChapters(boundaryEpubBytes);
       final chapterRefs = await bookRef.getChapterRefsWithSplitting();
-      
+
       // Both chapters get split since they have 3000+ words
-      final chapter1Parts = chapterRefs.where((ref) => 
-        ref.title?.contains('Chapter 1 - Exactly 3000 Words') ?? false).toList();
-      final chapter2Parts = chapterRefs.where((ref) => 
-        ref.title?.contains('Chapter 2 - Over 3000 Words') ?? false).toList();
-      
+      final chapter1Parts = chapterRefs
+          .where((ref) =>
+              ref.title?.contains('Chapter 1 - Exactly 3000 Words') ?? false)
+          .toList();
+      final chapter2Parts = chapterRefs
+          .where((ref) =>
+              ref.title?.contains('Chapter 2 - Over 3000 Words') ?? false)
+          .toList();
+
       // Both should be split into parts
       expect(chapter1Parts.length, equals(2));
       expect(chapter2Parts.length, equals(2));
-      
+
       // Verify they are split refs
       expect(chapter1Parts.every((ref) => ref is EpubChapterSplitRef), isTrue);
       expect(chapter2Parts.every((ref) => ref is EpubChapterSplitRef), isTrue);
@@ -225,14 +232,15 @@ void main() {
 
     test('handles chapters with only images/non-text content', () async {
       final imageOnlyEpubBytes = _createTestEpubWithImageOnlyChapter();
-      final bookRef = await EpubReader.openBookWithSplitChapters(imageOnlyEpubBytes);
+      final bookRef =
+          await EpubReader.openBookWithSplitChapters(imageOnlyEpubBytes);
       final chapterRefs = await bookRef.getChapterRefsWithSplitting();
-      
+
       // Image-only chapter should not be split
-      final imageChapter = chapterRefs.firstWhere((ref) => 
-        ref.title == 'Image Gallery');
+      final imageChapter =
+          chapterRefs.firstWhere((ref) => ref.title == 'Image Gallery');
       expect(imageChapter, isNot(isA<EpubChapterSplitRef>()));
-      
+
       // Verify content can still be read
       final content = await imageChapter.readHtmlContent();
       expect(content, contains('<img'));
@@ -240,8 +248,9 @@ void main() {
 
     test('handles missing metadata gracefully', () async {
       final noMetadataEpubBytes = _createTestEpubWithNoMetadata();
-      final bookRef = await EpubReader.openBookWithSplitChapters(noMetadataEpubBytes);
-      
+      final bookRef =
+          await EpubReader.openBookWithSplitChapters(noMetadataEpubBytes);
+
       // Should handle missing title/author
       expect(bookRef.title, equals(''));
       expect(bookRef.author, equals(''));
@@ -250,8 +259,9 @@ void main() {
 
     test('handles special characters in metadata', () async {
       final specialCharsEpubBytes = _createTestEpubWithSpecialCharsMetadata();
-      final bookRef = await EpubReader.openBookWithSplitChapters(specialCharsEpubBytes);
-      
+      final bookRef =
+          await EpubReader.openBookWithSplitChapters(specialCharsEpubBytes);
+
       expect(bookRef.title, contains('café'));
       expect(bookRef.title, contains('π'));
       expect(bookRef.author, contains('Müller'));
@@ -259,11 +269,12 @@ void main() {
 
     test('concurrent access to getChapterRefsWithSplitting', () async {
       final bookRef = await EpubReader.openBookWithSplitChapters(epubBytes);
-      
+
       // Call getChapterRefsWithSplitting multiple times concurrently
-      final futures = List.generate(5, (_) => bookRef.getChapterRefsWithSplitting());
+      final futures =
+          List.generate(5, (_) => bookRef.getChapterRefsWithSplitting());
       final results = await Future.wait(futures);
-      
+
       // All results should be identical
       for (var i = 1; i < results.length; i++) {
         expect(results[i].length, equals(results[0].length));
@@ -275,22 +286,22 @@ void main() {
 
     test('EpubBookSplitRef maintains EpubBookRef interface', () async {
       final bookRef = await EpubReader.openBookWithSplitChapters(epubBytes);
-      
+
       // Test that it's an EpubBookRef
       expect(bookRef, isA<EpubBookRef>());
-      
+
       // Test that regular getChapters() returns original chapters
       final regularChapters = bookRef.getChapters();
       expect(regularChapters.length, equals(3)); // Original 3 chapters
-      
+
       // Test other EpubBookRef methods
       expect(bookRef.schema, isNotNull);
       expect(bookRef.content, isNotNull);
-      
+
       // Can read cover
       await bookRef.readCover();
       // Cover might be null in test EPUB
-      
+
       // Can get chapters with and without splitting
       final splitChapters = await bookRef.getChapterRefsWithSplitting();
       expect(splitChapters.length, greaterThan(regularChapters.length));
@@ -298,40 +309,44 @@ void main() {
 
     test('memory efficiency - lazy loading verification', () async {
       final largeEpubBytes = _createTestEpubWithManyLongChapters();
-      final bookRef = await EpubReader.openBookWithSplitChapters(largeEpubBytes);
-      
+      final bookRef =
+          await EpubReader.openBookWithSplitChapters(largeEpubBytes);
+
       // Getting refs should be fast (not loading content)
       final stopwatch = Stopwatch()..start();
       final chapterRefs = await bookRef.getChapterRefsWithSplitting();
       stopwatch.stop();
-      
+
       // Should complete quickly even with many chapters
-      expect(stopwatch.elapsedMilliseconds, lessThan(500)); // Increased to 500ms for slower machines
+      expect(stopwatch.elapsedMilliseconds,
+          lessThan(500)); // Increased to 500ms for slower machines
       expect(chapterRefs.length, greaterThan(20)); // Many split chapters
-      
+
       // Archive should still be accessible
       expect(bookRef.epubArchive, isNotNull);
     });
 
     test('handles nested sub-chapters that need splitting', () async {
       final nestedEpubBytes = _createTestEpubWithNestedLongChapters();
-      final bookRef = await EpubReader.openBookWithSplitChapters(nestedEpubBytes);
+      final bookRef =
+          await EpubReader.openBookWithSplitChapters(nestedEpubBytes);
       final chapterRefs = await bookRef.getChapterRefsWithSplitting();
-      
+
       // Find the main chapter with sub-chapters
-      final mainChapter = chapterRefs.firstWhere((ref) => 
-        ref.title?.contains('Main Chapter') ?? false);
-      
+      final mainChapter = chapterRefs
+          .firstWhere((ref) => ref.title?.contains('Main Chapter') ?? false);
+
       // If it's split, sub-chapters should only be in first part
       if (mainChapter is EpubChapterSplitRef) {
         expect(mainChapter.partNumber, equals(1));
         expect(mainChapter.subChapters, isNotEmpty);
-        
+
         // Find other parts of the same chapter
-        final otherParts = chapterRefs.whereType<EpubChapterSplitRef>()
-          .where((ref) => ref.originalTitle == mainChapter.originalTitle && 
-                         ref.partNumber > 1);
-        
+        final otherParts = chapterRefs.whereType<EpubChapterSplitRef>().where(
+            (ref) =>
+                ref.originalTitle == mainChapter.originalTitle &&
+                ref.partNumber > 1);
+
         for (final part in otherParts) {
           expect(part.subChapters, isEmpty);
         }
@@ -340,14 +355,15 @@ void main() {
 
     test('handles empty chapters without errors', () async {
       final emptyChapterEpubBytes = _createTestEpubWithEmptyChapter();
-      final bookRef = await EpubReader.openBookWithSplitChapters(emptyChapterEpubBytes);
+      final bookRef =
+          await EpubReader.openBookWithSplitChapters(emptyChapterEpubBytes);
       final chapterRefs = await bookRef.getChapterRefsWithSplitting();
-      
+
       // Empty chapter should not be split
-      final emptyChapter = chapterRefs.firstWhere((ref) => 
-        ref.title == 'Empty Chapter');
+      final emptyChapter =
+          chapterRefs.firstWhere((ref) => ref.title == 'Empty Chapter');
       expect(emptyChapter, isNot(isA<EpubChapterSplitRef>()));
-      
+
       // Can still read empty content
       final content = await emptyChapter.readHtmlContent();
       expect(content, isNotNull);
@@ -767,8 +783,8 @@ List<int> _createTestEpubWithImageOnlyChapter() {
 
   // Add a dummy image file
   final dummyImage = [0xFF, 0xD8, 0xFF, 0xE0]; // JPEG header
-  archive.addFile(
-      ArchiveFile('OEBPS/image1.jpg', dummyImage.length, dummyImage));
+  archive
+      .addFile(ArchiveFile('OEBPS/image1.jpg', dummyImage.length, dummyImage));
 
   final encoded = ZipEncoder().encode(archive);
   return encoded;
@@ -891,11 +907,14 @@ List<int> _createTestEpubWithManyLongChapters() {
       'META-INF/container.xml', containerXml.length, containerXml.codeUnits));
 
   // Create content.opf with 10 chapters
-  final manifestItems = List.generate(10,
-      (i) => '    <item id="chapter$i" href="chapter$i.html" media-type="application/xhtml+xml"/>').join('\n');
-  final spineItems = List.generate(10,
-      (i) => '    <itemref idref="chapter$i"/>').join('\n');
-  
+  final manifestItems = List.generate(
+          10,
+          (i) =>
+              '    <item id="chapter$i" href="chapter$i.html" media-type="application/xhtml+xml"/>')
+      .join('\n');
+  final spineItems =
+      List.generate(10, (i) => '    <itemref idref="chapter$i"/>').join('\n');
+
   final contentOpf = '''<?xml version="1.0" encoding="UTF-8"?>
 <package xmlns="http://www.idpf.org/2007/opf" version="2.0" unique-identifier="id">
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -916,12 +935,14 @@ $spineItems
       'OEBPS/content.opf', contentOpf.length, contentOpf.codeUnits));
 
   // Create toc.ncx
-  final navPoints = List.generate(10, (i) => '''
+  final navPoints = List.generate(
+      10,
+      (i) => '''
     <navPoint id="chapter$i" playOrder="${i + 1}">
       <navLabel><text>Chapter ${i + 1}</text></navLabel>
       <content src="chapter$i.html"/>
     </navPoint>''').join('\n');
-    
+
   final tocNcx = '''<?xml version="1.0" encoding="UTF-8"?>
 <ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
   <head>
@@ -944,7 +965,7 @@ $navPoints
       final words = List.generate(150, (w) => 'word$w').join(' ');
       paragraphs.add('<p>$words</p>');
     }
-    
+
     final chapterHtml = '''<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -1034,7 +1055,7 @@ List<int> _createTestEpubWithNestedLongChapters() {
     final words = List.generate(150, (w) => 'word$w').join(' ');
     paragraphs.add('<p>$words</p>');
   }
-  
+
   final chapter1Html = '''<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -1060,8 +1081,8 @@ List<int> _createTestEpubWithNestedLongChapters() {
   <p>This is sub-chapter $i with short content.</p>
 </body>
 </html>''';
-    archive.addFile(ArchiveFile(
-        'OEBPS/chapter1-$i.html', subChapterHtml.length, subChapterHtml.codeUnits));
+    archive.addFile(ArchiveFile('OEBPS/chapter1-$i.html', subChapterHtml.length,
+        subChapterHtml.codeUnits));
   }
 
   final encoded = ZipEncoder().encode(archive);
