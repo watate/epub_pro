@@ -88,7 +88,8 @@ class ChapterReader {
     final ncxChapters = <EpubChapterRef>[];
 
     for (var navPoint in navPoints) {
-      final chapter = _processNavPoint(bookRef, navPoint, handledSpineItems, seenContentFiles);
+      final chapter = _processNavPoint(
+          bookRef, navPoint, handledSpineItems, seenContentFiles);
       if (chapter != null) {
         ncxChapters.add(chapter);
       }
@@ -154,7 +155,8 @@ class ChapterReader {
   /// Processes a navigation point without adding orphaned spine items as sub-chapters.
   /// Orphaned items will be handled separately as standalone chapters.
   static EpubChapterRef? _processNavPoint(EpubBookRef bookRef,
-      EpubNavigationPoint navPoint, Set<String> handledSpineItems, [Set<String>? seenContentFiles]) {
+      EpubNavigationPoint navPoint, Set<String> handledSpineItems,
+      [Set<String>? seenContentFiles]) {
     seenContentFiles ??= <String>{};
     String? contentFileName;
     String? anchor;
@@ -190,8 +192,8 @@ class ChapterReader {
     // Process child navigation points recursively
     final subChapters = <EpubChapterRef>[];
     for (var childNavPoint in navPoint.childNavigationPoints) {
-      final childChapter =
-          _processNavPoint(bookRef, childNavPoint, handledSpineItems, seenContentFiles);
+      final childChapter = _processNavPoint(
+          bookRef, childNavPoint, handledSpineItems, seenContentFiles);
       if (childChapter != null) {
         subChapters.add(childChapter);
       }

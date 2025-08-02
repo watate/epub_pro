@@ -37,7 +37,7 @@ void main() async {
 
       // After fixing duplicate detection, Alice's Adventures now has 4 top-level chapters:
       // - wrap0000.html (orphaned spine item)
-      // - Main title page content (duplicate references consolidated)  
+      // - Main title page content (duplicate references consolidated)
       // - Chapter III
       // - THE END
       expect(t.length, equals(4));
@@ -48,9 +48,12 @@ void main() async {
 
       // Second is the consolidated title page content
       expect(t[1].title, equals("ALICE'S ADVENTURES UNDER GROUND"));
-      expect(t[1].contentFileName, equals('@public@vhost@g@gutenberg@html@files@19002@19002-h@19002-h-0.htm.html'));
+      expect(
+          t[1].contentFileName,
+          equals(
+              '@public@vhost@g@gutenberg@html@files@19002@19002-h@19002-h-0.htm.html'));
 
-      // Third is Chapter III 
+      // Third is Chapter III
       expect(t[2].title, equals("Chapter III"));
 
       // Fourth is THE END
