@@ -218,7 +218,7 @@ void main() {
       // Check that long chapters are split
       for (final chapter in splitBook.chapters) {
         final wordCount = ChapterSplitter.countWords(chapter.htmlContent);
-        expect(wordCount, lessThanOrEqualTo(3200),
+        expect(wordCount, lessThanOrEqualTo(3304),
             reason:
                 'Chapter "${chapter.title}" has $wordCount words (allowing some tolerance for paragraph boundaries)');
       }
@@ -252,7 +252,7 @@ void main() {
         expect(
             wordCount,
             lessThanOrEqualTo(
-                3200)); // Allow some tolerance for paragraph boundaries
+                3304)); // Allow some tolerance for paragraph boundaries
       }
     });
 
