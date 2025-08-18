@@ -6,7 +6,7 @@ import '../dom/dom_abstraction.dart';
 import '../dom/html_navigator.dart';
 
 /// Manager for EPUB-specific CFI operations.
-/// 
+///
 /// Integrates CFI functionality with the existing EPUB library structure,
 /// providing methods to navigate to CFI locations within EPUB books and
 /// generate CFIs from EPUB positions.
@@ -17,16 +17,16 @@ class EpubCFIManager {
   EpubCFIManager(this._bookRef);
 
   /// Navigates to a CFI location within the EPUB.
-  /// 
+  ///
   /// Returns the chapter reference and DOM position where the CFI points,
   /// or null if the CFI cannot be resolved.
-  /// 
+  ///
   /// ```dart
   /// final manager = EpubCFIManager(bookRef);
   /// final location = await manager.navigateToCFI(
   ///   CFI('epubcfi(/6/4!/4/10/2:5)')
   /// );
-  /// 
+  ///
   /// if (location != null) {
   ///   final content = await location.chapterRef.readHtmlContent();
   ///   // Use location.position for precise positioning
@@ -60,10 +60,10 @@ class EpubCFIManager {
   }
 
   /// Generates a CFI from an EPUB position.
-  /// 
+  ///
   /// Creates a CFI that references the specified position within the given
   /// chapter at the character offset.
-  /// 
+  ///
   /// ```dart
   /// final cfi = await manager.generateCFI(
   ///   chapterRef: chapters[0],
@@ -85,7 +85,7 @@ class EpubCFIManager {
 
     // Parse element path
     final pathParts = _parseElementPath(elementPath, characterOffset);
-    
+
     // Create complete CFI structure
     final structure = CFIStructure(
       start: CFIPath(parts: [spinePart, ...pathParts]),
@@ -95,7 +95,7 @@ class EpubCFIManager {
   }
 
   /// Generates a CFI from a DOM position within a chapter.
-  /// 
+  ///
   /// Creates a CFI by analyzing the DOM position and building the
   /// appropriate spine and document paths.
   Future<CFI?> generateCFIFromPosition({
@@ -122,7 +122,8 @@ class EpubCFIManager {
     final allParts = [
       spinePart,
       indirectionPart,
-      ...documentPath.parts.skip(1), // Skip first part as it's now the indirection
+      ...documentPath.parts
+          .skip(1), // Skip first part as it's now the indirection
     ];
 
     final structure = CFIStructure(
@@ -133,7 +134,7 @@ class EpubCFIManager {
   }
 
   /// Generates a range CFI from two positions within the same chapter.
-  /// 
+  ///
   /// Creates a range CFI spanning from the start position to the end position.
   Future<CFI?> generateRangeCFI({
     required EpubChapterRef chapterRef,
@@ -169,7 +170,7 @@ class EpubCFIManager {
   }
 
   /// Validates that a CFI can be resolved within the EPUB.
-  /// 
+  ///
   /// Checks that the CFI points to a valid location without actually
   /// navigating to it (more efficient for validation).
   Future<bool> validateCFI(CFI cfi) async {
@@ -188,20 +189,20 @@ class EpubCFIManager {
   }
 
   /// Gets all chapters that contain content referenced by CFIs.
-  /// 
+  ///
   /// Returns a map of spine indices to chapter references for all
   /// chapters that have content files in the spine.
   Map<int, EpubChapterRef> getSpineChapterMap() {
     final map = <int, EpubChapterRef>{};
     final chapters = _bookRef.getChapters();
-    
+
     for (final chapter in chapters) {
       final spineIndex = getSpineIndexForChapter(chapter);
       if (spineIndex != null) {
         map[spineIndex] = chapter;
       }
     }
-    
+
     return map;
   }
 
@@ -211,25 +212,25 @@ class EpubCFIManager {
   }
 
   /// Creates a simple position CFI for reading progress tracking.
-  /// 
+  ///
   /// Generates a CFI that represents a rough position within a chapter,
   /// useful for bookmarks and reading progress without requiring precise
   /// DOM analysis.
   CFI createProgressCFI(int spineIndex, {double fraction = 0.0}) {
     final spinePart = CFIPart(index: (spineIndex + 1) * 2);
-    
+
     if (fraction > 0.0) {
       // Create an approximate position based on the fraction
       final estimatedStep = (fraction * 100).round() * 2;
       final progressPart = CFIPart(index: estimatedStep, hasIndirection: true);
-      
+
       return CFI.fromStructure(
         CFIStructure(
           start: CFIPath(parts: [spinePart, progressPart]),
         ),
       );
     }
-    
+
     return CFI.fromStructure(
       CFIStructure(
         start: CFIPath(parts: [spinePart]),
@@ -240,7 +241,8 @@ class EpubCFIManager {
   /// Extracts the spine index from a CFI.
   int? extractSpineIndex(CFI cfi) {
     final structure = cfi.structure;
-    final firstPart = structure.parent?.parts.first ?? structure.start.parts.first;
+    final firstPart =
+        structure.parent?.parts.first ?? structure.start.parts.first;
 
     // CFI spine indices are 1-based even numbers (2, 4, 6, ...)
     // Convert to 0-based: (index / 2) - 1
@@ -254,10 +256,10 @@ class EpubCFIManager {
   /// Extracts the document path (after step indirection) from a CFI.
   CFIPath? _extractDocumentPath(CFI cfi) {
     final structure = cfi.structure;
-    
+
     // For range CFIs, use the start path
     final pathParts = structure.parent?.parts ?? structure.start.parts;
-    
+
     // Find step indirection marker
     int indirectionIndex = -1;
     for (int i = 0; i < pathParts.length; i++) {
@@ -266,18 +268,18 @@ class EpubCFIManager {
         break;
       }
     }
-    
+
     if (indirectionIndex >= 0) {
       // Return parts after indirection
       final documentParts = pathParts.skip(indirectionIndex).toList();
       return CFIPath(parts: documentParts);
     }
-    
+
     // If no indirection found, assume simple spine reference
     if (pathParts.length > 1) {
       return CFIPath(parts: pathParts.skip(1).toList());
     }
-    
+
     return null;
   }
 
@@ -290,7 +292,7 @@ class EpubCFIManager {
 
     final spineItem = spineItems[spineIndex];
     final manifest = _bookRef.schema?.package?.manifest?.items;
-    
+
     // Find manifest item by ID
     final manifestItem = manifest?.firstWhere(
       (item) => item.id == spineItem.idRef,
@@ -311,7 +313,7 @@ class EpubCFIManager {
   int? getSpineIndexForChapter(EpubChapterRef chapterRef) {
     final spineItems = _bookRef.schema?.package?.spine?.items;
     final manifest = _bookRef.schema?.package?.manifest?.items;
-    
+
     if (spineItems == null || manifest == null) return null;
 
     // Find manifest item for this chapter
@@ -338,7 +340,7 @@ class EpubCFIManager {
     for (int i = 0; i < segments.length; i++) {
       final segment = segments.elementAt(i);
       final index = int.tryParse(segment);
-      
+
       if (index != null) {
         final isLast = i == segments.length - 1;
         parts.add(CFIPart(
@@ -380,7 +382,7 @@ class CFILocation {
       final text = position.container.nodeValue ?? '';
       return text.substring(position.offset.clamp(0, text.length));
     }
-    
+
     return position.container.textContent;
   }
 

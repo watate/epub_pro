@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 
 /// Represents the parsed structure of a CFI.
-/// 
+///
 /// A CFI can be either:
 /// - A simple path (point CFI): just a start path
 /// - A range CFI: parent path + start path + end path
@@ -31,15 +31,15 @@ class CFIStructure {
   /// Collapses a range CFI to a point CFI.
   CFIStructure collapse({bool toEnd = false}) {
     if (!hasRange) return this;
-    
+
     final targetPath = toEnd ? end! : start;
-    
+
     // Combine parent and target path
     if (parent != null) {
       final combinedParts = [...parent!.parts, ...targetPath.parts];
       return CFIStructure(start: CFIPath(parts: combinedParts));
     }
-    
+
     return CFIStructure(start: targetPath);
   }
 
@@ -48,7 +48,7 @@ class CFIStructure {
     // Compare start positions (ranges are compared by start)
     final thisStart = _getEffectiveStartPath();
     final otherStart = other._getEffectiveStartPath();
-    
+
     return thisStart.compare(otherStart);
   }
 
@@ -63,7 +63,7 @@ class CFIStructure {
   /// Converts this structure back to a CFI string.
   String toCFIString() {
     final buffer = StringBuffer('epubcfi(');
-    
+
     if (hasRange) {
       // Range CFI: parent,start,end
       if (parent != null) {
@@ -77,7 +77,7 @@ class CFIStructure {
       // Point CFI: just the path
       buffer.write(start.toCFIString());
     }
-    
+
     buffer.write(')');
     return buffer.toString();
   }
@@ -104,15 +104,14 @@ class CFIPath {
 
   /// Compares this path with another for reading order.
   int compare(CFIPath other) {
-    final minLength = parts.length < other.parts.length 
-        ? parts.length 
-        : other.parts.length;
-    
+    final minLength =
+        parts.length < other.parts.length ? parts.length : other.parts.length;
+
     for (int i = 0; i < minLength; i++) {
       final comparison = parts[i].compare(other.parts[i]);
       if (comparison != 0) return comparison;
     }
-    
+
     // If all compared parts are equal, shorter path comes first
     return parts.length.compareTo(other.parts.length);
   }
@@ -125,8 +124,7 @@ class CFIPath {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is CFIPath &&
-        const ListEquality().equals(parts, other.parts);
+    return other is CFIPath && const ListEquality().equals(parts, other.parts);
   }
 
   @override
@@ -175,66 +173,66 @@ class CFIPart {
     // First compare by index
     final indexComparison = index.compareTo(other.index);
     if (indexComparison != 0) return indexComparison;
-    
+
     // If indices are equal, compare by offset
     final thisOffset = offset ?? 0;
     final otherOffset = other.offset ?? 0;
     final offsetComparison = thisOffset.compareTo(otherOffset);
     if (offsetComparison != 0) return offsetComparison;
-    
+
     // If offsets are equal, compare by temporal
     if (temporal != null && other.temporal != null) {
       return temporal!.compareTo(other.temporal!);
     }
-    
+
     // If one has temporal and other doesn't, non-temporal comes first
     if (temporal != null) return 1;
     if (other.temporal != null) return -1;
-    
+
     return 0;
   }
 
   /// Converts this part to a CFI string representation.
   String toCFIString() {
     final buffer = StringBuffer();
-    
+
     // Add step indirection if present
     if (hasIndirection) buffer.write('!');
-    
+
     // Add the step reference
     buffer.write('/$index');
-    
+
     // Add ID assertion
     if (id != null) {
       buffer.write('[${_escapeCFI(id!)}]');
     }
-    
+
     // Add character offset
     if (offset != null) {
       buffer.write(':$offset');
     }
-    
+
     // Add temporal offset
     if (temporal != null) {
       buffer.write('~$temporal');
     }
-    
+
     // Add spatial coordinates
     if (spatial != null && spatial!.isNotEmpty) {
       buffer.write('@${spatial!.join(':')}');
     }
-    
+
     // Add text assertion
     if (text != null && text!.isNotEmpty) {
       final escapedText = text!.map(_escapeCFI).join(',');
       buffer.write('[,$escapedText]');
     }
-    
+
     // Add side bias
     if (side != null) {
       buffer.write('[$side]');
     }
-    
+
     return buffer.toString();
   }
 

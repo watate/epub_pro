@@ -9,7 +9,7 @@ import 'cfi_structure.dart';
 ///
 /// ## CFI Format
 /// A CFI has the format: `epubcfi(/6/4[chap01]!/4/10/2:3)`
-/// - `/6/4[chap01]` - spine position and chapter reference  
+/// - `/6/4[chap01]` - spine position and chapter reference
 /// - `!` - step indirection (crossing document boundaries)
 /// - `/4/10/2` - DOM path to specific element
 /// - `:3` - character offset within text node
@@ -19,12 +19,12 @@ import 'cfi_structure.dart';
 /// // Parse an existing CFI
 /// final cfi = CFI('epubcfi(/6/4[chap01]!/4/10/2:3)');
 /// print('Is range CFI: ${cfi.isRange}');
-/// 
+///
 /// // Compare CFIs for reading order
 /// final cfi1 = CFI('epubcfi(/6/4!/4/10/2:3)');
 /// final cfi2 = CFI('epubcfi(/6/4!/4/10/2:5)');
 /// final comparison = cfi1.compare(cfi2); // Returns -1, 0, or 1
-/// 
+///
 /// // Collapse range CFI to a point
 /// final rangeCfi = CFI('epubcfi(/6/4!/4/10,/2:5,/2:15)');
 /// final startCfi = rangeCfi.collapse(); // Points to start of range
@@ -33,12 +33,12 @@ import 'cfi_structure.dart';
 class CFI {
   /// The raw CFI string as provided.
   final String raw;
-  
+
   /// The parsed CFI structure.
   late final CFIStructure _structure;
 
   /// Creates a CFI from a CFI string.
-  /// 
+  ///
   /// Throws [FormatException] if the CFI string is malformed.
   CFI(this.raw) {
     _structure = CFIParser.parse(raw);
@@ -63,10 +63,10 @@ class CFI {
   CFIStructure get structure => _structure;
 
   /// Collapses a range CFI to a point CFI.
-  /// 
+  ///
   /// For point CFIs, returns the same CFI.
   /// For range CFIs, returns either the start point (default) or end point.
-  /// 
+  ///
   /// ```dart
   /// final rangeCfi = CFI('epubcfi(/6/4!/4/10,/2:5,/2:15)');
   /// final startCfi = rangeCfi.collapse(); // Points to character 5
@@ -74,19 +74,19 @@ class CFI {
   /// ```
   CFI collapse({bool toEnd = false}) {
     if (!isRange) return this;
-    
+
     return CFI.fromStructure(_structure.collapse(toEnd: toEnd));
   }
 
   /// Compares this CFI with another CFI for reading order.
-  /// 
+  ///
   /// Returns:
   /// - Negative value if this CFI comes before [other]
   /// - Zero if CFIs are equivalent
   /// - Positive value if this CFI comes after [other]
-  /// 
+  ///
   /// Range CFIs are compared by their start positions.
-  /// 
+  ///
   /// ```dart
   /// final cfi1 = CFI('epubcfi(/6/4!/4/10/2:3)');
   /// final cfi2 = CFI('epubcfi(/6/4!/4/10/2:5)');
@@ -97,14 +97,13 @@ class CFI {
   }
 
   /// Creates a normalized CFI string representation.
-  /// 
+  ///
   /// This may differ from the original [raw] string if the original
   /// contained unnecessary whitespace or formatting variations.
   @override
   String toString() {
     return _structure.toCFIString();
   }
-
 
   @override
   bool operator ==(Object other) {

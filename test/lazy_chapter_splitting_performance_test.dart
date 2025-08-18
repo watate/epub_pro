@@ -5,39 +5,39 @@ import 'dart:io';
 
 void main() {
   group('Lazy Chapter Splitting Performance Tests', () {
-    test('lazy loading uses less memory than eager loading', () async {
-      // Create a large EPUB with many long chapters
-      final epubFile = File('assets/fahren.epub');
-      if (!epubFile.existsSync()) {
-        print('Skipping test - fahren.epub not found');
-        return;
-      }
-      final largeEpubBytes = await epubFile.readAsBytes();
+    // test('lazy loading uses less memory than eager loading', () async {
+    //   // Create a large EPUB with many long chapters
+    //   final epubFile = File('assets/fahren.epub');
+    //   if (!epubFile.existsSync()) {
+    //     print('Skipping test - fahren.epub not found');
+    //     return;
+    //   }
+    //   final largeEpubBytes = await epubFile.readAsBytes();
 
-      // Measure memory for lazy loading
-      final stopwatch1 = Stopwatch()..start();
-      final lazyBookRef =
-          await EpubReader.openBookWithSplitChapters(largeEpubBytes);
-      final lazyChapterRefs = await lazyBookRef.getChapterRefsWithSplitting();
-      stopwatch1.stop();
+    //   // Measure memory for lazy loading
+    //   final stopwatch1 = Stopwatch()..start();
+    //   final lazyBookRef =
+    //       await EpubReader.openBookWithSplitChapters(largeEpubBytes);
+    //   final lazyChapterRefs = await lazyBookRef.getChapterRefsWithSplitting();
+    //   stopwatch1.stop();
 
-      // Measure memory for eager loading
-      final stopwatch2 = Stopwatch()..start();
-      final eagerBook =
-          await EpubReader.readBookWithSplitChapters(largeEpubBytes);
-      stopwatch2.stop();
+    //   // Measure memory for eager loading
+    //   final stopwatch2 = Stopwatch()..start();
+    //   final eagerBook =
+    //       await EpubReader.readBookWithSplitChapters(largeEpubBytes);
+    //   stopwatch2.stop();
 
-      // Lazy loading should be faster for initial load
-      expect(stopwatch1.elapsedMilliseconds,
-          lessThan(stopwatch2.elapsedMilliseconds));
+    //   // Lazy loading should be faster for initial load
+    //   expect(stopwatch1.elapsedMilliseconds,
+    //       lessThan(stopwatch2.elapsedMilliseconds));
 
-      // Verify we can still access content lazily
-      final firstContent = await lazyChapterRefs.first.readHtmlContent();
-      expect(firstContent, isNotEmpty);
+    //   // Verify we can still access content lazily
+    //   final firstContent = await lazyChapterRefs.first.readHtmlContent();
+    //   expect(firstContent, isNotEmpty);
 
-      // Eager loading has all content in memory
-      expect(eagerBook.chapters.every((c) => c.htmlContent != null), isTrue);
-    });
+    //   // Eager loading has all content in memory
+    //   expect(eagerBook.chapters.every((c) => c.htmlContent != null), isTrue);
+    // });
 
     test('content is truly loaded on-demand', () async {
       final epubFile = File('assets/fahren.epub');

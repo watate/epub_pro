@@ -3,21 +3,22 @@ import 'cfi_structure.dart';
 /// Parser for EPUB CFI strings into structured components.
 class CFIParser {
   /// Parses a CFI string into a structured representation.
-  /// 
+  ///
   /// Throws [FormatException] if the CFI string is malformed.
   static CFIStructure parse(String cfi) {
     if (!cfi.startsWith('epubcfi(') || !cfi.endsWith(')')) {
-      throw FormatException('Invalid CFI format: must start with "epubcfi(" and end with ")"');
+      throw FormatException(
+          'Invalid CFI format: must start with "epubcfi(" and end with ")"');
     }
-    
+
     // Extract the content between epubcfi( and )
     final content = cfi.substring(8, cfi.length - 1);
-    
+
     // Check for empty content
     if (content.isEmpty) {
       throw FormatException('CFI content cannot be empty');
     }
-    
+
     // Check if this is a range CFI (contains commas not inside brackets)
     if (_isRangeCFI(content)) {
       return _parseRangeCFI(content);
@@ -45,15 +46,16 @@ class CFIParser {
   /// Parses a range CFI with format: parent,start,end
   static CFIStructure _parseRangeCFI(String content) {
     final parts = _splitRangeParts(content);
-    
+
     if (parts.length != 3) {
-      throw FormatException('Range CFI must have exactly 3 parts separated by commas');
+      throw FormatException(
+          'Range CFI must have exactly 3 parts separated by commas');
     }
-    
+
     final parentPath = parts[0].isNotEmpty ? _parsePath(parts[0]) : null;
     final startPath = _parsePath(parts[1]);
     final endPath = _parsePath(parts[2]);
-    
+
     return CFIStructure(
       parent: parentPath,
       start: startPath,
@@ -72,7 +74,7 @@ class CFIParser {
     final parts = <String>[];
     int bracketDepth = 0;
     int startIndex = 0;
-    
+
     for (int i = 0; i < content.length; i++) {
       final char = content[i];
       if (char == '[') {
@@ -84,10 +86,10 @@ class CFIParser {
         startIndex = i + 1;
       }
     }
-    
+
     // Add the last part
     parts.add(content.substring(startIndex));
-    
+
     return parts;
   }
 
@@ -95,11 +97,11 @@ class CFIParser {
   static CFIPath _parsePath(String pathStr) {
     final tokens = _tokenize(pathStr);
     final parts = <CFIPart>[];
-    
+
     int i = 0;
     while (i < tokens.length) {
       final token = tokens[i];
-      
+
       if (token.type == CFITokenType.indirection) {
         // Handle step indirection - affects the next step
         i++;
@@ -108,7 +110,8 @@ class CFIParser {
           parts.add(part);
           i = _skipPartTokens(tokens, i);
         } else {
-          throw FormatException('Step indirection (!) must be followed by a step');
+          throw FormatException(
+              'Step indirection (!) must be followed by a step');
         }
       } else if (token.type == CFITokenType.step) {
         final part = _parsePartFromTokens(tokens, i);
@@ -118,16 +121,17 @@ class CFIParser {
         throw FormatException('Unexpected token: ${token.value}');
       }
     }
-    
+
     return CFIPath(parts: parts);
   }
 
   /// Parses a CFI part from tokens starting at the given index.
-  static CFIPart _parsePartFromTokens(List<CFIToken> tokens, int startIndex, {bool hasIndirection = false}) {
+  static CFIPart _parsePartFromTokens(List<CFIToken> tokens, int startIndex,
+      {bool hasIndirection = false}) {
     if (tokens[startIndex].type != CFITokenType.step) {
       throw FormatException('Expected step token');
     }
-    
+
     final index = tokens[startIndex].value as int;
     String? id;
     int? offset;
@@ -135,11 +139,13 @@ class CFIParser {
     List<double>? spatial;
     List<String>? text;
     String? side;
-    
+
     int i = startIndex + 1;
-    while (i < tokens.length && tokens[i].type != CFITokenType.step && tokens[i].type != CFITokenType.indirection) {
+    while (i < tokens.length &&
+        tokens[i].type != CFITokenType.step &&
+        tokens[i].type != CFITokenType.indirection) {
       final token = tokens[i];
-      
+
       switch (token.type) {
         case CFITokenType.assertion:
           final value = token.value as String;
@@ -168,7 +174,7 @@ class CFIParser {
       }
       i++;
     }
-    
+
     return CFIPart(
       index: index,
       id: id,
@@ -184,7 +190,9 @@ class CFIParser {
   /// Skips all tokens belonging to the current part.
   static int _skipPartTokens(List<CFIToken> tokens, int startIndex) {
     int i = startIndex + 1;
-    while (i < tokens.length && tokens[i].type != CFITokenType.step && tokens[i].type != CFITokenType.indirection) {
+    while (i < tokens.length &&
+        tokens[i].type != CFITokenType.step &&
+        tokens[i].type != CFITokenType.indirection) {
       i++;
     }
     return i;
@@ -193,45 +201,48 @@ class CFIParser {
   /// Tokenizes a CFI path string.
   static List<CFIToken> _tokenize(String pathStr) {
     final tokens = <CFIToken>[];
-    
+
     int i = 0;
     while (i < pathStr.length) {
       final char = pathStr[i];
-      
+
       switch (char) {
         case '/':
           // Step reference
           i++;
           final numberStr = _readNumber(pathStr, i);
           if (numberStr.isEmpty) {
-            throw FormatException('Step reference must be followed by a number');
+            throw FormatException(
+                'Step reference must be followed by a number');
           }
           tokens.add(CFIToken(CFITokenType.step, int.parse(numberStr)));
           i += numberStr.length;
           break;
-          
+
         case ':':
           // Character offset
           i++;
           final numberStr = _readNumber(pathStr, i);
           if (numberStr.isEmpty) {
-            throw FormatException('Character offset must be followed by a number');
+            throw FormatException(
+                'Character offset must be followed by a number');
           }
           tokens.add(CFIToken(CFITokenType.offset, int.parse(numberStr)));
           i += numberStr.length;
           break;
-          
+
         case '~':
           // Temporal offset
           i++;
           final numberStr = _readFloat(pathStr, i);
           if (numberStr.isEmpty) {
-            throw FormatException('Temporal offset must be followed by a number');
+            throw FormatException(
+                'Temporal offset must be followed by a number');
           }
           tokens.add(CFIToken(CFITokenType.temporal, double.parse(numberStr)));
           i += numberStr.length;
           break;
-          
+
         case '@':
           // Spatial coordinates
           i++;
@@ -240,7 +251,7 @@ class CFIParser {
           tokens.add(CFIToken(CFITokenType.spatial, coords));
           i += coordsStr.length;
           break;
-          
+
         case '[':
           // Assertion
           i++;
@@ -248,18 +259,18 @@ class CFIParser {
           tokens.add(CFIToken(CFITokenType.assertion, assertion));
           i += assertion.length + 1; // +1 for closing ]
           break;
-          
+
         case '!':
           // Step indirection
           tokens.add(CFIToken(CFITokenType.indirection, null));
           i++;
           break;
-          
+
         default:
           throw FormatException('Unexpected character in CFI: $char');
       }
     }
-    
+
     return tokens;
   }
 
@@ -303,7 +314,7 @@ class CFIParser {
   static String _readAssertion(String str, int startIndex) {
     final buffer = StringBuffer();
     int i = startIndex;
-    
+
     while (i < str.length && str[i] != ']') {
       if (str[i] == '^' && i + 1 < str.length) {
         // Escape sequence
@@ -314,11 +325,11 @@ class CFIParser {
       }
       i++;
     }
-    
+
     if (i >= str.length) {
       throw FormatException('Unclosed assertion bracket');
     }
-    
+
     return buffer.toString();
   }
 
@@ -344,10 +355,10 @@ class CFIToken {
 
 /// Types of CFI tokens.
 enum CFITokenType {
-  step,           // /N - step reference
-  offset,         // :N - character offset
-  temporal,       // ~N - temporal offset
-  spatial,        // @X:Y - spatial coordinates
-  assertion,      // [text] - ID or text assertion
-  indirection,    // ! - step indirection
+  step, // /N - step reference
+  offset, // :N - character offset
+  temporal, // ~N - temporal offset
+  spatial, // @X:Y - spatial coordinates
+  assertion, // [text] - ID or text assertion
+  indirection, // ! - step indirection
 }

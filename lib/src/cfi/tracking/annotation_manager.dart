@@ -5,7 +5,7 @@ import '../epub/epub_cfi_manager.dart';
 import '../../ref_entities/epub_book_ref.dart';
 
 /// Manages annotations (highlights, notes, bookmarks) using CFI for precise positioning.
-/// 
+///
 /// The annotation manager provides functionality to create, store, retrieve,
 /// and manage annotations within EPUB books using CFI for location references.
 class CFIAnnotationManager {
@@ -23,17 +23,17 @@ class CFIAnnotationManager {
         _storage = storage;
 
   /// Creates a highlight annotation from a text selection.
-  /// 
+  ///
   /// Records a highlighted text passage using range CFI for precise positioning.
   /// The highlight includes the selected text, CFI location, and optional styling.
-  /// 
+  ///
   /// ```dart
   /// final manager = CFIAnnotationManager(
   ///   bookId: 'book123',
   ///   bookRef: bookRef,
   ///   storage: storage,
   /// );
-  /// 
+  ///
   /// final highlight = await manager.createHighlight(
   ///   startCFI: CFI('epubcfi(/6/4!/4/10/2:5)'),
   ///   endCFI: CFI('epubcfi(/6/4!/4/10/2:15)'),
@@ -51,7 +51,7 @@ class CFIAnnotationManager {
   }) async {
     // Create range CFI from start and end positions
     final rangeCFI = CFIRange.fromStartEnd(startCFI, endCFI);
-    
+
     final highlight = HighlightAnnotation(
       id: _generateId(),
       bookId: _bookId,
@@ -69,9 +69,9 @@ class CFIAnnotationManager {
   }
 
   /// Creates a note annotation at a specific position.
-  /// 
+  ///
   /// Records a text note attached to a specific location in the book.
-  /// 
+  ///
   /// ```dart
   /// final note = await manager.createNote(
   ///   cfi: CFI('epubcfi(/6/4!/4/10/2:5)'),
@@ -103,9 +103,9 @@ class CFIAnnotationManager {
   }
 
   /// Creates a bookmark at a specific position.
-  /// 
+  ///
   /// Records a bookmark for easy navigation back to a specific location.
-  /// 
+  ///
   /// ```dart
   /// final bookmark = await manager.createBookmark(
   ///   cfi: CFI('epubcfi(/6/4!/4/10/2:5)'),
@@ -135,9 +135,9 @@ class CFIAnnotationManager {
   }
 
   /// Gets all annotations for the book, sorted by reading order.
-  /// 
+  ///
   /// Returns annotations ordered by their CFI positions in the book.
-  /// 
+  ///
   /// ```dart
   /// final annotations = await manager.getAllAnnotations();
   /// for (final annotation in annotations) {
@@ -146,22 +146,23 @@ class CFIAnnotationManager {
   /// ```
   Future<List<Annotation>> getAllAnnotations() async {
     final annotations = await _storage.getAnnotations(_bookId);
-    
+
     // Sort by CFI reading order
     annotations.sort((a, b) => a.cfi.compare(b.cfi));
-    
+
     return annotations;
   }
 
   /// Gets annotations of a specific type.
-  /// 
+  ///
   /// Filters annotations by type (highlight, note, bookmark).
-  /// 
+  ///
   /// ```dart
   /// final highlights = await manager.getAnnotationsByType(AnnotationType.highlight);
   /// final bookmarks = await manager.getAnnotationsByType(AnnotationType.bookmark);
   /// ```
-  Future<List<T>> getAnnotationsByType<T extends Annotation>(AnnotationType type) async {
+  Future<List<T>> getAnnotationsByType<T extends Annotation>(
+      AnnotationType type) async {
     final allAnnotations = await getAllAnnotations();
     return allAnnotations
         .where((annotation) => annotation.type == type)
@@ -170,15 +171,16 @@ class CFIAnnotationManager {
   }
 
   /// Gets annotations within a CFI range.
-  /// 
+  ///
   /// Returns all annotations that fall within the specified range.
-  /// 
+  ///
   /// ```dart
   /// final startCFI = CFI('epubcfi(/6/4!/4/2/1:0)');
   /// final endCFI = CFI('epubcfi(/6/6!/4/2/1:0)');
   /// final annotations = await manager.getAnnotationsInRange(startCFI, endCFI);
   /// ```
-  Future<List<Annotation>> getAnnotationsInRange(CFI startCFI, CFI endCFI) async {
+  Future<List<Annotation>> getAnnotationsInRange(
+      CFI startCFI, CFI endCFI) async {
     final allAnnotations = await getAllAnnotations();
     return CFIComparator.filterInRange(
       allAnnotations.map((a) => a.cfi).toList(),
@@ -188,24 +190,25 @@ class CFIAnnotationManager {
   }
 
   /// Gets annotations for a specific chapter.
-  /// 
+  ///
   /// Returns annotations that belong to the specified spine index.
-  /// 
+  ///
   /// ```dart
   /// final chapterAnnotations = await manager.getAnnotationsForChapter(2);
   /// ```
   Future<List<Annotation>> getAnnotationsForChapter(int spineIndex) async {
     final allAnnotations = await getAllAnnotations();
     return allAnnotations.where((annotation) {
-      final annotationSpineIndex = _cfiManager.extractSpineIndex(annotation.cfi);
+      final annotationSpineIndex =
+          _cfiManager.extractSpineIndex(annotation.cfi);
       return annotationSpineIndex == spineIndex;
     }).toList();
   }
 
   /// Updates an existing annotation.
-  /// 
+  ///
   /// Modifies an annotation's content while preserving its ID and creation time.
-  /// 
+  ///
   /// ```dart
   /// final updatedHighlight = highlight.copyWith(
   ///   note: 'Added this note later',
@@ -219,9 +222,9 @@ class CFIAnnotationManager {
   }
 
   /// Deletes an annotation.
-  /// 
+  ///
   /// Removes the annotation from storage permanently.
-  /// 
+  ///
   /// ```dart
   /// await manager.deleteAnnotation(annotation.id);
   /// ```
@@ -230,10 +233,10 @@ class CFIAnnotationManager {
   }
 
   /// Finds annotations near a specific CFI position.
-  /// 
+  ///
   /// Returns annotations within a certain distance of the target position.
   /// Useful for showing contextual annotations.
-  /// 
+  ///
   /// ```dart
   /// final nearbyAnnotations = await manager.findNearbyAnnotations(
   ///   targetCFI,
@@ -248,7 +251,8 @@ class CFIAnnotationManager {
     final nearbyAnnotations = <Annotation>[];
 
     for (final annotation in allAnnotations) {
-      final distance = CFIComparator.calculateDistance(targetCFI, annotation.cfi);
+      final distance =
+          CFIComparator.calculateDistance(targetCFI, annotation.cfi);
       if (distance <= maxDistance) {
         nearbyAnnotations.add(annotation);
       }
@@ -265,9 +269,9 @@ class CFIAnnotationManager {
   }
 
   /// Exports all annotations to a portable format.
-  /// 
+  ///
   /// Creates a data structure that can be serialized and imported elsewhere.
-  /// 
+  ///
   /// ```dart
   /// final exportData = await manager.exportAnnotations();
   /// await saveToFile(exportData.toJson());
@@ -283,9 +287,9 @@ class CFIAnnotationManager {
   }
 
   /// Imports annotations from exported data.
-  /// 
+  ///
   /// Merges imported annotations with existing ones, avoiding duplicates.
-  /// 
+  ///
   /// ```dart
   /// final importData = AnnotationExport.fromJson(jsonData);
   /// await manager.importAnnotations(importData, mergeStrategy: MergeStrategy.skipExisting);
@@ -301,13 +305,13 @@ class CFIAnnotationManager {
       final shouldImport = switch (mergeStrategy) {
         MergeStrategy.skipExisting => !existingIds.contains(annotation.id),
         MergeStrategy.overwriteExisting => true,
-        MergeStrategy.renameConflicts => !existingIds.contains(annotation.id) || 
+        MergeStrategy.renameConflicts => !existingIds.contains(annotation.id) ||
             annotation.copyWith(id: _generateId()) != annotation,
       };
 
       if (shouldImport) {
         var importAnnotation = annotation;
-        if (mergeStrategy == MergeStrategy.renameConflicts && 
+        if (mergeStrategy == MergeStrategy.renameConflicts &&
             existingIds.contains(annotation.id)) {
           importAnnotation = annotation.copyWith(id: _generateId());
         }
@@ -317,9 +321,9 @@ class CFIAnnotationManager {
   }
 
   /// Searches annotations by text content.
-  /// 
+  ///
   /// Finds annotations containing the search query in their text content.
-  /// 
+  ///
   /// ```dart
   /// final results = await manager.searchAnnotations('important concept');
   /// ```
@@ -333,15 +337,15 @@ class CFIAnnotationManager {
         ...annotation.metadata.values.map((v) => v.toString()),
       ];
 
-      return searchFields.any((field) => 
-          field.toLowerCase().contains(lowercaseQuery));
+      return searchFields
+          .any((field) => field.toLowerCase().contains(lowercaseQuery));
     }).toList();
   }
 
   /// Gets annotation statistics for the book.
-  /// 
+  ///
   /// Returns counts and metrics about annotations in the book.
-  /// 
+  ///
   /// ```dart
   /// final stats = await manager.getAnnotationStatistics();
   /// print('Total annotations: ${stats.totalCount}');
@@ -349,7 +353,7 @@ class CFIAnnotationManager {
   /// ```
   Future<AnnotationStatistics> getAnnotationStatistics() async {
     final annotations = await getAllAnnotations();
-    
+
     int highlightCount = 0;
     int noteCount = 0;
     int bookmarkCount = 0;
@@ -374,10 +378,16 @@ class CFIAnnotationManager {
       highlightCount: highlightCount,
       noteCount: noteCount,
       bookmarkCount: bookmarkCount,
-      firstCreated: annotations.isNotEmpty ? 
-          annotations.map((a) => a.createdAt).reduce((a, b) => a.isBefore(b) ? a : b) : null,
-      lastModified: annotations.isNotEmpty ?
-          annotations.map((a) => a.modifiedAt).reduce((a, b) => a.isAfter(b) ? a : b) : null,
+      firstCreated: annotations.isNotEmpty
+          ? annotations
+              .map((a) => a.createdAt)
+              .reduce((a, b) => a.isBefore(b) ? a : b)
+          : null,
+      lastModified: annotations.isNotEmpty
+          ? annotations
+              .map((a) => a.modifiedAt)
+              .reduce((a, b) => a.isAfter(b) ? a : b)
+          : null,
     );
   }
 
@@ -739,9 +749,9 @@ class AnnotationExport {
 
 /// Strategies for merging imported annotations.
 enum MergeStrategy {
-  skipExisting,      // Skip annotations with existing IDs
+  skipExisting, // Skip annotations with existing IDs
   overwriteExisting, // Overwrite annotations with existing IDs
-  renameConflicts,   // Rename conflicting annotations with new IDs
+  renameConflicts, // Rename conflicting annotations with new IDs
 }
 
 /// Abstract interface for annotation storage implementations.

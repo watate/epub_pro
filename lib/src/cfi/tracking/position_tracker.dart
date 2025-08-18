@@ -3,7 +3,7 @@ import '../epub/epub_cfi_manager.dart';
 import '../../ref_entities/epub_book_ref.dart';
 
 /// Tracks reading positions and progress using CFI for precise positioning.
-/// 
+///
 /// The position tracker provides functionality to save and restore reading
 /// positions, calculate reading progress, and sync positions across devices.
 class CFIPositionTracker {
@@ -21,17 +21,17 @@ class CFIPositionTracker {
         _storage = storage;
 
   /// Saves the current reading position.
-  /// 
+  ///
   /// Records a CFI-based position that can be restored later.
   /// The position includes the CFI, spine information, and progress data.
-  /// 
+  ///
   /// ```dart
   /// final tracker = CFIPositionTracker(
   ///   bookId: 'book123',
   ///   bookRef: bookRef,
   ///   storage: storage,
   /// );
-  /// 
+  ///
   /// await tracker.savePosition(
   ///   cfi: CFI('epubcfi(/6/4!/4/10/2:5)'),
   ///   fractionInChapter: 0.3,
@@ -48,7 +48,8 @@ class CFIPositionTracker {
     }
 
     final totalSpineItems = _cfiManager.spineItemCount;
-    final overallProgress = (spineIndex + (fractionInChapter ?? 0.0)) / totalSpineItems;
+    final overallProgress =
+        (spineIndex + (fractionInChapter ?? 0.0)) / totalSpineItems;
 
     final position = ReadingPosition(
       bookId: _bookId,
@@ -65,9 +66,9 @@ class CFIPositionTracker {
   }
 
   /// Restores the last saved reading position.
-  /// 
+  ///
   /// Returns the saved position or null if no position has been saved.
-  /// 
+  ///
   /// ```dart
   /// final position = await tracker.restorePosition();
   /// if (position != null) {
@@ -80,10 +81,10 @@ class CFIPositionTracker {
   }
 
   /// Navigates to the saved reading position.
-  /// 
+  ///
   /// Convenience method that restores the position and navigates to it.
   /// Returns null if no position is saved or navigation fails.
-  /// 
+  ///
   /// ```dart
   /// final location = await tracker.navigateToSavedPosition();
   /// if (location != null) {
@@ -99,10 +100,10 @@ class CFIPositionTracker {
   }
 
   /// Calculates detailed reading progress.
-  /// 
+  ///
   /// Returns comprehensive progress information including current position,
   /// overall progress, and estimated reading time.
-  /// 
+  ///
   /// ```dart
   /// final progress = await tracker.calculateProgress();
   /// print('Current chapter: ${progress.currentChapterIndex + 1}/${progress.totalChapters}');
@@ -127,15 +128,16 @@ class CFIPositionTracker {
       currentChapterTitle: currentChapter?.title,
       lastReadTime: position.timestamp,
       readingVelocity: await _calculateReadingVelocity(),
-      estimatedTimeRemaining: await _estimateTimeRemaining(position.overallProgress),
+      estimatedTimeRemaining:
+          await _estimateTimeRemaining(position.overallProgress),
     );
   }
 
   /// Records a reading session milestone.
-  /// 
+  ///
   /// Saves intermediate positions during reading to track velocity
   /// and provide better progress estimates.
-  /// 
+  ///
   /// ```dart
   /// await tracker.recordMilestone(
   ///   cfi: currentCFI,
@@ -164,10 +166,10 @@ class CFIPositionTracker {
   }
 
   /// Gets reading statistics for this book.
-  /// 
+  ///
   /// Returns comprehensive reading statistics including total time spent,
   /// reading velocity, and progress over time.
-  /// 
+  ///
   /// ```dart
   /// final stats = await tracker.getReadingStatistics();
   /// print('Total reading time: ${stats.totalReadingTime}');
@@ -191,17 +193,19 @@ class CFIPositionTracker {
       averageWordsPerMinute: averageVelocity,
       sessionsCount: sessions.length,
       totalProgress: position?.overallProgress ?? 0.0,
-      firstStarted: milestones.isNotEmpty ? milestones.first.timestamp : position?.timestamp,
+      firstStarted: milestones.isNotEmpty
+          ? milestones.first.timestamp
+          : position?.timestamp,
       lastRead: position?.timestamp ?? DateTime.now(),
       milestoneCount: milestones.length,
     );
   }
 
   /// Synchronizes positions with another tracker (for cross-device sync).
-  /// 
+  ///
   /// Merges reading positions and milestones with another device's data,
   /// resolving conflicts by timestamp.
-  /// 
+  ///
   /// ```dart
   /// final otherDeviceData = await fetchFromCloud();
   /// await tracker.syncWith(otherDeviceData);
@@ -212,8 +216,9 @@ class CFIPositionTracker {
     final remotePosition = syncData.position;
 
     // Use the most recent position
-    if (localPosition == null || 
-        (remotePosition != null && remotePosition.timestamp.isAfter(localPosition.timestamp))) {
+    if (localPosition == null ||
+        (remotePosition != null &&
+            remotePosition.timestamp.isAfter(localPosition.timestamp))) {
       await _storage.savePosition(remotePosition!);
     }
 
@@ -231,10 +236,10 @@ class CFIPositionTracker {
   }
 
   /// Exports position data for backup or transfer.
-  /// 
+  ///
   /// Returns all position and milestone data for this book
   /// in a serializable format.
-  /// 
+  ///
   /// ```dart
   /// final exportData = await tracker.exportData();
   /// await saveToFile(exportData.toJson());
@@ -291,7 +296,8 @@ class CFIPositionTracker {
   }
 
   /// Groups milestones into reading sessions.
-  List<ReadingSession> _groupMilestonesIntoSessions(List<ReadingMilestone> milestones) {
+  List<ReadingSession> _groupMilestonesIntoSessions(
+      List<ReadingMilestone> milestones) {
     if (milestones.isEmpty) return [];
 
     final sessions = <ReadingSession>[];
@@ -504,10 +510,10 @@ class ReadingProgress {
   /// Gets a human-readable progress description.
   String get progressDescription {
     final percentage = (overallProgress * 100).toStringAsFixed(1);
-    final chapterInfo = currentChapterTitle != null 
+    final chapterInfo = currentChapterTitle != null
         ? 'in "$currentChapterTitle"'
         : 'in chapter ${currentChapterIndex + 1}';
-    
+
     return '$percentage% complete $chapterInfo';
   }
 
@@ -601,7 +607,7 @@ class SyncData {
   factory SyncData.fromJson(Map<String, dynamic> json) {
     return SyncData(
       bookId: json['bookId'],
-      position: json['position'] != null 
+      position: json['position'] != null
           ? ReadingPosition.fromJson(json['position'])
           : null,
       milestones: (json['milestones'] as List)

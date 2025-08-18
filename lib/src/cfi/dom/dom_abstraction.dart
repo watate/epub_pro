@@ -1,7 +1,7 @@
 import 'package:xml/xml.dart';
 
 /// Abstract representation of a DOM node for cross-platform compatibility.
-/// 
+///
 /// This abstraction allows CFI operations to work consistently across
 /// server, web, and Flutter environments without depending on dart:html.
 abstract class DOMNode {
@@ -185,7 +185,8 @@ class DOMRange {
   String getText() {
     if (collapsed) return '';
 
-    if (startContainer == endContainer && startContainer.nodeType == DOMNodeType.text) {
+    if (startContainer == endContainer &&
+        startContainer.nodeType == DOMNodeType.text) {
       // Simple case: range within a single text node
       final text = startContainer.nodeValue ?? '';
       return text.substring(startOffset, endOffset.clamp(0, text.length));
@@ -201,14 +202,14 @@ class DOMRange {
     // Simplified implementation - in a full implementation,
     // this would perform tree traversal to extract text
     final buffer = StringBuffer();
-    
+
     // This is a placeholder - real implementation would traverse
     // the DOM tree between start and end positions
     if (startContainer.nodeType == DOMNodeType.text) {
       final text = startContainer.nodeValue ?? '';
       buffer.write(text.substring(startOffset));
     }
-    
+
     return buffer.toString();
   }
 
@@ -228,7 +229,8 @@ class DOMRange {
   }
 
   @override
-  int get hashCode => Object.hash(startContainer, startOffset, endContainer, endOffset);
+  int get hashCode =>
+      Object.hash(startContainer, startOffset, endContainer, endOffset);
 }
 
 /// XML-based implementation of the DOM abstraction using the xml package.
@@ -257,9 +259,12 @@ class XMLDOMDocument extends DOMDocument {
     return html
         .replaceAll(RegExp(r'<br\s*>', caseSensitive: false), '<br/>')
         .replaceAll(RegExp(r'<hr\s*>', caseSensitive: false), '<hr/>')
-        .replaceAll(RegExp(r'<img([^>]*[^/])>', caseSensitive: false), '<img\$1/>')
-        .replaceAll(RegExp(r'<meta([^>]*[^/])>', caseSensitive: false), '<meta\$1/>')
-        .replaceAll(RegExp(r'<link([^>]*[^/])>', caseSensitive: false), '<link\$1/>');
+        .replaceAll(
+            RegExp(r'<img([^>]*[^/])>', caseSensitive: false), '<img\$1/>')
+        .replaceAll(
+            RegExp(r'<meta([^>]*[^/])>', caseSensitive: false), '<meta\$1/>')
+        .replaceAll(
+            RegExp(r'<link([^>]*[^/])>', caseSensitive: false), '<link\$1/>');
   }
 
   @override
@@ -326,7 +331,7 @@ class XMLDOMDocument extends DOMDocument {
       if (node.getAttribute('id') == id) {
         return XMLDOMElement._(node);
       }
-      
+
       for (final child in node.children) {
         final found = _findElementById(child, id);
         if (found != null) return found;
@@ -338,16 +343,18 @@ class XMLDOMDocument extends DOMDocument {
   @override
   List<DOMElement> getElementsByTagName(String tagName) {
     final elements = <DOMElement>[];
-    _collectElementsByTagName(_xmlDoc.rootElement, tagName.toLowerCase(), elements);
+    _collectElementsByTagName(
+        _xmlDoc.rootElement, tagName.toLowerCase(), elements);
     return elements;
   }
 
-  void _collectElementsByTagName(XmlNode? node, String tagName, List<DOMElement> results) {
+  void _collectElementsByTagName(
+      XmlNode? node, String tagName, List<DOMElement> results) {
     if (node is XmlElement) {
       if (node.name.local.toLowerCase() == tagName) {
         results.add(XMLDOMElement._(node));
       }
-      
+
       for (final child in node.children) {
         _collectElementsByTagName(child, tagName, results);
       }
@@ -387,12 +394,14 @@ class XMLDOMNode extends DOMNode {
   @override
   List<DOMNode> get childNodes {
     if (_xmlNode is XmlElement) {
-      return (_xmlNode as XmlElement).children
+      return (_xmlNode as XmlElement)
+          .children
           .map((child) => XMLDOMNode._(child))
           .toList();
     }
     if (_xmlNode is XmlDocument) {
-      return (_xmlNode as XmlDocument).children
+      return (_xmlNode as XmlDocument)
+          .children
           .map((child) => XMLDOMNode._(child))
           .toList();
     }
@@ -478,7 +487,8 @@ class XMLDOMElement extends XMLDOMNode implements DOMElement {
 
   @override
   DOMElement? get firstElementChild {
-    final firstElement = _xmlElement.children.whereType<XmlElement>().firstOrNull;
+    final firstElement =
+        _xmlElement.children.whereType<XmlElement>().firstOrNull;
     return firstElement != null ? XMLDOMElement._(firstElement) : null;
   }
 
@@ -495,11 +505,11 @@ class XMLDOMElement extends XMLDOMNode implements DOMElement {
 
     final siblings = parent.children.whereType<XmlElement>().toList();
     final currentIndex = siblings.indexOf(_xmlElement);
-    
+
     if (currentIndex >= 0 && currentIndex < siblings.length - 1) {
       return XMLDOMElement._(siblings[currentIndex + 1]);
     }
-    
+
     return null;
   }
 
@@ -510,11 +520,11 @@ class XMLDOMElement extends XMLDOMNode implements DOMElement {
 
     final siblings = parent.children.whereType<XmlElement>().toList();
     final currentIndex = siblings.indexOf(_xmlElement);
-    
+
     if (currentIndex > 0) {
       return XMLDOMElement._(siblings[currentIndex - 1]);
     }
-    
+
     return null;
   }
 
@@ -555,12 +565,12 @@ class XMLDOMElement extends XMLDOMNode implements DOMElement {
     if (element.getAttribute('id') == id) {
       return XMLDOMElement._(element);
     }
-    
+
     for (final child in element.children.whereType<XmlElement>()) {
       final found = _findElementById(child, id);
       if (found != null) return found;
     }
-    
+
     return null;
   }
 }
@@ -597,7 +607,7 @@ class XMLDOMText extends XMLDOMNode implements DOMText {
 
     // Create new text node
     final newTextNode = XmlText(afterText);
-    
+
     // Insert after this node
     final parent = _xmlText.parent;
     if (parent != null) {
