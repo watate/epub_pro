@@ -33,4 +33,15 @@ export 'src/schema/navigation/epub_navigation_head_meta.dart';
 export 'src/schema/navigation/epub_navigation_label.dart';
 export 'src/schema/navigation/epub_navigation_map.dart';
 export 'src/schema/navigation/epub_navigation_point.dart';
+
+// CFI (Canonical Fragment Identifier) Support
+export 'src/cfi/core/cfi.dart';
+export 'src/cfi/core/cfi_comparator.dart';
+export 'src/cfi/core/cfi_range.dart';
+export 'src/cfi/dom/dom_abstraction.dart';
+export 'src/cfi/epub/epub_cfi_manager.dart';
+export 'src/cfi/epub/epub_cfi_extensions.dart';
+export 'src/cfi/tracking/position_tracker.dart';
+export 'src/cfi/tracking/annotation_manager.dart';
+
 export 'package:image/image.dart' show Image;
