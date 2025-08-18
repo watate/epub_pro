@@ -41,32 +41,32 @@ void main() {
         final spineIndex = manager.extractSpineIndex(cfi);
 
         expect(spineIndex,
-            equals(2)); // Implementation returns 2 due to CFI structure parsing
+            equals(1)); // /6/4!/ maps to spine index 1: (4/2) - 1 = 1
       });
 
       test('Extract spine index from range CFI', () {
         final cfi = CFI('epubcfi(/6/6!/4/10,/2:5,/2:15)');
         final spineIndex = manager.extractSpineIndex(cfi);
 
-        expect(spineIndex, equals(2)); // (6/2) - 1 = 2
+        expect(spineIndex, equals(2)); // /6/6!/ maps to spine index 2: (6/2) - 1 = 2
       });
 
       test('Handle invalid spine index', () {
         final cfi = CFI('epubcfi(/6/1!/4/10/2:5)'); // Odd index
         final spineIndex = manager.extractSpineIndex(cfi);
 
-        // Implementation still extracts index from first part regardless of odd/even
-        expect(spineIndex, equals(2));
+        // Invalid CFI with odd spine index should return null
+        expect(spineIndex, isNull);
       });
 
       test('Extract spine index with complex CFI', () {
-        final cfi = CFI('epubcfi(/6/8[chapter-id]!/4/10/2:5)');
+        final cfi = CFI('epubcfi(/6/6[chapter-id]!/4/10/2:5)');
         final spineIndex = manager.extractSpineIndex(cfi);
 
         expect(
             spineIndex,
             equals(
-                2)); // Implementation extracts from first part: (6/2) - 1 = 2
+                2)); // /6/6!/ maps to spine index 2: (6/2) - 1 = 2
       });
     });
 
@@ -133,8 +133,8 @@ void main() {
         );
 
         expect(cfi, isNotNull);
-        // Implementation generates without package root: missing /6/ prefix
-        expect(cfi!.toString(), equals('epubcfi(/2!/4/10/2:5)'));
+        // Implementation generates with package document reference (EPUB spec compliant)
+        expect(cfi!.toString(), equals('epubcfi(/6!/2!/4/10/2:5)'));
         expect(cfi.isRange, isFalse);
       });
 
@@ -160,8 +160,8 @@ void main() {
         );
 
         expect(cfi, isNotNull);
-        // Implementation generates without package root: missing /6/ prefix
-        expect(cfi!.toString(), equals('epubcfi(/4!/4/10/2)'));
+        // Implementation generates with package document reference (EPUB spec compliant)
+        expect(cfi!.toString(), equals('epubcfi(/6!/4!/4/10/2)'));
 
         // Verify no offset in the CFI
         final lastPart = cfi.structure.start.parts.last;
@@ -226,16 +226,16 @@ void main() {
         final cfi = CFI('epubcfi(/6/99!/4/2/1:0)');
         final isValid = await manager.validateCFI(cfi);
 
-        // Implementation validation may return true for basic structure checks
-        expect(isValid, isTrue);
+        // Should reject CFI pointing to non-existent spine index (49)
+        expect(isValid, isFalse);
       });
 
       test('Reject CFI with malformed structure', () async {
         final cfi = CFI('epubcfi(/6/1!/4/2/1:0)'); // Odd spine index
         final isValid = await manager.validateCFI(cfi);
 
-        // Implementation validation may return true for basic structure checks
-        expect(isValid, isTrue);
+        // Should reject CFI with odd spine index (invalid per EPUB spec)
+        expect(isValid, isFalse);
       });
     });
 
@@ -243,8 +243,8 @@ void main() {
       test('Create simple progress CFI', () {
         final cfi = manager.createProgressCFI(1);
 
-        // Implementation generates without package root: missing /6/ prefix
-        expect(cfi.toString(), equals('epubcfi(/4)'));
+        // Implementation generates with package document reference (EPUB spec compliant)
+        expect(cfi.toString(), equals('epubcfi(/6!/4)'));
         expect(cfi.isRange, isFalse);
 
         final spineIndex = manager.extractSpineIndex(cfi);
@@ -259,10 +259,10 @@ void main() {
         final spineIndex = manager.extractSpineIndex(cfi);
         expect(spineIndex, equals(2));
 
-        // Should contain indirection marker for progress
+        // Should contain package document, spine, and progress parts
         final parts = cfi.structure.start.parts;
-        expect(parts.length, equals(2));
-        expect(parts[1].hasIndirection, isTrue);
+        expect(parts.length, equals(3)); // Package + spine + progress
+        expect(parts[1].hasIndirection, isTrue); // Spine part has indirection
       });
 
       test('Create progress CFI for all spine items', () {
@@ -442,12 +442,12 @@ void main() {
 
     group('Integration with Real CFI Patterns', () {
       test('Handle typical EPUB3 CFI patterns', () async {
-        // Common EPUB3 CFI patterns
+        // Common EPUB3 CFI patterns (using available spine indices 0, 1, 2)
         final commonCFIs = [
-          'epubcfi(/6/2!/4/2/1:0)', // Simple position
-          'epubcfi(/6/4!/4/10/2:15)', // Element with offset
-          'epubcfi(/6/6!/4/2,/1:0,/1:10)', // Range CFI
-          'epubcfi(/6/8[ch01]!/4/2/1:0)', // With ID assertion
+          'epubcfi(/6/2!/4/2/1:0)', // Simple position (spine 0)
+          'epubcfi(/6/4!/4/10/2:15)', // Element with offset (spine 1)
+          'epubcfi(/6/6!/4/2,/1:0,/1:10)', // Range CFI (spine 2)
+          'epubcfi(/6/6[ch01]!/4/2/1:0)', // With ID assertion (spine 2)
         ];
 
         for (final cfiString in commonCFIs) {

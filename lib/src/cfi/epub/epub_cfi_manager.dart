@@ -80,15 +80,18 @@ class EpubCFIManager {
     final spineIndex = getSpineIndexForChapter(chapterRef);
     if (spineIndex == null) return null;
 
+    // Package document reference (always /6/ for EPUB)
+    final packagePart = CFIPart(index: 6);
+
     // Build spine part (convert 0-based index to CFI format)
-    final spinePart = CFIPart(index: (spineIndex + 1) * 2);
+    final spinePart = CFIPart(index: (spineIndex + 1) * 2, hasIndirection: true);
 
     // Parse element path
     final pathParts = _parseElementPath(elementPath, characterOffset);
 
-    // Create complete CFI structure
+    // Create complete CFI structure with package reference
     final structure = CFIStructure(
-      start: CFIPath(parts: [spinePart, ...pathParts]),
+      start: CFIPath(parts: [packagePart, spinePart, ...pathParts]),
     );
 
     return CFI.fromStructure(structure);
@@ -105,25 +108,20 @@ class EpubCFIManager {
     final spineIndex = getSpineIndexForChapter(chapterRef);
     if (spineIndex == null) return null;
 
+    // Package document reference (always /6/ for EPUB)
+    final packagePart = CFIPart(index: 6);
+
     // Build spine part
-    final spinePart = CFIPart(index: (spineIndex + 1) * 2);
+    final spinePart = CFIPart(index: (spineIndex + 1) * 2, hasIndirection: true);
 
     // Get document path from position
     final documentPath = HTMLNavigator.createPathFromPosition(position);
 
-    // Add step indirection marker
-    final indirectionPart = CFIPart(
-      index: documentPath.parts.first.index,
-      id: documentPath.parts.first.id,
-      hasIndirection: true,
-    );
-
-    // Combine spine + indirection + document path
+    // Combine package + spine + document path
     final allParts = [
+      packagePart,
       spinePart,
-      indirectionPart,
-      ...documentPath.parts
-          .skip(1), // Skip first part as it's now the indirection
+      ...documentPath.parts,
     ];
 
     final structure = CFIStructure(
@@ -155,10 +153,11 @@ class EpubCFIManager {
     // Build CFI structure from range
     final rangeStructure = HTMLNavigator.createStructureFromRange(range);
 
-    // Add spine information to parent path
-    final spinePart = CFIPart(index: (spineIndex + 1) * 2);
+    // Add package document and spine information to parent path
+    final packagePart = CFIPart(index: 6);
+    final spinePart = CFIPart(index: (spineIndex + 1) * 2, hasIndirection: true);
     final parentParts = rangeStructure.parent?.parts ?? [];
-    final fullParentParts = [spinePart, ...parentParts];
+    final fullParentParts = [packagePart, spinePart, ...parentParts];
 
     final structure = CFIStructure(
       parent: CFIPath(parts: fullParentParts),
@@ -216,24 +215,31 @@ class EpubCFIManager {
   /// Generates a CFI that represents a rough position within a chapter,
   /// useful for bookmarks and reading progress without requiring precise
   /// DOM analysis.
+  ///
+  /// The CFI format follows the EPUB specification with package document
+  /// reference and proper indirection: epubcfi(/6/X!/...)
   CFI createProgressCFI(int spineIndex, {double fraction = 0.0}) {
-    final spinePart = CFIPart(index: (spineIndex + 1) * 2);
+    // Package document reference (always /6/ for EPUB)
+    final packagePart = CFIPart(index: 6);
+    
+    // Spine reference (even numbers: 2, 4, 6, ...)
+    final spinePart = CFIPart(index: (spineIndex + 1) * 2, hasIndirection: true);
 
     if (fraction > 0.0) {
       // Create an approximate position based on the fraction
       final estimatedStep = (fraction * 100).round() * 2;
-      final progressPart = CFIPart(index: estimatedStep, hasIndirection: true);
+      final progressPart = CFIPart(index: estimatedStep);
 
       return CFI.fromStructure(
         CFIStructure(
-          start: CFIPath(parts: [spinePart, progressPart]),
+          start: CFIPath(parts: [packagePart, spinePart, progressPart]),
         ),
       );
     }
 
     return CFI.fromStructure(
       CFIStructure(
-        start: CFIPath(parts: [spinePart]),
+        start: CFIPath(parts: [packagePart, spinePart]),
       ),
     );
   }
@@ -241,11 +247,30 @@ class EpubCFIManager {
   /// Extracts the spine index from a CFI.
   int? extractSpineIndex(CFI cfi) {
     final structure = cfi.structure;
-    final firstPart =
-        structure.parent?.parts.first ?? structure.start.parts.first;
+    final pathParts = structure.parent?.parts ?? structure.start.parts;
 
-    // CFI spine indices are 1-based even numbers (2, 4, 6, ...)
-    // Convert to 0-based: (index / 2) - 1
+    // CFI format: epubcfi(/6/X!/...) where X is spine index
+    // First part should be package document (6), second part is spine
+    if (pathParts.length >= 2) {
+      final packagePart = pathParts[0];
+      final spinePart = pathParts[1];
+
+      // Verify package document reference and valid spine index
+      if (packagePart.index == 6 && 
+          spinePart.index >= 2 && 
+          spinePart.index.isEven) {
+        // Convert spine index to 0-based: (index / 2) - 1
+        return (spinePart.index ~/ 2) - 1;
+      }
+      
+      // Return null for invalid spine indices (odd numbers, etc.)
+      if (packagePart.index == 6) {
+        return null;
+      }
+    }
+
+    // Fallback for old format CFIs without package reference
+    final firstPart = pathParts.first;
     if (firstPart.index >= 2 && firstPart.index.isEven) {
       return (firstPart.index ~/ 2) - 1;
     }
@@ -260,7 +285,7 @@ class EpubCFIManager {
     // For range CFIs, use the start path
     final pathParts = structure.parent?.parts ?? structure.start.parts;
 
-    // Find step indirection marker
+    // Find step indirection marker (should be on spine part)
     int indirectionIndex = -1;
     for (int i = 0; i < pathParts.length; i++) {
       if (pathParts[i].hasIndirection) {
@@ -270,14 +295,14 @@ class EpubCFIManager {
     }
 
     if (indirectionIndex >= 0) {
-      // Return parts after indirection
-      final documentParts = pathParts.skip(indirectionIndex).toList();
-      return CFIPath(parts: documentParts);
+      // Return parts after indirection (excluding the indirection part itself)
+      final documentParts = pathParts.skip(indirectionIndex + 1).toList();
+      return documentParts.isNotEmpty ? CFIPath(parts: documentParts) : null;
     }
 
-    // If no indirection found, assume simple spine reference
-    if (pathParts.length > 1) {
-      return CFIPath(parts: pathParts.skip(1).toList());
+    // Fallback: Skip package and spine parts (first two parts)
+    if (pathParts.length > 2) {
+      return CFIPath(parts: pathParts.skip(2).toList());
     }
 
     return null;

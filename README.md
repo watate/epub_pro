@@ -19,6 +19,11 @@ History: This is a fork of a [fork](https://github.com/4akloon/epub_plus), of a 
    - This matches how Apple Books and other readers handle malformed EPUBs
 5. Added chapter splitting functionality (optional) - automatically split long chapters (>3000 words) into smaller, more manageable parts
 6. Added lazy loading support for chapter splitting - read and split chapters on-demand for better memory efficiency
+7. **📍 CFI (Canonical Fragment Identifier) Support** - Industry-standard precise positioning system:
+   - **Position tracking**: Save and restore exact reading positions with CFI precision
+   - **Annotation system**: Create highlights, notes, and bookmarks with precise location references  
+   - **Reading analytics**: Track reading progress, velocity, and time estimates
+   - **Cross-device sync**: Synchronize positions and annotations between devices
 
 ## Some useful info
 ### Mimetype
@@ -276,6 +281,277 @@ for (final chapter in epubBook.chapters) {
 //   SubChapter: chapter02.xhtml
 // Chapter: Part 2
 //   SubChapter: chapter03.xhtml
+```
+
+### 📍 CFI (Canonical Fragment Identifier) Support
+
+CFI provides industry-standard precise positioning within EPUB books, enabling exact reading position tracking, annotations, and cross-device synchronization.
+
+#### Basic CFI Operations
+
+```dart
+// Open book with CFI manager access
+final bookRef = await EpubReader.openBook(bytes);
+final cfiManager = bookRef.cfiManager;
+
+// Create a progress CFI pointing to a specific spine position
+final cfi = bookRef.createProgressCFI(2); // Beginning of spine item 2
+final cfiWithProgress = bookRef.createProgressCFI(2, fraction: 0.5); // 50% through spine item 2
+
+// Navigate to a CFI location
+final location = await bookRef.navigateToCFI(CFI('epubcfi(/6/4!/4/10/2:5)'));
+if (location != null) {
+  print('Found in chapter: ${location.chapterRef.title}');
+  final textContent = await location.getTextContent();
+  final context = await location.getContext(beforeChars: 50, afterChars: 50);
+}
+
+// Validate CFI before navigation
+final isValid = await bookRef.validateCFI(cfi);
+if (isValid) {
+  final location = await bookRef.navigateToCFI(cfi);
+}
+
+// Get spine-to-chapter mapping for CFI operations
+final spineMap = bookRef.getSpineChapterMap();
+for (final entry in spineMap.entries) {
+  print('Spine ${entry.key}: ${entry.value.title}');
+}
+```
+
+#### Position Tracking & Reading Progress
+
+```dart
+// Create position tracker with storage implementation
+final tracker = CFIPositionTracker(
+  bookId: 'unique_book_id',
+  bookRef: bookRef,
+  storage: MyPositionStorage(), // Your storage implementation
+);
+
+// Save current reading position
+await tracker.savePosition(
+  cfi: CFI('epubcfi(/6/4!/4/10/2:5)'),
+  fractionInChapter: 0.3, // 30% through the chapter
+  metadata: {
+    'sessionId': 'session_123',
+    'deviceId': 'mobile_device',
+  },
+);
+
+// Restore last reading position
+final savedPosition = await tracker.restorePosition();
+if (savedPosition != null) {
+  print('Last read at: ${savedPosition.cfi}');
+  print('Overall progress: ${(savedPosition.overallProgress * 100).toStringAsFixed(1)}%');
+  
+  // Navigate back to saved position
+  final location = await tracker.navigateToSavedPosition();
+}
+
+// Get comprehensive reading progress
+final progress = await tracker.calculateProgress();
+print('Current chapter: ${progress.currentChapterIndex + 1}/${progress.totalChapters}');
+print('Chapter: "${progress.currentChapterTitle}"');
+print('Progress: ${progress.progressDescription}');
+print('Reading speed: ${progress.readingVelocity.toStringAsFixed(1)} words/min');
+print('Estimated time remaining: ${progress.estimatedTimeRemaining}');
+
+// Record reading milestones for analytics
+await tracker.recordMilestone(
+  cfi: currentCFI,
+  fractionInChapter: 0.5,
+  sessionData: {
+    'wordsRead': 1200,
+    'timeSpentSeconds': 300, // 5 minutes
+    'sessionType': 'focused_reading',
+  },
+);
+
+// Get detailed reading statistics
+final stats = await tracker.getReadingStatistics();
+print('Total reading time: ${stats.totalReadingTime}');
+print('Average reading speed: ${stats.averageWordsPerMinute} wpm');
+print('Reading sessions: ${stats.sessionsCount}');
+print('First started: ${stats.firstStarted}');
+```
+
+#### Cross-Device Synchronization
+
+```dart
+// Export data for sync
+final syncData = await tracker.exportData();
+final json = syncData.toJson();
+
+// Send to cloud storage or another device...
+await uploadToCloud(json);
+
+// On another device, import and merge
+final importedData = SyncData.fromJson(await downloadFromCloud());
+await tracker.syncWith(importedData);
+
+print('Positions synchronized across devices');
+```
+
+#### Annotation Management
+
+```dart
+// Create annotation manager
+final annotationManager = CFIAnnotationManager(
+  bookId: 'unique_book_id',
+  bookRef: bookRef,
+  storage: MyAnnotationStorage(), // Your storage implementation
+);
+
+// Create a highlight annotation
+final highlight = await annotationManager.createHighlight(
+  startCFI: CFI('epubcfi(/6/4!/4/10/2:5)'),
+  endCFI: CFI('epubcfi(/6/4!/4/10/2:15)'),
+  selectedText: 'This is important text',
+  color: '#ffff00', // Yellow highlight
+  note: 'Key concept for the exam',
+);
+
+// Create a note annotation
+final note = await annotationManager.createNote(
+  cfi: CFI('epubcfi(/6/4!/4/10/2:5)'),
+  text: 'This reminds me of the discussion in Chapter 1',
+  title: 'Connection to earlier material',
+  category: 'analysis',
+);
+
+// Create a bookmark
+final bookmark = await annotationManager.createBookmark(
+  cfi: CFI('epubcfi(/6/6!/4/2/1:0)'),
+  title: 'Start of important section',
+  description: 'Chapter 3: The turning point',
+);
+
+// Retrieve annotations
+final allAnnotations = await annotationManager.getAllAnnotations();
+final highlights = await annotationManager.getAnnotationsByType<HighlightAnnotation>(
+  AnnotationType.highlight,
+);
+final bookmarks = await annotationManager.getAnnotationsByType<BookmarkAnnotation>(
+  AnnotationType.bookmark,
+);
+
+// Get annotations for a specific chapter
+final chapterAnnotations = await annotationManager.getAnnotationsForChapter(2);
+
+// Get annotations in a CFI range
+final startCFI = CFI('epubcfi(/6/4!/4/2/1:0)');
+final endCFI = CFI('epubcfi(/6/8!/4/2/1:0)');
+final rangeAnnotations = await annotationManager.getAnnotationsInRange(startCFI, endCFI);
+
+// Search annotations by content
+final searchResults = await annotationManager.searchAnnotations('important concept');
+
+// Find annotations near a specific position
+final nearbyAnnotations = await annotationManager.findNearbyAnnotations(
+  CFI('epubcfi(/6/4!/4/10/2:10)'),
+  maxDistance: 1000, // characters
+);
+```
+
+#### Advanced CFI Generation
+
+```dart
+// Generate CFI from chapter and element path
+final chapterRef = bookRef.getChapters()[0];
+final cfi = await chapterRef.generateCFI(
+  elementPath: '/4/10/2', // XPath-style element path
+  characterOffset: 15,
+  bookRef: bookRef,
+);
+
+// Parse chapter content and generate CFI from DOM position
+final document = await chapterRef.parseAsDOM();
+final paragraph = document.getElementsByTagName('p').first;
+final textNode = paragraph.childNodes.first;
+
+final domPosition = DOMPosition(container: textNode, offset: 10);
+final cfiFromDOM = await chapterRef.generateCFIFromPosition(
+  position: domPosition,
+  bookRef: bookRef,
+);
+
+// Create range CFI for text selections
+final startPos = DOMPosition(container: textNode, offset: 5);
+final endPos = DOMPosition(container: textNode, offset: 25);
+
+final rangeCFI = await chapterRef.generateRangeCFI(
+  startPosition: startPos,
+  endPosition: endPos,
+  bookRef: bookRef,
+);
+
+// Get text content at a CFI location
+final textAtCFI = await chapterRef.getTextAtCFI(cfi, bookRef: bookRef);
+print('Text at CFI: $textAtCFI');
+```
+
+#### Annotation Statistics and Export
+
+```dart
+// Get annotation statistics
+final stats = await annotationManager.getAnnotationStatistics();
+print('Total annotations: ${stats.totalCount}');
+print('Highlights: ${stats.highlightCount}');
+print('Notes: ${stats.noteCount}');
+print('Bookmarks: ${stats.bookmarkCount}');
+print('First annotation: ${stats.firstCreated}');
+
+// Export annotations for backup
+final exportData = await annotationManager.exportAnnotations();
+final exportJson = exportData.toJson();
+await saveToFile(exportJson);
+
+// Import annotations with merge strategy
+final importData = AnnotationExport.fromJson(await loadFromFile());
+await annotationManager.importAnnotations(
+  importData,
+  mergeStrategy: MergeStrategy.skipExisting, // Don't overwrite existing
+);
+```
+
+#### Storage Implementation
+
+You'll need to implement storage interfaces for persistence:
+
+```dart
+// Position storage example (implement PositionStorage)
+class MyPositionStorage implements PositionStorage {
+  @override
+  Future<void> savePosition(ReadingPosition position) async {
+    // Save to local database, cloud, etc.
+    await database.insert('positions', position.toJson());
+  }
+
+  @override
+  Future<ReadingPosition?> getPosition(String bookId) async {
+    final result = await database.query('positions', where: 'bookId = ?', whereArgs: [bookId]);
+    return result.isNotEmpty ? ReadingPosition.fromJson(result.first) : null;
+  }
+
+  // ... implement other methods
+}
+
+// Annotation storage example (implement AnnotationStorage)  
+class MyAnnotationStorage implements AnnotationStorage {
+  @override
+  Future<void> saveAnnotation(Annotation annotation) async {
+    await database.insert('annotations', annotation.toJson());
+  }
+
+  @override
+  Future<List<Annotation>> getAnnotations(String bookId) async {
+    final results = await database.query('annotations', where: 'bookId = ?', whereArgs: [bookId]);
+    return results.map((json) => Annotation.fromJson(json)).toList();
+  }
+
+  // ... implement other methods
+}
 ```
 
 ### Writing EPUB Files
