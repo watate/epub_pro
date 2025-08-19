@@ -16,14 +16,14 @@ import 'split_cfi.dart';
 /// ## Example
 /// ```dart
 /// final converter = SplitCFIConverter();
-/// 
+///
 /// // Convert standard CFI to split CFI
 /// final standardCFI = CFI('epubcfi(/6/4!/4/10/2:500)');
 /// final splitCFI = converter.standardToSplit(
 ///   standardCFI,
 ///   splitRef: mySplitChapterRef,
 /// );
-/// 
+///
 /// // Convert split CFI back to standard CFI
 /// final backToStandard = converter.splitToStandard(splitCFI, splitRef);
 /// ```
@@ -61,22 +61,21 @@ class SplitCFIConverter {
 
     // Calculate split part boundaries
     final partBoundaries = _calculatePartBoundaries(splitRef);
-    
+
     // Find which part contains this character offset
     for (int i = 0; i < partBoundaries.length; i++) {
       final boundary = partBoundaries[i];
-      if (characterOffset >= boundary.startOffset && 
+      if (characterOffset >= boundary.startOffset &&
           characterOffset <= boundary.endOffset) {
-        
         // Calculate relative offset within the part
         final relativeOffset = characterOffset - boundary.startOffset;
-        
+
         // Create split CFI with adjusted offset
         final adjustedCFI = _adjustCharacterOffset(
-          standardCFI, 
+          standardCFI,
           relativeOffset,
         );
-        
+
         return SplitCFI.fromStandardCFI(
           adjustedCFI,
           splitPart: i + 1, // Parts are 1-based
@@ -107,9 +106,8 @@ class SplitCFIConverter {
     if (splitCFI.splitPart != splitRef.partNumber ||
         splitCFI.totalParts != splitRef.totalParts) {
       throw ArgumentError(
-        'Split CFI (${splitCFI.splitPart}/${splitCFI.totalParts}) '
-        'does not match split reference (${splitRef.partNumber}/${splitRef.totalParts})'
-      );
+          'Split CFI (${splitCFI.splitPart}/${splitCFI.totalParts}) '
+          'does not match split reference (${splitRef.partNumber}/${splitRef.totalParts})');
     }
 
     // Extract character offset from split CFI
@@ -122,13 +120,14 @@ class SplitCFIConverter {
     // Calculate the absolute offset in the original chapter
     final partBoundaries = _calculatePartBoundaries(splitRef);
     final partIndex = splitRef.partNumber - 1; // Convert to 0-based
-    
+
     if (partIndex >= partBoundaries.length) {
       throw ArgumentError('Invalid part number: ${splitRef.partNumber}');
     }
 
-    final absoluteOffset = partBoundaries[partIndex].startOffset + relativeOffset;
-    
+    final absoluteOffset =
+        partBoundaries[partIndex].startOffset + relativeOffset;
+
     // Create standard CFI with absolute offset
     return _adjustCharacterOffset(splitCFI.baseCFI, absoluteOffset);
   }
@@ -155,7 +154,7 @@ class SplitCFIConverter {
 
     for (int i = 0; i < partBoundaries.length; i++) {
       final boundary = partBoundaries[i];
-      if (characterOffset >= boundary.startOffset && 
+      if (characterOffset >= boundary.startOffset &&
           characterOffset <= boundary.endOffset) {
         return i + 1; // Return 1-based part number
       }
@@ -178,45 +177,48 @@ class SplitCFIConverter {
       RegExp(r':(\d+)'),
       ':$newOffset',
     );
-    
+
     // If no offset was found, add one
     if (!originalCFI.raw.contains(':')) {
       // Find the last part and add offset
       final insertPoint = originalCFI.raw.lastIndexOf(')');
-      final withOffset = '${originalCFI.raw.substring(0, insertPoint)}:$newOffset${originalCFI.raw.substring(insertPoint)}';
+      final withOffset =
+          '${originalCFI.raw.substring(0, insertPoint)}:$newOffset${originalCFI.raw.substring(insertPoint)}';
       return CFI(withOffset);
     }
-    
+
     return CFI(adjustedString);
   }
 
   /// Calculates character boundaries for each part of a split chapter.
-  static List<PartBoundary> _calculatePartBoundaries(EpubChapterSplitRef splitRef) {
+  static List<PartBoundary> _calculatePartBoundaries(
+      EpubChapterSplitRef splitRef) {
     // This is a simplified implementation
     // In practice, this would need to load the original chapter content
     // and calculate exact boundaries based on the splitting algorithm
-    
+
     final totalParts = splitRef.totalParts;
     final boundaries = <PartBoundary>[];
-    
+
     // Estimate boundaries (this would be more precise in real implementation)
     // For now, assume equal distribution as a placeholder
-    const estimatedTotalChars = 10000; // Would be calculated from actual content
+    const estimatedTotalChars =
+        10000; // Would be calculated from actual content
     final charsPerPart = estimatedTotalChars ~/ totalParts;
-    
+
     for (int i = 0; i < totalParts; i++) {
       final startOffset = i * charsPerPart;
-      final endOffset = (i == totalParts - 1) 
-          ? estimatedTotalChars - 1 
+      final endOffset = (i == totalParts - 1)
+          ? estimatedTotalChars - 1
           : (i + 1) * charsPerPart - 1;
-      
+
       boundaries.add(PartBoundary(
         partNumber: i + 1,
         startOffset: startOffset,
         endOffset: endOffset,
       ));
     }
-    
+
     return boundaries;
   }
 }
@@ -250,9 +252,9 @@ class PartBoundary {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is PartBoundary &&
-           other.partNumber == partNumber &&
-           other.startOffset == startOffset &&
-           other.endOffset == endOffset;
+        other.partNumber == partNumber &&
+        other.startOffset == startOffset &&
+        other.endOffset == endOffset;
   }
 
   @override

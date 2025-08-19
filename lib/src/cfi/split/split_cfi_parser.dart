@@ -34,7 +34,8 @@ class SplitCFIParser {
   /// information or is malformed.
   static SplitCFI parseSplitCFI(String cfiString) {
     if (!SplitCFI.containsSplitInfo(cfiString)) {
-      throw FormatException('CFI does not contain split information: $cfiString');
+      throw FormatException(
+          'CFI does not contain split information: $cfiString');
     }
     return SplitCFI(cfiString);
   }
@@ -52,13 +53,13 @@ class SplitCFIParser {
 
     // Extract split information
     final splitInfo = _extractSplitInfo(cfiString);
-    
+
     // Remove split information for standard parsing
     final cleanCFI = _removeSplitNotation(cfiString);
-    
+
     // Parse using standard parser
     final structure = CFIParser.parse(cleanCFI);
-    
+
     // Add split metadata to the structure
     return _addSplitMetadata(structure, splitInfo);
   }
@@ -74,7 +75,8 @@ class SplitCFIParser {
       }
 
       // Validate split notation syntax
-      final splitMatch = RegExp(r'/split=(\d+),total=(\d+)/').firstMatch(cfiString);
+      final splitMatch =
+          RegExp(r'/split=(\d+),total=(\d+)/').firstMatch(cfiString);
       if (splitMatch == null) {
         return false;
       }
@@ -118,7 +120,8 @@ class SplitCFIParser {
   }
 
   /// Adds split metadata to a parsed CFI structure.
-  static CFIStructure _addSplitMetadata(CFIStructure structure, SplitInfo splitInfo) {
+  static CFIStructure _addSplitMetadata(
+      CFIStructure structure, SplitInfo splitInfo) {
     // For now, we'll store split info in the structure's metadata
     // This preserves the existing structure while adding split context
     return CFIStructureWithSplitInfo(
@@ -136,19 +139,19 @@ class SplitCFIParser {
   ) {
     // Generate standard CFI string
     final standardCFI = structure.toString();
-    
+
     // Find insertion point after spine reference
     final spineEndMatch = RegExp(r'(/6/\d+!)').firstMatch(standardCFI);
     if (spineEndMatch == null) {
       throw FormatException('Invalid CFI structure for split CFI');
     }
-    
+
     final insertionPoint = spineEndMatch.end;
     final splitNotation = '/split=$splitPart,total=$totalParts';
-    
+
     return standardCFI.substring(0, insertionPoint) +
-           splitNotation +
-           standardCFI.substring(insertionPoint);
+        splitNotation +
+        standardCFI.substring(insertionPoint);
   }
 
   /// Converts a split CFI to its canonical format.
@@ -194,10 +197,10 @@ class CFIStructureWithSplitInfo extends CFIStructure {
     this.splitPart,
     this.totalParts,
   ) : super(
-    start: baseStructure.start,
-    end: baseStructure.end,
-    parent: baseStructure.parent,
-  );
+          start: baseStructure.start,
+          end: baseStructure.end,
+          parent: baseStructure.parent,
+        );
 
   /// Whether this structure contains split information.
   bool get hasSplitInfo => true;
@@ -212,9 +215,9 @@ class CFIStructureWithSplitInfo extends CFIStructure {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is CFIStructureWithSplitInfo &&
-           other.baseStructure == baseStructure &&
-           other.splitPart == splitPart &&
-           other.totalParts == totalParts;
+        other.baseStructure == baseStructure &&
+        other.splitPart == splitPart &&
+        other.totalParts == totalParts;
   }
 
   @override

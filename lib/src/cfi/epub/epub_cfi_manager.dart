@@ -84,7 +84,8 @@ class EpubCFIManager {
     final packagePart = CFIPart(index: 6);
 
     // Build spine part (convert 0-based index to CFI format)
-    final spinePart = CFIPart(index: (spineIndex + 1) * 2, hasIndirection: true);
+    final spinePart =
+        CFIPart(index: (spineIndex + 1) * 2, hasIndirection: true);
 
     // Parse element path
     final pathParts = _parseElementPath(elementPath, characterOffset);
@@ -112,7 +113,8 @@ class EpubCFIManager {
     final packagePart = CFIPart(index: 6);
 
     // Build spine part
-    final spinePart = CFIPart(index: (spineIndex + 1) * 2, hasIndirection: true);
+    final spinePart =
+        CFIPart(index: (spineIndex + 1) * 2, hasIndirection: true);
 
     // Get document path from position
     final documentPath = HTMLNavigator.createPathFromPosition(position);
@@ -155,7 +157,8 @@ class EpubCFIManager {
 
     // Add package document and spine information to parent path
     final packagePart = CFIPart(index: 6);
-    final spinePart = CFIPart(index: (spineIndex + 1) * 2, hasIndirection: true);
+    final spinePart =
+        CFIPart(index: (spineIndex + 1) * 2, hasIndirection: true);
     final parentParts = rangeStructure.parent?.parts ?? [];
     final fullParentParts = [packagePart, spinePart, ...parentParts];
 
@@ -221,9 +224,10 @@ class EpubCFIManager {
   CFI createProgressCFI(int spineIndex, {double fraction = 0.0}) {
     // Package document reference (always /6/ for EPUB)
     final packagePart = CFIPart(index: 6);
-    
+
     // Spine reference (even numbers: 2, 4, 6, ...)
-    final spinePart = CFIPart(index: (spineIndex + 1) * 2, hasIndirection: true);
+    final spinePart =
+        CFIPart(index: (spineIndex + 1) * 2, hasIndirection: true);
 
     if (fraction > 0.0) {
       // Create an approximate position based on the fraction
@@ -256,13 +260,13 @@ class EpubCFIManager {
       final spinePart = pathParts[1];
 
       // Verify package document reference and valid spine index
-      if (packagePart.index == 6 && 
-          spinePart.index >= 2 && 
+      if (packagePart.index == 6 &&
+          spinePart.index >= 2 &&
           spinePart.index.isEven) {
         // Convert spine index to 0-based: (index / 2) - 1
         return (spinePart.index ~/ 2) - 1;
       }
-      
+
       // Return null for invalid spine indices (odd numbers, etc.)
       if (packagePart.index == 6) {
         return null;

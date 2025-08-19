@@ -20,13 +20,13 @@ import 'split_cfi.dart';
 /// ## Usage
 /// ```dart
 /// final mapper = SplitChapterPositionMapper();
-/// 
+///
 /// // Map position from original chapter to split part
 /// final splitCFI = await mapper.mapOriginalToSplit(
 ///   originalCFI,
 ///   splitRef,
 /// );
-/// 
+///
 /// // Map position from split part to original chapter
 /// final originalCFI = await mapper.mapSplitToOriginal(
 ///   splitCFI,
@@ -49,7 +49,7 @@ class SplitChapterPositionMapper {
   ) async {
     // Get the precise boundaries for this split chapter
     final boundaries = await calculatePreciseBoundaries(splitRef);
-    
+
     // Extract character position from the original CFI
     final characterOffset = _extractCharacterOffset(originalCFI);
     if (characterOffset == null) {
@@ -74,10 +74,10 @@ class SplitChapterPositionMapper {
 
     // Calculate relative offset within the split part
     final relativeOffset = characterOffset - boundary.startOffset;
-    
+
     // Create adjusted CFI with relative offset
     final adjustedCFI = _adjustCharacterOffset(originalCFI, relativeOffset);
-    
+
     return SplitCFI.fromStandardCFI(
       adjustedCFI,
       splitPart: splitRef.partNumber,
@@ -97,25 +97,24 @@ class SplitChapterPositionMapper {
     if (splitCFI.splitPart != splitRef.partNumber ||
         splitCFI.totalParts != splitRef.totalParts) {
       throw ArgumentError(
-        'Split CFI part ${splitCFI.splitPart}/${splitCFI.totalParts} '
-        'does not match split reference ${splitRef.partNumber}/${splitRef.totalParts}'
-      );
+          'Split CFI part ${splitCFI.splitPart}/${splitCFI.totalParts} '
+          'does not match split reference ${splitRef.partNumber}/${splitRef.totalParts}');
     }
 
     // Get precise boundaries
     final boundaries = await calculatePreciseBoundaries(splitRef);
     final partIndex = splitRef.partNumber - 1;
-    
+
     if (partIndex >= boundaries.length) {
       throw ArgumentError('Invalid part number: ${splitRef.partNumber}');
     }
 
     // Extract relative offset from split CFI
     final relativeOffset = _extractCharacterOffset(splitCFI.baseCFI) ?? 0;
-    
+
     // Calculate absolute offset in original chapter
     final absoluteOffset = boundaries[partIndex].startOffset + relativeOffset;
-    
+
     // Create original CFI with absolute offset
     return _adjustCharacterOffset(splitCFI.baseCFI, absoluteOffset);
   }
@@ -128,23 +127,23 @@ class SplitChapterPositionMapper {
     EpubChapterSplitRef splitRef,
   ) async {
     // Use cache key to avoid recalculating boundaries
-    final cacheKey = '${splitRef.originalChapter.contentFileName}_${splitRef.totalParts}';
-    
+    final cacheKey =
+        '${splitRef.originalChapter.contentFileName}_${splitRef.totalParts}';
+
     if (_boundaryCache.containsKey(cacheKey)) {
       return _boundaryCache[cacheKey]!;
     }
 
     // Load the original chapter content
     final originalContent = await splitRef.originalChapter.readHtmlContent();
-    
+
     // Use ChapterSplitter to analyze the content
     final wordCount = ChapterSplitter.countWords(originalContent);
     final isLongEnough = wordCount > ChapterSplitter.maxWordsPerChapter;
-    
+
     if (!isLongEnough && splitRef.totalParts > 1) {
       throw StateError(
-        'Chapter with $wordCount words should not be split into ${splitRef.totalParts} parts'
-      );
+          'Chapter with $wordCount words should not be split into ${splitRef.totalParts} parts');
     }
 
     // Calculate boundaries using the same algorithm as ChapterSplitter
@@ -155,7 +154,7 @@ class SplitChapterPositionMapper {
 
     // Cache the results
     _boundaryCache[cacheKey] = boundaries;
-    
+
     return boundaries;
   }
 
@@ -168,11 +167,11 @@ class SplitChapterPositionMapper {
   ) async {
     final boundaries = await calculatePreciseBoundaries(splitRef);
     final partIndex = splitRef.partNumber - 1;
-    
+
     if (partIndex >= boundaries.length) {
       throw ArgumentError('Invalid part number: ${splitRef.partNumber}');
     }
-    
+
     return boundaries[partIndex].startOffset;
   }
 
@@ -185,11 +184,11 @@ class SplitChapterPositionMapper {
   ) async {
     final boundaries = await calculatePreciseBoundaries(splitRef);
     final partIndex = splitRef.partNumber - 1;
-    
+
     if (partIndex >= boundaries.length) {
       throw ArgumentError('Invalid part number: ${splitRef.partNumber}');
     }
-    
+
     return boundaries[partIndex].endOffset;
   }
 
@@ -202,13 +201,13 @@ class SplitChapterPositionMapper {
     EpubChapterSplitRef anySplitRef, // Used to get splitting info
   ) async {
     final boundaries = await calculatePreciseBoundaries(anySplitRef);
-    
+
     for (int i = 0; i < boundaries.length; i++) {
       if (boundaries[i].contains(characterOffset)) {
         return i + 1; // Return 1-based part number
       }
     }
-    
+
     return null; // Offset is outside chapter boundaries
   }
 
@@ -232,7 +231,7 @@ class SplitChapterPositionMapper {
       if (relativeOffset != null) {
         final boundaries = await calculatePreciseBoundaries(splitRef);
         final partIndex = splitRef.partNumber - 1;
-        
+
         if (partIndex >= boundaries.length) {
           return false;
         }
@@ -275,24 +274,23 @@ class SplitChapterPositionMapper {
     // Strip HTML tags to get text content for accurate character counting
     final textContent = htmlContent.replaceAll(RegExp(r'<[^>]*>'), '');
     final textLength = textContent.length;
-    
+
     // Calculate approximate part boundaries
     final boundaries = <PartBoundary>[];
     final basePartLength = textLength ~/ totalParts;
-    
+
     for (int i = 0; i < totalParts; i++) {
       final startOffset = i * basePartLength;
-      final endOffset = (i == totalParts - 1) 
-          ? textLength - 1 
-          : (i + 1) * basePartLength - 1;
-      
+      final endOffset =
+          (i == totalParts - 1) ? textLength - 1 : (i + 1) * basePartLength - 1;
+
       boundaries.add(PartBoundary(
         partNumber: i + 1,
         startOffset: startOffset,
         endOffset: endOffset,
       ));
     }
-    
+
     return boundaries;
   }
 
@@ -309,14 +307,15 @@ class SplitChapterPositionMapper {
       RegExp(r':(\d+)'),
       ':$newOffset',
     );
-    
+
     // Add offset if none exists
     if (!originalCFI.raw.contains(':')) {
       final insertPoint = originalCFI.raw.lastIndexOf(')');
-      final withOffset = '${originalCFI.raw.substring(0, insertPoint)}:$newOffset${originalCFI.raw.substring(insertPoint)}';
+      final withOffset =
+          '${originalCFI.raw.substring(0, insertPoint)}:$newOffset${originalCFI.raw.substring(insertPoint)}';
       return CFI(withOffset);
     }
-    
+
     return CFI(adjustedString);
   }
 }
@@ -353,9 +352,9 @@ class PartBoundary {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is PartBoundary &&
-           other.partNumber == partNumber &&
-           other.startOffset == startOffset &&
-           other.endOffset == endOffset;
+        other.partNumber == partNumber &&
+        other.startOffset == startOffset &&
+        other.endOffset == endOffset;
   }
 
   @override

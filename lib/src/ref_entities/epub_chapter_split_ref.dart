@@ -80,7 +80,7 @@ class EpubChapterSplitRef extends EpubChapterRef {
       elementPath: elementPath,
       characterOffset: characterOffset,
     );
-    
+
     if (standardCFI == null) return null;
 
     // Convert to Split CFI using position mapper
@@ -113,7 +113,7 @@ class EpubChapterSplitRef extends EpubChapterRef {
       characterOffset: characterOffset,
       cfiManager: cfiManager,
     );
-    
+
     if (splitCFI == null) return null;
 
     // Convert to standard CFI

@@ -31,29 +31,29 @@ class CFIParser {
   static bool _isRangeCFI(String content) {
     int bracketDepth = 0;
     bool inSplitNotation = false;
-    
+
     for (int i = 0; i < content.length; i++) {
       final char = content[i];
-      
+
       // Handle bracket depth for parameters
       if (char == '[') {
         bracketDepth++;
       } else if (char == ']') {
         bracketDepth--;
       }
-      
+
       // Check for split notation start
       if (i + 6 < content.length && content.substring(i, i + 6) == 'split=') {
         inSplitNotation = true;
         continue;
       }
-      
+
       // Check for split notation end (next '/')
       if (inSplitNotation && char == '/') {
         inSplitNotation = false;
         continue;
       }
-      
+
       // Only count commas outside brackets and outside split notation
       if (char == ',' && bracketDepth == 0 && !inSplitNotation) {
         return true;
@@ -97,25 +97,25 @@ class CFIParser {
 
     for (int i = 0; i < content.length; i++) {
       final char = content[i];
-      
+
       if (char == '[') {
         bracketDepth++;
       } else if (char == ']') {
         bracketDepth--;
       }
-      
+
       // Check for split notation start
       if (i + 6 < content.length && content.substring(i, i + 6) == 'split=') {
         inSplitNotation = true;
         continue;
       }
-      
+
       // Check for split notation end (next '/')
       if (inSplitNotation && char == '/') {
         inSplitNotation = false;
         continue;
       }
-      
+
       // Only split on commas outside brackets and outside split notation
       if (char == ',' && bracketDepth == 0 && !inSplitNotation) {
         parts.add(content.substring(startIndex, i));
@@ -246,9 +246,10 @@ class CFIParser {
         case '/':
           // Step reference or split notation
           i++;
-          
+
           // Check if this is split notation
-          if (i + 5 < pathStr.length && pathStr.substring(i, i + 5) == 'split') {
+          if (i + 5 < pathStr.length &&
+              pathStr.substring(i, i + 5) == 'split') {
             // Skip split notation: split=X,total=Y
             final nextSlash = pathStr.indexOf('/', i);
             if (nextSlash == -1) {
@@ -257,7 +258,7 @@ class CFIParser {
             i = nextSlash; // Skip to next slash, will be processed in next iteration
             continue;
           }
-          
+
           final numberStr = _readNumber(pathStr, i);
           if (numberStr.isEmpty) {
             throw FormatException(

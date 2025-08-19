@@ -98,7 +98,7 @@ class CFI {
       // Standard CFI comes before Split CFI at same position
       return -1;
     }
-    
+
     return _structure.compare(other._structure);
   }
 

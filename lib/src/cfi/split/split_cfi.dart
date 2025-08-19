@@ -47,10 +47,10 @@ class SplitCFI extends CFI {
   ///
   /// Throws [FormatException] if the CFI string is malformed or contains
   /// invalid split information.
-  SplitCFI(String cfiString) : 
-    splitPart = _extractSplitPart(cfiString),
-    totalParts = _extractTotalParts(cfiString),
-    super(cfiString) {
+  SplitCFI(String cfiString)
+      : splitPart = _extractSplitPart(cfiString),
+        totalParts = _extractTotalParts(cfiString),
+        super(cfiString) {
     _validateSplitInfo();
     _baseCFI = CFI(_removeSplitInfo(cfiString));
   }
@@ -76,7 +76,6 @@ class SplitCFI extends CFI {
     _validateSplitInfo();
     _baseCFI = standardCFI;
   }
-
 
   /// The base CFI without split information.
   ///
@@ -117,19 +116,18 @@ class SplitCFI extends CFI {
   @override
   int compare(CFI other) {
     // Compare base positions first
-    final baseComparison = _baseCFI.compare(
-      other is SplitCFI ? other._baseCFI : other
-    );
-    
+    final baseComparison =
+        _baseCFI.compare(other is SplitCFI ? other._baseCFI : other);
+
     if (baseComparison != 0) {
       return baseComparison;
     }
-    
+
     // If base positions are equal, compare split parts
     if (other is SplitCFI) {
       return splitPart.compareTo(other.splitPart);
     }
-    
+
     // Split CFI comes after standard CFI at same base position
     return 1;
   }
@@ -144,8 +142,7 @@ class SplitCFI extends CFI {
     }
     if (splitPart > totalParts) {
       throw FormatException(
-        'Split part ($splitPart) cannot be greater than total parts ($totalParts)'
-      );
+          'Split part ($splitPart) cannot be greater than total parts ($totalParts)');
     }
   }
 
@@ -183,13 +180,13 @@ class SplitCFI extends CFI {
     if (spineEndMatch == null) {
       throw FormatException('Invalid CFI format: $standardCFI');
     }
-    
+
     final insertionPoint = spineEndMatch.end;
     final splitInfo = '/split=$splitPart,total=$totalParts';
-    
+
     return standardCFI.substring(0, insertionPoint) +
-           splitInfo +
-           standardCFI.substring(insertionPoint);
+        splitInfo +
+        standardCFI.substring(insertionPoint);
   }
 
   /// Checks if a CFI string contains split information.
@@ -206,9 +203,9 @@ class SplitCFI extends CFI {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is SplitCFI &&
-           other.splitPart == splitPart &&
-           other.totalParts == totalParts &&
-           other._baseCFI == _baseCFI;
+        other.splitPart == splitPart &&
+        other.totalParts == totalParts &&
+        other._baseCFI == _baseCFI;
   }
 
   @override

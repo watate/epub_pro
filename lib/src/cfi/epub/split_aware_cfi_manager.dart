@@ -22,10 +22,10 @@ import 'epub_cfi_manager.dart';
 /// ## Usage
 /// ```dart
 /// final manager = SplitAwareCFIManager(bookRef);
-/// 
+///
 /// // Works with both standard and split CFI
 /// final location = await manager.navigateToCFI(anyCFI);
-/// 
+///
 /// // Generate appropriate CFI type based on chapter
 /// final cfi = await manager.generateCFI(
 ///   chapterRef: splitChapterRef,
@@ -36,7 +36,6 @@ import 'epub_cfi_manager.dart';
 class SplitAwareCFIManager extends EpubCFIManager {
   /// Creates a split-aware CFI manager for the given book.
   SplitAwareCFIManager(super.bookRef);
-
 
   /// Navigates to a CFI location, handling both standard and split CFI.
   ///
@@ -52,7 +51,7 @@ class SplitAwareCFIManager extends EpubCFIManager {
     if (splitCFI != null) {
       return await _navigateToSplitCFI(splitCFI);
     }
-    
+
     // Use standard navigation for regular CFI
     return await super.navigateToCFI(cfi);
   }
@@ -76,7 +75,7 @@ class SplitAwareCFIManager extends EpubCFIManager {
         characterOffset,
       );
     }
-    
+
     // Use standard generation for regular chapters
     return await super.generateCFI(
       chapterRef: chapterRef,
@@ -93,7 +92,7 @@ class SplitAwareCFIManager extends EpubCFIManager {
     if (splitCFI != null) {
       return await _validateSplitCFI(splitCFI);
     }
-    
+
     // Use standard validation for regular CFI
     return await super.validateCFI(cfi);
   }
@@ -204,7 +203,7 @@ class SplitAwareCFIManager extends EpubCFIManager {
       elementPath: elementPath,
       characterOffset: characterOffset,
     );
-    
+
     if (standardCFI == null) return null;
 
     // Convert to split CFI
@@ -287,11 +286,10 @@ class SplitCFILocation extends CFILocation {
   @override
   String toString() {
     return 'SplitCFILocation('
-           'chapter: ${chapterRef.title}, '
-           'spine: $spineIndex, '
-           'split: $splitPart/$totalParts, '
-           'position: $position'
-           ')';
+        'chapter: ${chapterRef.title}, '
+        'spine: $spineIndex, '
+        'split: $splitPart/$totalParts, '
+        'position: $position'
+        ')';
   }
 }
-

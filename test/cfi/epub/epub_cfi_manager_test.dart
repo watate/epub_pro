@@ -48,7 +48,8 @@ void main() {
         final cfi = CFI('epubcfi(/6/6!/4/10,/2:5,/2:15)');
         final spineIndex = manager.extractSpineIndex(cfi);
 
-        expect(spineIndex, equals(2)); // /6/6!/ maps to spine index 2: (6/2) - 1 = 2
+        expect(spineIndex,
+            equals(2)); // /6/6!/ maps to spine index 2: (6/2) - 1 = 2
       });
 
       test('Handle invalid spine index', () {
@@ -63,10 +64,8 @@ void main() {
         final cfi = CFI('epubcfi(/6/6[chapter-id]!/4/10/2:5)');
         final spineIndex = manager.extractSpineIndex(cfi);
 
-        expect(
-            spineIndex,
-            equals(
-                2)); // /6/6!/ maps to spine index 2: (6/2) - 1 = 2
+        expect(spineIndex,
+            equals(2)); // /6/6!/ maps to spine index 2: (6/2) - 1 = 2
       });
     });
 

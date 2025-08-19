@@ -134,7 +134,8 @@ void main() {
       });
 
       test('Copy Split CFI with different split info', () {
-        final originalSplit = SplitCFI('epubcfi(/6/4!/split=2,total=3/4/10/2:15)');
+        final originalSplit =
+            SplitCFI('epubcfi(/6/4!/split=2,total=3/4/10/2:15)');
         final copiedSplit = originalSplit.copyWithSplitInfo(
           splitPart: 1,
           totalParts: 4,
@@ -150,7 +151,8 @@ void main() {
     group('Split CFI Detection', () {
       test('Detect split CFI in strings', () {
         expect(
-          SplitCFI.containsSplitInfo('epubcfi(/6/4!/split=2,total=3/4/10/2:15)'),
+          SplitCFI.containsSplitInfo(
+              'epubcfi(/6/4!/split=2,total=3/4/10/2:15)'),
           isTrue,
         );
 
