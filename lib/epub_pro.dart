@@ -43,5 +43,11 @@ export 'src/cfi/epub/epub_cfi_manager.dart';
 export 'src/cfi/epub/epub_cfi_extensions.dart';
 export 'src/cfi/tracking/position_tracker.dart';
 export 'src/cfi/tracking/annotation_manager.dart';
+// Split CFI Support
+export 'src/cfi/split/split_cfi.dart';
+export 'src/cfi/split/split_cfi_parser.dart';
+export 'src/cfi/split/split_cfi_converter.dart' hide PartBoundary;
+export 'src/cfi/split/split_position_mapper.dart';
+export 'src/cfi/epub/split_aware_cfi_manager.dart';
 
 export 'package:image/image.dart' show Image;

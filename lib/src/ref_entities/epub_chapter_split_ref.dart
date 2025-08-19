@@ -1,6 +1,10 @@
 import 'dart:async';
 
 import 'epub_chapter_ref.dart';
+import '../cfi/core/cfi.dart';
+import '../cfi/split/split_cfi.dart';
+import '../cfi/split/split_position_mapper.dart';
+import '../cfi/epub/epub_cfi_manager.dart';
 
 /// A reference to a part of a split chapter.
 ///
@@ -52,6 +56,82 @@ class EpubChapterSplitRef extends EpubChapterRef {
 
   /// Whether this is a split part (always true for this class)
   bool get isSplitPart => true;
+
+  /// Generates a Split CFI for a position within this split chapter part.
+  ///
+  /// Creates a Split CFI that precisely identifies a location within
+  /// this specific part of the split chapter.
+  ///
+  /// ```dart
+  /// final splitCFI = await splitChapterRef.generateSplitCFI(
+  ///   elementPath: '/4/10/2',
+  ///   characterOffset: 15,
+  ///   bookRef: bookRef,
+  /// );
+  /// ```
+  Future<SplitCFI?> generateSplitCFI({
+    required String elementPath,
+    int? characterOffset,
+    required EpubCFIManager cfiManager,
+  }) async {
+    // Generate standard CFI for the original chapter
+    final standardCFI = await cfiManager.generateCFI(
+      chapterRef: originalChapter,
+      elementPath: elementPath,
+      characterOffset: characterOffset,
+    );
+    
+    if (standardCFI == null) return null;
+
+    // Convert to Split CFI using position mapper
+    return await SplitChapterPositionMapper.mapOriginalToSplit(
+      standardCFI,
+      this,
+    );
+  }
+
+  /// Generates a standard CFI for a position within this split chapter part.
+  ///
+  /// Converts the split chapter position to a standard CFI that points
+  /// to the equivalent position in the original chapter.
+  ///
+  /// ```dart
+  /// final standardCFI = await splitChapterRef.generateStandardCFI(
+  ///   elementPath: '/4/10/2',
+  ///   characterOffset: 15,
+  ///   bookRef: bookRef,
+  /// );
+  /// ```
+  Future<CFI?> generateStandardCFI({
+    required String elementPath,
+    int? characterOffset,
+    required EpubCFIManager cfiManager,
+  }) async {
+    // Generate Split CFI first
+    final splitCFI = await generateSplitCFI(
+      elementPath: elementPath,
+      characterOffset: characterOffset,
+      cfiManager: cfiManager,
+    );
+    
+    if (splitCFI == null) return null;
+
+    // Convert to standard CFI
+    return await SplitChapterPositionMapper.mapSplitToOriginal(
+      splitCFI,
+      this,
+    );
+  }
+
+  /// Gets the character offset where this split part starts in the original chapter.
+  Future<int> getPartStartOffset() async {
+    return await SplitChapterPositionMapper.calculatePartStartOffset(this);
+  }
+
+  /// Gets the character offset where this split part ends in the original chapter.
+  Future<int> getPartEndOffset() async {
+    return await SplitChapterPositionMapper.calculatePartEndOffset(this);
+  }
 
   @override
   String toString() {

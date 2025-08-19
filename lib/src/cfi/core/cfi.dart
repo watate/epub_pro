@@ -93,6 +93,12 @@ class CFI {
   /// print(cfi1.compare(cfi2)); // -1 (cfi1 comes before cfi2)
   /// ```
   int compare(CFI other) {
+    // Handle special case when comparing with SplitCFI
+    if (other.runtimeType.toString() == 'SplitCFI') {
+      // Standard CFI comes before Split CFI at same position
+      return -1;
+    }
+    
     return _structure.compare(other._structure);
   }
 
